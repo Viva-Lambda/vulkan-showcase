@@ -269,10 +269,10 @@ type:
 - pfnAllocation: pointer to application defined memory allocation function.
 Its signature must be of the following type:
 typedef void* (VKAPI_PTR *PFN_vkAllocationFunction)(
-    void*                                       pUserData,
-    size_t                                      size,
-    size_t                                      alignment,
-    VkSystemAllocationScope                     allocationScope);
+    void* pUserData,
+    size_t size,
+    size_t alignment,
+    VkSystemAllocationScope allocationScope);
 
 - pUserData: data to be allocated defined by the user.
 - size requested allocation amount
