@@ -11,6 +11,10 @@
 #include "vkextension.cpp"
 #include "vulkantuto.cpp"
 #include "vkgraphpipeline.cpp"
+#include "vkrenderpass.cpp"
+#include "vkbuffer.cpp"
+#include "vkdescriptor.cpp"
+#include "vkdraw.cpp"
 
 using namespace vtuto;
 
