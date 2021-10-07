@@ -57,13 +57,13 @@ public:
         array_layer_index;
     createInfo.subresourceRange.layerCount =
         array_layer_count;
-    CHECK_VK(vkCreateImageView(logical_dev.device(),
+    CHECK_VK2(vkCreateImageView(logical_dev.device(),
                                &createInfo, nullptr, &view),
              "failed to create image view");
   }
   image_view(VkImageViewCreateInfo createInfo,
              vulkan_device<VkDevice> &logical_dev) {
-    CHECK_VK(vkCreateImageView(logical_dev.device(),
+    CHECK_VK2(vkCreateImageView(logical_dev.device(),
                                &createInfo, nullptr, &view),
              "failed to create image view");
   }

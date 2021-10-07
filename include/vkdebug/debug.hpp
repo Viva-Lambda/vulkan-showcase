@@ -1,7 +1,6 @@
 // vk debug utils
 #pragma once
 #include <external.hpp>
-#include <ostream>
 #include <vkresult/debug.hpp>
 #include <vkresult/paramchecker.hpp>
 
@@ -20,37 +19,30 @@ const bool enableValidationLayers = true;
 
 std::ostream &operator<<(std::ostream &out,
                          VkDebugUtilsMessageSeverityFlagBitsEXT b) {
-  switch (b) {
-
-  case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: {
+  if (b == VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
     out << "Severity level: verbose" << std::endl;
-  }
-  case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: {
+  } else if (b == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
     out << "Severity level: info" << std::endl;
-  }
-  case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: {
+  } else if (b == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
     out << "Severity level: warning" << std::endl;
-  }
-  case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: {
+  } else if (b == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
     out << "Severity level: warning" << std::endl;
-  }
+  } else {
+    out << "Severity level: unknown" << std::endl;
   }
   return out;
 }
 
 std::ostream &operator<<(std::ostream &out,
                          VkDebugUtilsMessageTypeFlagBitsEXT b) {
-  switch (b) {
-
-  case VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT: {
+  if (b == VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT) {
     out << "Message type: general" << std::endl;
-  }
-  case VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT: {
+  } else if (b == VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT) {
     out << "Message level: validation" << std::endl;
-  }
-  case VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT: {
+  } else if (b == VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) {
     out << "Message level: performance" << std::endl;
-  }
+  } else {
+    out << "Message level: unknown" << std::endl;
   }
   return out;
 }
@@ -58,12 +50,16 @@ std::ostream &operator<<(std::ostream &out,
 struct DebugUtilsCreateInfoExt {
 
   // struct type
-  const VkStructureType stype =
+private:
+  VkStructureType _stype =
       VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 
   // reserved for future use
-  const VkDebugUtilsMessageCreateFlagsEXT flags = 0;
+  VkDebugUtilsMessengerCreateFlagsEXT _flags = 0;
 
+  void *_pNext = NULL;
+
+public:
   /**
       Determines message severity. If null, messages are
   skipped
@@ -105,7 +101,7 @@ VkAttachmentDescription::loadOp to VK_ATTACHMENT_LOAD_OP_CLEAR would have
 worked.
      */
 
-  std::vector<vkDebugUtilsMessageTypeFlagBitsEXT> message_type_bits;
+  std::vector<VkDebugUtilsMessageTypeFlagBitsEXT> message_type_bits;
 
   // user debugging call back
   /**
@@ -127,6 +123,13 @@ worked.
 
   // user data
   void *userData = nullptr;
+
+  void *pnext() const { return _pNext; }
+
+  /**
+    add a struct to pnext chain
+   */
+  void add_pnext(VkBaseInStructure s) { _pNext = static_cast<void *>(&s); }
 
   VkDebugUtilsMessengerCreateInfoEXT mkDebugMessenger() const {
     //
@@ -184,14 +187,17 @@ worked.
 
      */
     VkDebugUtilsMessengerCreateInfoEXT createInfo;
-    createInfo.sType = stype;
+    createInfo.sType = stype();
     createInfo.messageSeverity = severity;
     createInfo.messageType = messengerType;
     createInfo.pfnUserCallback = callbackFn;
     createInfo.pUserData = userData;
+    createInfo.pNext = pnext();
 
     return createInfo;
   }
+  VkStructureType stype() const { return _stype; }
+  VkDebugUtilsMessengerCreateFlagsEXT flags() const { return _flags; }
 };
 /**
 
@@ -217,10 +223,11 @@ PFN_vkDebugUtilsMessengerCallbackEXT value
 */
 template <> struct StructChecker<DebugUtilsCreateInfoExt> {
   static Result_Vk check(const DebugUtilsCreateInfoExt &params) {
-    Result_Vk vr.status = SUCCESS_VK;
+    Result_Vk vr;
+    vr.status = SUCCESS_VK;
 
     // check type
-    if (params.stype !=
+    if (params.stype() !=
         VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT) {
       vr.status = STRUCT_TYPE_ERROR_VK;
       return vr;
@@ -238,7 +245,7 @@ template <> struct StructChecker<DebugUtilsCreateInfoExt> {
     }
 
     // check flags
-    if (params.flags != 0) {
+    if (params.flags() != 0) {
       vr.status = STRUCT_PARAM_ERROR_VK;
       return vr;
     }
@@ -246,4 +253,5 @@ template <> struct StructChecker<DebugUtilsCreateInfoExt> {
     return vr;
   }
 };
+
 } // namespace vtuto

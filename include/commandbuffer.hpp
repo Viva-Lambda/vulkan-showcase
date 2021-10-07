@@ -12,6 +12,12 @@
 
 using namespace vtuto;
 namespace vtuto {
+// command buffer default values
+float cvals[] = {0.0f, 0.0f, 0.0f, 1.0f};
+
+
+
+
 struct VkDrawInfo {
   uint32_t vertex_count;
   uint32_t instance_count;
@@ -35,10 +41,10 @@ public:
         VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     commandPoolInfo.queueFamilyIndex =
         qfi.graphics_family.value();
-    CHECK_VK(vkCreateCommandPool(logical_dev.device(),
-                                 &commandPoolInfo, nullptr,
-                                 &pool),
-             "failed to create command pool");
+    CHECK_VK2(vkCreateCommandPool(logical_dev.device(),
+                                  &commandPoolInfo, nullptr,
+                                  &pool),
+              "failed to create command pool");
   }
   void destroy(vulkan_device<VkDevice> &logical_dev) {
     vkDestroyCommandPool(logical_dev.device(), pool,
@@ -63,7 +69,7 @@ public:
       VkPipelineLayout pipeline_layout,
       int32_t render_offset_x = 0,
       int32_t render_offset_y = 0,
-      VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f},
+      VkClearValue clearColor = {{0.0f, 0.0f, 0.0f, 1.0f}},
       uint clearValueCount = 1,
       VkSubpassContents subpass_contents =
           VK_SUBPASS_CONTENTS_INLINE,
@@ -118,7 +124,7 @@ public:
       VkPipelineLayout pipeline_layout,
       int32_t render_offset_x = 0,
       int32_t render_offset_y = 0,
-      VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f},
+      VkClearValue clearColor = {{0.0f, 0.0f, 0.0f, 1.0f}},
       uint clearValueCount = 1,
       VkSubpassContents subpass_contents =
           VK_SUBPASS_CONTENTS_INLINE,
@@ -133,8 +139,8 @@ public:
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType =
         VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    CHECK_VK(vkBeginCommandBuffer(buffer, &beginInfo),
-             "failed to begin recording commands");
+    CHECK_VK2(vkBeginCommandBuffer(buffer, &beginInfo),
+              "failed to begin recording commands");
 
     // 2. create render pass info
     VkRenderPassBeginInfo renderPassInfo{};
@@ -147,7 +153,7 @@ public:
     renderPassInfo.renderArea.extent = swap_chain_extent;
 
     std::array<VkClearValue, 2> cvalues{};
-    cvalues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
+    cvalues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
     cvalues[1].depthStencil = {1.0f, 0};
 
     renderPassInfo.clearValueCount =
@@ -183,8 +189,8 @@ public:
                      first_instance_index, 0);
 
     vkCmdEndRenderPass(buffer);
-    CHECK_VK(vkEndCommandBuffer(buffer),
-             "failed to register command buffer");
+    CHECK_VK2(vkEndCommandBuffer(buffer),
+              "failed to register command buffer");
   }
 };
-}
+} // namespace vtuto

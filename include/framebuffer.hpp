@@ -30,14 +30,14 @@ public:
     framebufferInfo.height = height;
     framebufferInfo.layers = layer_nb;
 
-    CHECK_VK(vkCreateFramebuffer(logical_dev.device(),
+    CHECK_VK2(vkCreateFramebuffer(logical_dev.device(),
                                  &framebufferInfo, nullptr,
                                  &buffer),
              "failed to create framebuffer for image view");
   }
   vulkan_buffer(VkFramebufferCreateInfo info,
                 vulkan_device<VkDevice> &logical_dev) {
-    CHECK_VK(vkCreateFramebuffer(logical_dev.device(),
+    CHECK_VK2(vkCreateFramebuffer(logical_dev.device(),
                                  &info, nullptr, &buffer),
              "failed to create framebuffer for image view");
   }

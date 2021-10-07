@@ -87,7 +87,7 @@ public:
     return cond2;
   }
   void createSurface(GLFWwindow *window) {
-    CHECK_VK(glfwCreateWindowSurface(instance(), window,
+    CHECK_VK2(glfwCreateWindowSurface(instance(), window,
                                      nullptr, &surface),
              "failed to create window surface");
   }

@@ -58,14 +58,16 @@ InstanceInfo_Vk_Params mkInstanceInfoParams() {
   return params;
 }
 
+static InstanceInfo_Vk_Params defparams = mkInstanceInfoParams();
+
+static VkInstanceCreateInfo defcreateInfo = defparams.mkInstanceCreateInfo();
+
 void mkInstance(VkInstance &instance) {
 
-  InstanceInfo_Vk_Params params = mkInstanceInfoParams();
-
-  VkInstanceCreateInfo createInfo = params.mkInstanceCreateInfo();
+  //
   Result_Vk res;
-  CHECK_VK(vkCreateInstance(&createInfo, nullptr, &instance),
-           "Failed to create Vulkan instance", res);
+  std::string msg = "Failed to create Vulkan instance";
+  CHECK_VK(vkCreateInstance(&defcreateInfo, nullptr, &instance), msg, res);
 }
 
 /**make a default instance*/

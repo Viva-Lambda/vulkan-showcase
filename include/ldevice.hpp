@@ -78,7 +78,7 @@ public:
     } else {
       createInfo.enabledLayerCount = 0;
     }
-    CHECK_VK(vkCreateDevice(physical_dev.pdevice,
+    CHECK_VK2(vkCreateDevice(physical_dev.pdevice,
                             &createInfo, nullptr, &ldevice),
              "failed to create a logical device given "
              "create info params");

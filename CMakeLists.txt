@@ -17,7 +17,7 @@ set(AbsPathPrefix
 # executables
 add_executable(
     vulkantuto.out 
-    "src/vulkantuto.cpp"
+    "src/vkmain.cpp"
 )
 
 include_directories("./include/")

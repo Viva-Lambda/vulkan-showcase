@@ -9,6 +9,7 @@ enum status_t_vk : uint_least8_t {
   FAIL_VK = 1,
   STRUCT_PARAM_ERROR_VK = 2,
   STRUCT_TYPE_ERROR_VK = 3,
+  STYPE_CHAIN_ERROR_VK = 4
 };
 
 struct Result_Vk {
@@ -17,7 +18,7 @@ struct Result_Vk {
   std::string fn_name = "";
   std::string msg = "";
   std::string description = "";
-  vk_status_t status;
+  status_t_vk status;
 };
 
 #define UPDATE_RESULT_VK(res, msg)                                             \

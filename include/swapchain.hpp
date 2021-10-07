@@ -103,17 +103,17 @@ public:
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
     //
-    CHECK_VK(vkCreateSwapchainKHR(logical_dev.device(),
+    CHECK_VK2(vkCreateSwapchainKHR(logical_dev.device(),
                                   &createInfo, nullptr,
                                   &chain),
              "failed to create a swap chain");
 
-    CHECK_VK(vkGetSwapchainImagesKHR(logical_dev.device(),
+    CHECK_VK2(vkGetSwapchainImagesKHR(logical_dev.device(),
                                      chain, &img_count,
                                      nullptr),
              "failed to reserve for swapchain images");
     simages.resize(img_count);
-    CHECK_VK(vkGetSwapchainImagesKHR(logical_dev.device(),
+    CHECK_VK2(vkGetSwapchainImagesKHR(logical_dev.device(),
                                      chain, &img_count,
                                      simages.data()),
              "failed to set swapchain images");
