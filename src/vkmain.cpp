@@ -15,6 +15,7 @@
 #include "vkbuffer.cpp"
 #include "vkdescriptor.cpp"
 #include "vkdraw.cpp"
+#include "vkdebug.cpp"
 
 using namespace vtuto;
 

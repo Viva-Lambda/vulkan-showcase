@@ -193,6 +193,7 @@ worked.
     createInfo.pfnUserCallback = callbackFn;
     createInfo.pUserData = userData;
     createInfo.pNext = pnext();
+    createInfo.flags = flags();
 
     return createInfo;
   }
