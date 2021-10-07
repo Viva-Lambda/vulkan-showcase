@@ -75,20 +75,12 @@ namespace vtuto {
 
 void HelloTriangle::populateDebugMessengerCreateInfo(
     VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
-  auto dinfo = mkDebugCreateInfo();
-  createInfo = dinfo.mkDebugMessenger();
+  DebugUtilsCreateInfoExt dinfo = mkDebugCreateInfo();
+  createInfo = dinfo.mkDebugMessengerInfo();
 }
 
 void HelloTriangle::setupDebugMessenger() {
-  if (!enableValidationLayers)
-    return;
-  //
-  VkDebugUtilsMessengerCreateInfoEXT createInfo;
-  populateDebugMessengerCreateInfo(createInfo);
-
-  CHECK_VK2(CreateDebugUtilsMessengerExt(instance, &createInfo, nullptr,
-                                         &debugMessenger),
-            "failed to create and setup debug messenger");
+  mkDebugMess(instance, debugMessenger);
 }
 
 /**

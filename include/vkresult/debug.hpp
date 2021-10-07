@@ -9,7 +9,8 @@ enum status_t_vk : uint_least8_t {
   FAIL_VK = 1,
   STRUCT_PARAM_ERROR_VK = 2,
   STRUCT_TYPE_ERROR_VK = 3,
-  STYPE_CHAIN_ERROR_VK = 4
+  STYPE_CHAIN_ERROR_VK = 4,
+  INACTIVE_VALIDATION_LAYERS_VK = 5
 };
 
 struct Result_Vk {

@@ -131,7 +131,7 @@ worked.
    */
   void add_pnext(VkBaseInStructure s) { _pNext = static_cast<void *>(&s); }
 
-  VkDebugUtilsMessengerCreateInfoEXT mkDebugMessenger() const {
+  VkDebugUtilsMessengerCreateInfoEXT mkDebugMessengerInfo() const {
     //
 
     // create messenger type
@@ -254,5 +254,20 @@ template <> struct StructChecker<DebugUtilsCreateInfoExt> {
     return vr;
   }
 };
+
+Result_Vk createDebugMessenger(VkInstance &instance,
+                               DebugUtilsCreateInfoExt &info,
+                               VkDebugUtilsMessengerEXT &messenger) {
+  Result_Vk vr;
+  if (!enableValidationLayers) {
+    vr.status = INACTIVE_VALIDATION_LAYERS_VK;
+    return vr;
+  }
+  auto cinfo = info.mkDebugMessengerInfo();
+  std::string msg = "failed to create and setup debug messenger";
+  CHECK_VK(CreateDebugUtilsMessengerExt(instance, &cinfo, nullptr, &messenger),
+           msg, vr);
+  return vr;
+}
 
 } // namespace vtuto

@@ -6,7 +6,7 @@
 
 namespace vtuto {
 
-VKAPI_ATTR VkBool32 VKAPI_CALL
+static VkBool32 VKAPI_CALL
 debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
               VkDebugUtilsMessageTypeFlagsEXT messageType,
               const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
@@ -33,6 +33,15 @@ DebugUtilsCreateInfoExt mkDebugCreateInfo() {
   cinfo.callbackFn = debugCallback;
 
   return cinfo;
+}
+
+static DebugUtilsCreateInfoExt DebugINFO = mkDebugCreateInfo();
+
+void mkDebugMess(VkInstance &instance, VkDebugUtilsMessengerEXT &messenger) {
+  //
+  auto res = createDebugMessenger(instance, DebugINFO, messenger);
+  std::string msg = "Failed to create default Vulkan debug messenger";
+  UPDATE_RESULT_VK(res, msg);
 }
 
 } // namespace vtuto

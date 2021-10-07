@@ -146,7 +146,7 @@ public:
 
       // 4. create debug messenger handler
       VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo =
-          debugCreateInfoExt.mkDebugMessenger();
+          debugCreateInfoExt.mkDebugMessengerInfo();
 
       createInfo.pNext =
           static_cast<VkDebugUtilsMessengerCreateInfoEXT *>(&debugCreateInfo);
@@ -266,7 +266,7 @@ template <> struct StructChecker<InstanceInfo_Vk_Params> {
   we would like to use for the application instance.
  */
 Result_Vk createInstance(const AppInfo_Vk_Params &vAppInfo,
-                         InstanceInfo_Vk_Params vInstInfo,
+                         InstanceInfo_Vk_Params &vInstInfo,
                          VkInstance &instance) {
 
   // 1. Create Application info struct
