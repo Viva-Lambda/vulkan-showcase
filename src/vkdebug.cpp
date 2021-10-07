@@ -79,25 +79,25 @@ void HelloTriangle::populateDebugMessengerCreateInfo(
   createInfo = dinfo.mkDebugMessengerInfo();
 }
 
-void HelloTriangle::setupDebugMessenger() {
-  mkDebugMess(instance, debugMessenger);
-}
+// void HelloTriangle::setupDebugMessenger() {
+// mkDebugMess(instance, debugMessenger);
+// }
 
 /**
 Set @see debugMessenger up by populating its related
 info.
 */
 
-// void HelloTriangle::setupDebugMessenger() {
-// if (!enableValidationLayers)
-//   return;
-// //
-// VkDebugUtilsMessengerCreateInfoEXT createInfo;
-// populateDebugMessengerCreateInfo(createInfo);
+void HelloTriangle::setupDebugMessenger() {
+  if (!enableValidationLayers)
+    return;
+  //
+  VkDebugUtilsMessengerCreateInfoEXT createInfo;
+  populateDebugMessengerCreateInfo(createInfo);
 
-// CHECK_VK2(CreateDebugUtilsMessengerExt(instance, &createInfo, nullptr,
-//                                        &debugMessenger),
-//           "failed to create and setup debug messenger");
-// }
+  CHECK_VK2(CreateDebugUtilsMessengerExt(instance, &createInfo, nullptr,
+                                         &debugMessenger),
+            "failed to create and setup debug messenger");
+}
 
 } // namespace vtuto
