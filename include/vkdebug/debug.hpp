@@ -225,7 +225,7 @@ PFN_vkDebugUtilsMessengerCallbackEXT value
 template <> struct StructChecker<DebugUtilsCreateInfoExt> {
   static Result_Vk check(const DebugUtilsCreateInfoExt &params) {
     Result_Vk vr;
-    vr.status = SUCCESS_VK;
+    vr.status = SUCCESS_OP;
 
     // check type
     if (params.stype() !=
@@ -250,22 +250,20 @@ template <> struct StructChecker<DebugUtilsCreateInfoExt> {
       vr.status = STRUCT_PARAM_ERROR_VK;
       return vr;
     }
-    vr.status = SUCCESS_VK;
     return vr;
   }
 };
 
 Result_Vk createDebugMessenger(VkInstance &instance,
-                               DebugUtilsCreateInfoExt &info,
+                               VkDebugUtilsMessengerCreateInfoEXT &info,
                                VkDebugUtilsMessengerEXT &messenger) {
   Result_Vk vr;
   if (!enableValidationLayers) {
     vr.status = INACTIVE_VALIDATION_LAYERS_VK;
     return vr;
   }
-  auto cinfo = info.mkDebugMessengerInfo();
   std::string msg = "failed to create and setup debug messenger";
-  CHECK_VK(CreateDebugUtilsMessengerExt(instance, &cinfo, nullptr, &messenger),
+  CHECK_VK(CreateDebugUtilsMessengerExt(instance, &info, nullptr, &messenger),
            msg, vr);
   return vr;
 }

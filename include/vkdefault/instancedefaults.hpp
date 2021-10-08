@@ -45,14 +45,12 @@ AppInfo_Vk_Params mkAppInfo() {
   return app;
 }
 
-
 InstanceInfo_Vk_Params mkInstanceInfoParams() {
 
   InstanceInfo_Vk_Params params;
   params.extensions = getRequiredExtensions();
   std::vector<const char *> khronos_layers = {"VK_LAYER_KHRONOS_validation"};
   params.validation_layers = khronos_layers;
-  params.debugCreateInfoExt = DebugINFO;
   return params;
 }
 
@@ -65,7 +63,7 @@ void mkInstance(VkInstance &instance) {
   //
   Result_Vk res;
   std::string msg = "Failed to create default Vulkan instance";
-  res = createInstance(app_params, inst_params, instance);
+  res = createInstance(app_params, inst_params, DebugINFO, instance);
   UPDATE_RESULT_VK(res, msg);
 }
 

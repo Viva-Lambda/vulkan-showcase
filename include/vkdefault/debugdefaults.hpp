@@ -17,7 +17,7 @@ debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
   return VK_FALSE;
 }
 
-DebugUtilsCreateInfoExt mkDebugCreateInfo() {
+VkDebugUtilsMessengerCreateInfoEXT mkDebugCreateInfo() {
   DebugUtilsCreateInfoExt cinfo;
 
   // severity level info
@@ -32,10 +32,10 @@ DebugUtilsCreateInfoExt mkDebugCreateInfo() {
   // apply callback function
   cinfo.callbackFn = debugCallback;
 
-  return cinfo;
+  return cinfo.mkDebugMessengerInfo();
 }
 
-static DebugUtilsCreateInfoExt DebugINFO = mkDebugCreateInfo();
+static VkDebugUtilsMessengerCreateInfoEXT DebugINFO = mkDebugCreateInfo();
 
 void mkDebugMess(VkInstance &instance, VkDebugUtilsMessengerEXT &messenger) {
   //

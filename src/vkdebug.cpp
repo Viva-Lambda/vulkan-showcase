@@ -75,8 +75,7 @@ namespace vtuto {
 
 void HelloTriangle::populateDebugMessengerCreateInfo(
     VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
-  DebugUtilsCreateInfoExt dinfo = mkDebugCreateInfo();
-  createInfo = dinfo.mkDebugMessengerInfo();
+  createInfo = mkDebugCreateInfo();
 }
 
 // void HelloTriangle::setupDebugMessenger() {
