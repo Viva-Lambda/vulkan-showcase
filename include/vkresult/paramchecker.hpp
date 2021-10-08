@@ -12,7 +12,7 @@ template <class T> struct StructChecker {
     r.line = __LINE__;
     r.filepath = __FILE__;
     r.fn_name = __FUNCTION__;
-    r.status = FAIL_VK;
+    r.status = FAIL_OP;
     return r;
   }
 };
