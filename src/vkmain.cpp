@@ -16,6 +16,9 @@
 #include "vkdescriptor.cpp"
 #include "vkdraw.cpp"
 #include "vkdebug.cpp"
+#include "vkimview.cpp"
+#include "vkphydevice.cpp"
+#include "vklogdevice.cpp"
 
 using namespace vtuto;
 

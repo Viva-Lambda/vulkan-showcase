@@ -1,13 +1,5 @@
 // main file
-#include <debug.hpp>
-#include <external.hpp>
 #include <hellotriangle.hpp>
-#include <ldevice.hpp>
-#include <pdevice.hpp>
-#include <support.hpp>
-#include <triangle.hpp>
-#include <ubo.hpp>
-#include <utils.hpp>
 using namespace vtuto;
 
 namespace vtuto {

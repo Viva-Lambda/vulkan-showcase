@@ -209,6 +209,7 @@ private:
    */
   void populateDebugMessengerCreateInfo(
       VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+
   void createSurface();
 
   void createRenderPass();
@@ -292,6 +293,7 @@ number of indices for given device family.
     by erasing from requested extensions.
    */
   bool checkDeviceExtensionSupport(VkPhysicalDevice pdev);
+  void createPhysicalDevice();
   void createLogicalDevice();
   VkShaderModule createShaderModule(const std::vector<char> &shaderCode);
   void createGraphicsPipeline();
