@@ -171,7 +171,9 @@ enum status_t_vk : uint_least8_t {
   STRUCT_PARAM_ERROR_VK = 3,
   STRUCT_TYPE_ERROR_VK = 4,
   PNEXT_STYPE_CHAIN_ERROR_VK = 5,
-  INACTIVE_VALIDATION_LAYERS_VK = 6
+  INACTIVE_VALIDATION_LAYERS_VK = 6,
+  IMAGE_SUBRESOURCE_RANGE_ERROR_VK = 7,
+  COMPONENT_SWIZZLE_ERROR_VK = 8
 };
 
 std::string toString(status_t_vk r) {
@@ -191,10 +193,27 @@ std::string toString(status_t_vk r) {
         "Error :: INACTIVE_VALIDATION_LAYERS_VK :: inactive validation layers";
   } else if (r == GLFW_ERROR) {
     str = "Error :: GLFW_ERROR :: error in glfw call";
+  } else if (r == IMAGE_SUBRESOURCE_RANGE_ERROR_VK) {
+    str = "Error :: IMAGE_SUBRESOURCE_RANGE_ERROR_VK :: error in image "
+          "subresource range";
   }
   return str;
 }
-
+/**
+  \param filepath contains the path to the file which called the function
+  \param fn_name contains the caller function name
+  \param context any contextual information that might help identifying the
+  result. For example, arguments, or the calling object name, etc.
+  \param call_info function call that produces the result most probably filled
+  with a checking macro
+  \param description description message for the vulkan result code, most
+  probably filled with a checking macro
+  \param spec_info if the error is caught by struct checker then this slot is
+  filled with a valid usage information provided by the specification.
+  \param status_info contains descriptive information with respect to status
+  code provided by our api.
+  \param status contains status code provided by our api.
+ */
 struct Result_Vk {
   unsigned int line = 0;
   std::string filepath = "";
@@ -202,6 +221,7 @@ struct Result_Vk {
   std::string context = "";
   std::string call_info = "";
   std::string description = "";
+  std::string spec_info = "";
   std::string status_info = "";
   status_t_vk status;
 };
