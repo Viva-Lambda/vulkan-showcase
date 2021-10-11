@@ -60,7 +60,7 @@ private:
   void *_pnext = NULL;
 
 public:
-  std::vector<VkImageViewCreateFlagBits> imflags;
+  std::set<VkImageViewCreateFlagBits> imflags;
   VkImage image;
   VkImageCreateInfo info;
   VkImageViewType T;

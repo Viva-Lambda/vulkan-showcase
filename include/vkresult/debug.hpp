@@ -173,7 +173,8 @@ enum status_t_vk : uint_least8_t {
   PNEXT_STYPE_CHAIN_ERROR_VK = 5,
   INACTIVE_VALIDATION_LAYERS_VK = 6,
   IMAGE_SUBRESOURCE_RANGE_ERROR_VK = 7,
-  COMPONENT_SWIZZLE_ERROR_VK = 8
+  COMPONENT_SWIZZLE_ERROR_VK = 8,
+  IMAGE_CREATE_ERROR_VK = 9,
 };
 
 std::string toString(status_t_vk r) {
@@ -196,6 +197,9 @@ std::string toString(status_t_vk r) {
   } else if (r == IMAGE_SUBRESOURCE_RANGE_ERROR_VK) {
     str = "Error :: IMAGE_SUBRESOURCE_RANGE_ERROR_VK :: error in image "
           "subresource range";
+  } else if (r == IMAGE_CREATE_ERROR_VK) {
+    str = "Error :: IMAGE_CREATE_ERROR_VK :: error in ImageCreateInfo "
+          "procedures ";
   }
   return str;
 }
