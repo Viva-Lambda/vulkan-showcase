@@ -122,6 +122,102 @@ struct SwapChainSupportDetails {
   std::vector<VkPresentModeKHR> presentModes;
 };
 
+static QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device,
+                                            VkSurfaceKHR surface) {
+  QueueFamilyIndices indices;
+
+  uint32_t queueFamilyCount = 0;
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+  std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount,
+                                           queueFamilies.data());
+
+  int i = 0;
+  for (const auto &queueFamily : queueFamilies) {
+    if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+      indices.graphicsFamily = i;
+    }
+
+    VkBool32 presentSupport = false;
+    vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+
+    if (presentSupport) {
+      indices.presentFamily = i;
+    }
+
+    if (indices.isComplete()) {
+      break;
+    }
+
+    i++;
+  }
+
+  return indices;
+}
+static bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
+  uint32_t extensionCount;
+  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
+                                       nullptr);
+
+  std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
+                                       availableExtensions.data());
+
+  std::set<std::string> requiredExtensions(deviceExtensions.begin(),
+                                           deviceExtensions.end());
+
+  for (const auto &extension : availableExtensions) {
+    requiredExtensions.erase(extension.extensionName);
+  }
+
+  return requiredExtensions.empty();
+}
+static SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device,
+                                                     VkSurfaceKHR surface) {
+  SwapChainSupportDetails details;
+
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface,
+                                            &details.capabilities);
+
+  uint32_t formatCount;
+  vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+
+  if (formatCount != 0) {
+    details.formats.resize(formatCount);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount,
+                                         details.formats.data());
+  }
+
+  uint32_t presentModeCount;
+  vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount,
+                                            nullptr);
+
+  if (presentModeCount != 0) {
+    details.presentModes.resize(presentModeCount);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(
+        device, surface, &presentModeCount, details.presentModes.data());
+  }
+
+  return details;
+}
+
+static bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface) {
+  QueueFamilyIndices indices = findQueueFamilies(device, surface);
+
+  bool extensionsSupported = checkDeviceExtensionSupport(device);
+
+  bool swapChainAdequate = false;
+  if (extensionsSupported) {
+    SwapChainSupportDetails swapChainSupport =
+        querySwapChainSupport(device, surface);
+    swapChainAdequate = !swapChainSupport.formats.empty() &&
+                        !swapChainSupport.presentModes.empty();
+  }
+
+  return indices.isComplete() && extensionsSupported && swapChainAdequate;
+}
+
 int main() {
   // declare graph
   vk_graph graph;
@@ -131,8 +227,9 @@ int main() {
   // declare node
   vk_node init_w_node;
   {
-    // initialize glfw window
-    std::function<void(vk_graph &)> init_f = [](vk_graph &myg) {
+    init_w_node.is_singular = true;
+    init_w_node.is_called = false;
+    init_w_node.compute = [](vk_graph &myg) {
       glfwInit();
 
       glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -143,7 +240,7 @@ int main() {
       glfwSetFramebufferSizeCallback(myg.window, framebufferResizeCallback);
       return;
     };
-    mkVkGNode(node_counter, init_f, init_w_node);
+    init_w_node.node_id = node_counter;
     //
     node_counter++;
   }
@@ -156,9 +253,10 @@ int main() {
    */
   /** vulkan instance creation node*/
   vk_node createInstanceNode;
-  createInstanceNode.is_singular = true;
   {
-    std::function<void(vk_graph &)> create_inst_f = [](vk_graph &myg) {
+    createInstanceNode.is_singular = true;
+    createInstanceNode.is_called = false;
+    createInstanceNode.compute = [](vk_graph &myg) {
       if (enableValidationLayers && !checkValidationLayerSupport()) {
         std::cerr << "validation layers requested, but not available!"
                   << std::endl;
@@ -199,17 +297,100 @@ int main() {
         std::cerr << "instance creation failed" << std::endl;
       }
     };
+    createInstanceNode.node_id = node_counter;
 
-    mkVkGNode(node_counter, create_inst_f, createInstanceNode);
+    // mkVkGNode(node_counter, create_inst_f, createInstanceNode);
     node_counter++;
   }
 
-  mkAddVkGEdge(graph, init_w_node, createInstanceNode, 1);
+  /** vulkan debug messenger node*/
+  vk_node setupDebugMessengerNode;
+  {
+    setupDebugMessengerNode.is_singular = true;
+    setupDebugMessengerNode.is_called = false;
+    setupDebugMessengerNode.compute = [](vk_graph &myg) {
+      if (!enableValidationLayers)
+        return;
+
+      VkDebugUtilsMessengerCreateInfoEXT createInfo;
+      populateDebugMessengerCreateInfo(createInfo);
+
+      if (CreateDebugUtilsMessengerEXT(myg.instance, &createInfo, nullptr,
+                                       &myg.debugMessenger) != VK_SUCCESS) {
+        std::cerr << "failed to set up debug messenger!" << std::endl;
+      }
+    };
+    setupDebugMessengerNode.node_id = node_counter;
+    node_counter++;
+  }
+
+  /** vulkan create surface node*/
+  vk_node createSurfaceNode;
+  {
+    createSurfaceNode.is_singular = true;
+    createSurfaceNode.is_called = false;
+    createSurfaceNode.compute = [](vk_graph &myg) {
+      if (glfwCreateWindowSurface(myg.instance, myg.window, nullptr,
+                                  &myg.surface) != VK_SUCCESS) {
+        std::cerr << "failed to create window surface!" << std::endl;
+      }
+    };
+    createSurfaceNode.node_id = node_counter;
+    node_counter++;
+  }
+
+  /** vulkan pick physical device node*/
+  vk_node pickPhysicalDeviceNode;
+  {
+    pickPhysicalDeviceNode.is_singular = true;
+    pickPhysicalDeviceNode.is_called = false;
+    pickPhysicalDeviceNode.compute = [](vk_graph &myg) {
+      uint32_t deviceCount = 0;
+      vkEnumeratePhysicalDevices(myg.instance, &deviceCount, nullptr);
+
+      if (deviceCount == 0) {
+        std::cerr << "failed to find GPUs with Vulkan support!" << std::endl;
+        return;
+      }
+
+      std::vector<VkPhysicalDevice> devices(deviceCount);
+      vkEnumeratePhysicalDevices(myg.instance, &deviceCount, devices.data());
+
+      for (const auto &device : devices) {
+        if (isDeviceSuitable(device, myg.surface)) {
+          myg.pdevice = device;
+          break;
+        }
+      }
+
+      if (myg.pdevice == VK_NULL_HANDLE) {
+        std::cerr << "failed to find a suitable GPU!" << std::endl;
+        return;
+      }
+    };
+    pickPhysicalDeviceNode.node_id = node_counter;
+    node_counter++;
+  }
+
+  // edges of the graph
+  unsigned int edge_counter = 1;
+
+  mkAddVkGEdge(graph, init_w_node, createInstanceNode, edge_counter);
+  edge_counter++;
+
+  mkAddVkGEdge(graph, createInstanceNode, setupDebugMessengerNode,
+               edge_counter);
+  edge_counter++;
+
+  mkAddVkGEdge(graph, createInstanceNode, createSurfaceNode, edge_counter);
+  edge_counter++;
 
   // run first edge
   std::vector<vk_edge> ops(graph.ops.begin(), graph.ops.end());
-  ops[0].start.run(graph);
-  ops[0].end.run(graph);
+  for (auto e : ops) {
+    e.start.run(graph);
+    e.end.run(graph);
+  }
 
   std::cout << "everything runs" << std::endl;
 
