@@ -1,15 +1,14 @@
 #pragma once
 // vertex object
 #include <external.hpp>
-#include <sstream>
 
+namespace vtuto {
 struct Vertex {
   glm::vec3 pos;
   glm::vec3 color;
   glm::vec2 texCoord;
 
-  static VkVertexInputBindingDescription
-  getBindingDescription() {
+  static VkVertexInputBindingDescription getBindingDescription() {
     VkVertexInputBindingDescription description{};
     description.binding = 0;
     description.stride = sizeof(Vertex);
@@ -18,8 +17,7 @@ struct Vertex {
   }
   static std::array<VkVertexInputAttributeDescription, 3>
   getAttributeDescriptions() {
-    std::array<VkVertexInputAttributeDescription, 3>
-        attributes{};
+    std::array<VkVertexInputAttributeDescription, 3> attributes{};
 
     // set position
     attributes[0].binding = 0;
@@ -42,12 +40,10 @@ struct Vertex {
     return attributes;
   }
   bool operator==(const Vertex &o) const {
-    auto c1 = o.pos.x == pos.x && o.pos.y == pos.y &&
-              o.pos.z == pos.z;
-    auto c2 = o.color.x == color.x &&
-              o.color.y == color.y && o.color.z == color.z;
-    auto c3 = o.texCoord.x == texCoord.x &&
-              o.texCoord.y == texCoord.y;
+    auto c1 = o.pos.x == pos.x && o.pos.y == pos.y && o.pos.z == pos.z;
+    auto c2 =
+        o.color.x == color.x && o.color.y == color.y && o.color.z == color.z;
+    auto c3 = o.texCoord.x == texCoord.x && o.texCoord.y == texCoord.y;
     return c1 && c2 && c3;
   }
 };
@@ -65,19 +61,18 @@ std::size_t glm_vec_hash(glm::vec3 v) {
   return h1 >> 1;
 }
 
-inline std::ostream &operator<<(std::ostream &out,
-                                const Vertex &v) {
-  return out << "vertex position: x: " << v.pos.x
-             << " y: " << v.pos.y << std::endl
-             << " vertex color: r: " << v.color.x
-             << " g: " << v.color.y << " b: " << v.color.z
-             << " vertex texCoord x" << v.texCoord.x
+inline std::ostream &operator<<(std::ostream &out, const Vertex &v) {
+  return out << "vertex position: x: " << v.pos.x << " y: " << v.pos.y
+             << std::endl
+             << " vertex color: r: " << v.color.x << " g: " << v.color.y
+             << " b: " << v.color.z << " vertex texCoord x" << v.texCoord.x
              << " y: " << v.texCoord.y << std::endl;
 }
+} // namespace vtuto
 
 namespace std {
-template <> struct hash<Vertex> {
-  size_t operator()(Vertex const &v) const {
+template <> struct hash<vtuto::Vertex> {
+  size_t operator()(vtuto::Vertex const &v) const {
     //
     stringstream ss;
     ss << v;
@@ -85,4 +80,4 @@ template <> struct hash<Vertex> {
     return hash<string>()(sv);
   }
 };
-};
+}; // namespace std

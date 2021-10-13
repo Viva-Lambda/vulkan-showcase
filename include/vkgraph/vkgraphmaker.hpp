@@ -8,15 +8,14 @@ namespace vtuto {
 
 void addGraphOp(vk_graph &g, const vk_edge &e) { g.add_op(e); }
 
-void mkVkGNode(vk_graph &g, unsigned int nid, std::function<void(vk_graph)> &f,
+void mkVkGNode(unsigned int nid, std::function<void(vk_graph &)> &f,
                vk_node &n) {
-  auto fn = [&]() { f(g); };
-  n = vk_node(nid, fn);
+  n = vk_node(nid, f);
 }
 void mkVkGEdge(unsigned int eid, vk_node &n1, vk_node &n2, unsigned int o,
                vk_edge &e) {
   if (n1.node_id == n2.node_id) {
-    // signal error
+    std::cerr << "nodes have same id " << std::endl;
     return;
   }
   e = vk_edge(eid, n1, n2, o);
@@ -25,34 +24,32 @@ void mkVkGEdge(unsigned int eid, vk_node &n1, vk_node &n2, unsigned int o,
 void mkVkGEdge(unsigned int eid, vk_node &n1, vk_node &n2, vk_edge &e) {
   mkVkGEdge(eid, n1, n2, 0, e);
 }
-void mkVkGEdge(vk_graph &g, unsigned int start_id,
-               std::function<void(vk_graph)> &sf, unsigned int end_id,
-               std::function<void(vk_graph)> &ef, unsigned int edge_id,
-               unsigned int order, vk_edge &edge) {
+void mkVkGEdge(unsigned int start_id, std::function<void(vk_graph &)> &sf,
+               unsigned int end_id, std::function<void(vk_graph &)> &ef,
+               unsigned int edge_id, unsigned int order, vk_edge &edge) {
   vk_node start;
-  mkVkGNode(g, start_id, sf, start);
+  mkVkGNode(start_id, sf, start);
 
   vk_node end;
-  mkVkGNode(g, end_id, ef, end);
+  mkVkGNode(end_id, ef, end);
 
   // make the edge
   mkVkGEdge(edge_id, start, end, order, edge);
 }
 
-void mkVkGEdge(vk_graph &g, unsigned int start_id,
-               std::function<void(vk_graph)> &sf, unsigned int end_id,
-               std::function<void(vk_graph)> &ef, unsigned int edge_id,
-               vk_edge &edge) {
-  mkVkGEdge(g, start_id, sf, end_id, ef, edge_id,
+void mkVkGEdge(unsigned int start_id, std::function<void(vk_graph &)> &sf,
+               unsigned int end_id, std::function<void(vk_graph &)> &ef,
+               unsigned int edge_id, vk_edge &edge) {
+  mkVkGEdge(start_id, sf, end_id, ef, edge_id,
             0, // order
             edge);
 }
 void mkAddVkGEdge(vk_graph &g, unsigned int start_id,
-                  std::function<void(vk_graph)> &sf, unsigned int end_id,
-                  std::function<void(vk_graph)> &ef, unsigned int edge_id,
+                  std::function<void(vk_graph &)> &sf, unsigned int end_id,
+                  std::function<void(vk_graph &)> &ef, unsigned int edge_id,
                   unsigned int order) {
   vk_edge edge;
-  mkVkGEdge(g, start_id, sf, end_id, ef, edge_id, order, edge);
+  mkVkGEdge(start_id, sf, end_id, ef, edge_id, order, edge);
   addGraphOp(g, edge);
 }
 

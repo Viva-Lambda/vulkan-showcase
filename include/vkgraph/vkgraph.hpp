@@ -2,6 +2,7 @@
 // graph like architecture
 #include <external.hpp>
 #include <vkgraph/vknode.hpp>
+#include <vertex.hpp>
 
 namespace vtuto {
 
@@ -27,8 +28,7 @@ bool operator<(const vk_edge &e1, const vk_edge &e2) {
   return e1.order < e2.order;
 }
 
-class vk_graph {
-private:
+struct vk_graph {
   std::set<vk_edge> ops;
 
   /** Attributes unrelated to vulkan
@@ -90,13 +90,7 @@ private:
   VkExtent2D sextent;
 
   /** swapchain image view */
-  image_views simage_views;
 
-  /** @} */
-
-  /** image view handlers
-    @{
-   */
   std::vector<VkImageView> views;
 
   /** @} */
@@ -218,6 +212,6 @@ private:
 
   /**starting methods*/
 public:
-  void add_op(const vk_edge &e) { ops.insert(e, ops.end()); }
+  void add_op(const vk_edge &e) { ops.insert(ops.end(), e); }
 };
 } // namespace vtuto
