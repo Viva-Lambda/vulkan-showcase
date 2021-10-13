@@ -17,26 +17,18 @@ public:
 
 public:
   image_view() {}
-  image_view(
-      const VkImage &image, VkFormat image_format,
-      vulkan_device<VkDevice> &logical_dev,
-      VkImageViewType view_type = VK_IMAGE_VIEW_TYPE_2D,
-      uint base_mipmap_index = 0, uint mipmap_count = 1,
-      uint array_layer_index = 0,
-      uint array_layer_count = 1,
-      VkComponentSwizzle r_swizzle =
-          VK_COMPONENT_SWIZZLE_IDENTITY,
-      VkComponentSwizzle g_swizzle =
-          VK_COMPONENT_SWIZZLE_IDENTITY,
-      VkComponentSwizzle b_swizzle =
-          VK_COMPONENT_SWIZZLE_IDENTITY,
-      VkComponentSwizzle a_swizzle =
-          VK_COMPONENT_SWIZZLE_IDENTITY,
-      VkImageAspectFlagBits aspect_mask =
-          VK_IMAGE_ASPECT_COLOR_BIT) {
+  image_view(const VkImage &image, VkFormat image_format,
+             vulkan_device<VkDevice> &logical_dev,
+             VkImageViewType view_type = VK_IMAGE_VIEW_TYPE_2D,
+             uint base_mipmap_index = 0, uint mipmap_count = 1,
+             uint array_layer_index = 0, uint array_layer_count = 1,
+             VkComponentSwizzle r_swizzle = VK_COMPONENT_SWIZZLE_IDENTITY,
+             VkComponentSwizzle g_swizzle = VK_COMPONENT_SWIZZLE_IDENTITY,
+             VkComponentSwizzle b_swizzle = VK_COMPONENT_SWIZZLE_IDENTITY,
+             VkComponentSwizzle a_swizzle = VK_COMPONENT_SWIZZLE_IDENTITY,
+             VkImageAspectFlagBits aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT) {
     VkImageViewCreateInfo createInfo{};
-    createInfo.sType =
-        VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     createInfo.image = image;
     /** view type can be 1d texture, 2d texture, 3d
      * textures and cubemaps*/
@@ -50,22 +42,19 @@ public:
     createInfo.components.a = a_swizzle;
 
     createInfo.subresourceRange.aspectMask = aspect_mask;
-    createInfo.subresourceRange.baseMipLevel =
-        base_mipmap_index;
+    createInfo.subresourceRange.baseMipLevel = base_mipmap_index;
     createInfo.subresourceRange.levelCount = mipmap_count;
-    createInfo.subresourceRange.baseArrayLayer =
-        array_layer_index;
-    createInfo.subresourceRange.layerCount =
-        array_layer_count;
-    CHECK_VK2(vkCreateImageView(logical_dev.device(),
-                               &createInfo, nullptr, &view),
-             "failed to create image view");
+    createInfo.subresourceRange.baseArrayLayer = array_layer_index;
+    createInfo.subresourceRange.layerCount = array_layer_count;
+    CHECK_VK2(
+        vkCreateImageView(logical_dev.device(), &createInfo, nullptr, &view),
+        "failed to create image view");
   }
   image_view(VkImageViewCreateInfo createInfo,
              vulkan_device<VkDevice> &logical_dev) {
-    CHECK_VK2(vkCreateImageView(logical_dev.device(),
-                               &createInfo, nullptr, &view),
-             "failed to create image view");
+    CHECK_VK2(
+        vkCreateImageView(logical_dev.device(), &createInfo, nullptr, &view),
+        "failed to create image view");
   }
   void destroy(vulkan_device<VkDevice> &logical_dev) {
     vkDestroyImageView(logical_dev.device(), view, nullptr);
@@ -77,31 +66,22 @@ public:
 
 public:
   image_views() {}
-  image_views(
-      const std::vector<VkImage> &images,
-      VkFormat image_format,
-      vulkan_device<VkDevice> &logical_dev,
-      VkImageViewType view_type = VK_IMAGE_VIEW_TYPE_2D,
-      uint base_mipmap_index = 0, uint mipmap_count = 1,
-      uint array_layer_index = 0,
-      uint array_layer_count = 1,
-      VkComponentSwizzle r_swizzle =
-          VK_COMPONENT_SWIZZLE_IDENTITY,
-      VkComponentSwizzle g_swizzle =
-          VK_COMPONENT_SWIZZLE_IDENTITY,
-      VkComponentSwizzle b_swizzle =
-          VK_COMPONENT_SWIZZLE_IDENTITY,
-      VkComponentSwizzle a_swizzle =
-          VK_COMPONENT_SWIZZLE_IDENTITY,
-      VkImageAspectFlagBits aspect_mask =
-          VK_IMAGE_ASPECT_COLOR_BIT) {
+  image_views(const std::vector<VkImage> &images, VkFormat image_format,
+              vulkan_device<VkDevice> &logical_dev,
+              VkImageViewType view_type = VK_IMAGE_VIEW_TYPE_2D,
+              uint base_mipmap_index = 0, uint mipmap_count = 1,
+              uint array_layer_index = 0, uint array_layer_count = 1,
+              VkComponentSwizzle r_swizzle = VK_COMPONENT_SWIZZLE_IDENTITY,
+              VkComponentSwizzle g_swizzle = VK_COMPONENT_SWIZZLE_IDENTITY,
+              VkComponentSwizzle b_swizzle = VK_COMPONENT_SWIZZLE_IDENTITY,
+              VkComponentSwizzle a_swizzle = VK_COMPONENT_SWIZZLE_IDENTITY,
+              VkImageAspectFlagBits aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT) {
     views.resize(images.size());
     for (std::size_t i = 0; i < images.size(); i++) {
-      views[i] = image_view(
-          images[i], image_format, logical_dev, view_type,
-          base_mipmap_index, mipmap_count,
-          array_layer_index, array_layer_count, r_swizzle,
-          g_swizzle, b_swizzle, a_swizzle, aspect_mask);
+      views[i] = image_view(images[i], image_format, logical_dev, view_type,
+                            base_mipmap_index, mipmap_count, array_layer_index,
+                            array_layer_count, r_swizzle, g_swizzle, b_swizzle,
+                            a_swizzle, aspect_mask);
     }
   }
   image_views(const std::vector<VkImage> &images,
@@ -114,9 +94,8 @@ public:
       views[i] = image_view(iminfo, logical_dev);
     }
   }
-  image_views(
-      const std::vector<VkImageViewCreateInfo> infos,
-      vulkan_device<VkDevice> &logical_dev) {
+  image_views(const std::vector<VkImageViewCreateInfo> infos,
+              vulkan_device<VkDevice> &logical_dev) {
     views.resize(infos.size());
     for (std::size_t i = 0; i < infos.size(); i++) {
       VkImageViewCreateInfo iminfo = infos[i];
@@ -130,9 +109,7 @@ public:
   }
 
   std::size_t size() { return views.size(); }
-  VkImageView operator[](std::size_t i) {
-    return views[i].view;
-  }
+  VkImageView operator[](std::size_t i) { return views[i].view; }
   std::vector<VkImageView> data() {
     std::vector<VkImageView> vs;
     vs.resize(views.size());
@@ -142,4 +119,4 @@ public:
     return vs;
   }
 };
-}
+} // namespace vtuto
