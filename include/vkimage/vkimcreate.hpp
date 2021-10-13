@@ -91,16 +91,17 @@ public:
   VkImageUsageFlags usage;
   VkSharingMode sharingMode;
   VkImageLayout initialLayout;
+  VkPhysicalDeviceLimits pdevlms;
+  std::vector<const char *> extensions;
 
   VkStructureType stype() const { return _stype; }
   void *pNext() const { return _pnext; }
 };
-
 Result_Vk check_sharingMode(const ImageCreateInfo &ic) {
   Result_Vk vr;
   vr.status = SUCCESS_OP;
   if (ic.sharingMode == VK_SHARING_MODE_CONCURRENT) {
-    if (queue_family_indices.size() == 0) {
+    if (ic.queue_family_indices.size() == 0) {
       vr.status = IMAGE_CREATE_ERROR_VK;
       vr.spec_info = R"(
 VUID-VkImageCreateInfo-sharingMode-00941 ::
@@ -205,8 +206,8 @@ VK_IMAGE_TYPE_3D
       return vr;
     }
   }
-  if (im.img_flags.find(VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT) !=
-      im.img_flags.end()) {
+  if (im.usage_flags.find(VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT) !=
+      im.usage_flags.end()) {
     if (im.imageType != VK_IMAGE_TYPE_2D) {
       vr.status = IMAGE_CREATE_ERROR_VK;
       vr.spec_info = R"(
@@ -264,6 +265,133 @@ If imageType is VK_IMAGE_TYPE_3D, arrayLayers must be 1
 )";
       return vr;
     }
+  }
+}
+Result_Vk check_samples(const ImageCreateInfo &im) {
+  //
+  Result_Vk vr;
+  vr.status = SUCCESS_OP;
+  if (im.samples != VK_SAMPLE_COUNT_1_BIT) {
+    if (im.usage_flags.find(VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT) !=
+        im.usage_flags.end()) {
+      vr.status = IMAGE_CREATE_ERROR_VK;
+      vr.spec_info = R"(
+VUID-VkImageCreateInfo-samples-02258 :: 
+If samples is not VK_SAMPLE_COUNT_1_BIT, usage must not contain
+VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT
+)";
+      return vr;
+    }
+    auto cond1 = im.imageType == VK_IMAGE_TYPE_2D;
+    auto cond2 = im.img_flags.find(VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT) ==
+                 im.img_flags.end();
+    auto cond3 = im.mipLevels == 1;
+    // image create maybe linear must be false
+    auto cond4 = im.tiling == VK_IMAGE_TILING_OPTIMAL;
+    // bool cond5 = true;
+    // if (im.tiling == VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT) {
+    //   auto ptrcst1 = (VkImageDrmFormatModifierExplicitCreateInfoEXT
+    //   *)(im.pNext()); auto ptrcst2 =
+    //   (VkImageDrmFormatModifierListCreateInfoEXT *)(im.pNext()); if (ptrcst1)
+    //   {
+    //     // we have a single drm modifier that should not be linear
+    //     auto vkdrmCreate = *ptrcst1;
+    //     auto modifier = vkdrmCreate.drmFormatModifier;
+    //     //
+    //     if (modifier == DRM_FORMAT_MOD_LINEAR) {
+    //       cond5 = false;
+    //     }
+    //   } else if (ptrcst2) {
+    //     // we have a list of drm modifiers that should not contain linear
+    //     auto vkDrmCreateInfoList = *ptrcst2;
+    //     auto modifierCount = vkDrmCreateInfoList.drmFormatModifierCount;
+    //     for (unsigned int i = 0; i < modifierCount; i++) {
+    //       if (vkDrmCreateInfoList.pDrmFormatModifiers[i] ==
+    //           DRM_FORMAT_MOD_LINEAR) {
+    //         cond5 = false;
+    //       }
+    //     }
+    //   } else {
+    //     // we don't have any drm modifiers
+    //     cond5 = true;
+    //   }
+    // }
+
+    // check if samples-02257 conditions pass
+    if (!(cond1 && cond2 && cond3 && cond4
+          // && cond5
+          )) {
+      vr.status = IMAGE_CREATE_ERROR_VK;
+      vr.spec_info = R"(
+VUID-VkImageCreateInfo-samples-02258 ::
+If samples is not VK_SAMPLE_COUNT_1_BIT, then imageType must be
+VK_IMAGE_TYPE_2D, flags must not contain VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
+mipLevels must be equal to 1, and imageCreateMaybeLinear (as defined in Image
+Creation Limits) must be VK_FALSE
+)";
+      return vr;
+    }
+  }
+  return vr;
+}
+Result_Vk check_usage(const ImageCreateInfo &im) {
+  Result_Vk vr;
+  vr.status = SUCCESS_OP;
+  auto imus = im.usage_flags;
+  if (imus.find(VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT) != imus.end()) {
+    bool cond1 = true;
+    for (const auto uflag : imus) {
+      auto c1 = uflag == VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+      auto c2 = uflag == VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+      auto c3 = uflag == VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT;
+      if (!(c1 || c2 || c3)) {
+        cond1 = false;
+      }
+    }
+    if (cond1) {
+      vr.status = IMAGE_CREATE_ERROR_VK;
+      vr.spec_info = R"(
+VUID-VkImageCreateInfo-usage-00963 ::
+If usage includes VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT, then bits other
+than VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, and
+VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT must not be set
+)";
+      return vr;
+    }
+  }
+  // 00964
+  auto c1 = imus.find(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) != imus.end();
+  auto c2 =
+      imus.find(VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) != imus.end();
+  auto c3 = imus.find(VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT) != imus.end();
+  auto c4 = imus.find(VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT) != imus.end();
+  if (c1 && c2 && c3 && c4) {
+    if (im.extent.width > im.pdevlms.maxFramebufferWidth) {
+      vr.status = IMAGE_CREATE_ERROR_VK;
+      vr.spec_info = R"(
+VUID-VkImageCreateInfo-usage-00964 ::
+If usage includes VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT, or
+VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT, extent.width must be less than or equal
+to VkPhysicalDeviceLimits::maxFramebufferWidth
+)";
+      return vr;
+    }
+    if (im.extent.height > im.pdevlms.maxFramebufferHeight) {
+      vr.status = IMAGE_CREATE_ERROR_VK;
+      vr.spec_info = R"(
+VUID-VkImageCreateInfo-usage-00965 ::
+If usage includes VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT, or
+VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT, extent.height must be less than or equal
+to VkPhysicalDeviceLimits::maxFramebufferHeight
+)";
+      return vr;
+    }
+  }
 }
 
 /**
@@ -539,22 +667,22 @@ Explicit Valid Usage:
 
 - VUID-VkImageCreateInfo-format-02561
   - If the image format is one of those listed in Formats requiring sampler
-  Y′CBCR conversion for VK_IMAGE_ASPECT_COLOR_BIT image views, then mipLevels
+  Y′CBCR conversion for VK_IMAGE_ASPECT_COLOR_BIT image views, then mipLe
   must be 1
 
 - VUID-VkImageCreateInfo-format-02562
   - If the image format is one of those listed in Formats requiring sampler
-  Y′CBCR conversion for VK_IMAGE_ASPECT_COLOR_BIT image views, samples must be
+  Y′CBCR conversion for VK_IMAGE_ASPECT_COLOR_BIT image views, samples mu
   VK_SAMPLE_COUNT_1_BIT
 
 - VUID-VkImageCreateInfo-format-02563
   - If the image format is one of those listed in Formats requiring sampler
-  Y′CBCR conversion for VK_IMAGE_ASPECT_COLOR_BIT image views, imageType must
+  Y′CBCR conversion for VK_IMAGE_ASPECT_COLOR_BIT image views, imageType 
   be VK_IMAGE_TYPE_2D
 
 - VUID-VkImageCreateInfo-format-02653
   - If the image format is one of those listed in Formats requiring sampler
-  Y′CBCR conversion for VK_IMAGE_ASPECT_COLOR_BIT image views, and the
+  Y′CBCR conversion for VK_IMAGE_ASPECT_COLOR_BIT image views, and
   ycbcrImageArrays feature is not enabled, arrayLayers must be 1
 
 - VUID-VkImageCreateInfo-imageCreateFormatFeatures-02260
@@ -590,8 +718,9 @@ Explicit Valid Usage:
   VkImageFormatListCreateInfo structure with non-zero viewFormatCount
 
 - VUID-VkImageCreateInfo-flags-01533
-  - If flags contains VK_IMAGE_CREATE_SAMPLE_LOCATIONS_COMPATIBLE_DEPTH_BIT_EXT
-  format must be a depth or depth/stencil format
+  - If flags contains
+VK_IMAGE_CREATE_SAMPLE_LOCATIONS_COMPATIBLE_DEPTH_BIT_EXT format must be a
+depth or depth/stencil format
 
 - VUID-VkImageCreateInfo-pNext-02393
   - If the pNext chain includes a VkExternalMemoryImageCreateInfo structure
