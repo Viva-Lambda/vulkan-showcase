@@ -156,6 +156,7 @@ int main() {
    */
   /** vulkan instance creation node*/
   vk_node createInstanceNode;
+  createInstanceNode.is_singular = true;
   {
     std::function<void(vk_graph &)> create_inst_f = [](vk_graph &myg) {
       if (enableValidationLayers && !checkValidationLayerSupport()) {
@@ -207,8 +208,8 @@ int main() {
 
   // run first edge
   std::vector<vk_edge> ops(graph.ops.begin(), graph.ops.end());
-  ops[0].start.compute(graph);
-  ops[0].end.compute(graph);
+  ops[0].start.run(graph);
+  ops[0].end.run(graph);
 
   std::cout << "everything runs" << std::endl;
 
