@@ -15,9 +15,17 @@ set(AbsPathPrefix
     "/home/kaan/GitProjects")
 
 # executables
+
+# main program
 add_executable(
     vulkantuto.out 
     "src/vkmain.cpp"
+)
+
+# simple triangle program
+add_executable(
+    vktriangle.out 
+    "src/vktriangle.cpp"
 )
 
 include_directories("./include/")
@@ -35,7 +43,11 @@ message("Vulkan Include Path: ${VulkanPath}/include/")
 message("Vulkan Library Path: ${VulkanPath}/lib/libvulkan.so")
 include_directories("${VulkanPath}/include/")
 
+# vk main
 target_link_libraries(vulkantuto.out VulkanLib)
+
+# simple triangle
+target_link_libraries(vktriangle.out VulkanLib)
 
 # glfw
 # find_package(glfw3 REQUIRED)
@@ -43,7 +55,12 @@ add_library(glfwLib SHARED IMPORTED)
 set_target_properties(glfwLib PROPERTIES IMPORTED_LOCATION
     "${AbsPathPrefix}/glfw-3.3.4/bin/lib/libglfw.so")
 include_directories("${AbsPathPrefix}/glfw-3.3.4/bin/include/")
+
+# vk main
 target_link_libraries(vulkantuto.out glfwLib)
+
+# simple triangle
+target_link_libraries(vktriangle.out glfwLib)
 
 # glm
 # find_package(glm REQUIRED)
@@ -62,9 +79,14 @@ set_target_properties(
 )
 include_directories("${AbsPathPrefix}/assimp-5.0.1/build/include/")
 
+# vk main
 target_link_libraries(vulkantuto.out AssimpLib)
+
+# simple triangle
+target_link_libraries(vktriangle.out AssimpLib)
 
 # libs
 
 install(TARGETS vulkantuto.out DESTINATION "${PROJECT_SOURCE_DIR}/bin/")
 
+install(TARGETS vktriangle.out DESTINATION "${PROJECT_SOURCE_DIR}/bin/")
