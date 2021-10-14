@@ -1,8 +1,8 @@
 #pragma once
 // graph like architecture
 #include <external.hpp>
-#include <vkgraph/vknode.hpp>
 #include <vertex.hpp>
+#include <vkgraph/vknode.hpp>
 
 namespace vtuto {
 
@@ -135,10 +135,19 @@ struct vk_graph {
 
   /** @} */
 
-  /** command pool and command buffer handlers @{*/
+  /** command pool and command buffer handlers
+
+    From spec: Command pools are externally synchronized, meaning that a
+    command pool must not be used concurrently in multiple threads. That
+    includes use via recording commands on any command buffers allocated from
+    the pool, as well as operations that allocate, free, and reset command
+    buffers or the pool itself.
+
+    @{*/
 
   VkCommandPool pool;
-  VkCommandBuffer buffer;
+  std::vector<VkCommandBuffer> cbuffers;
+  std::vector<bool> available_cbuffers;
 
   /** @} */
 

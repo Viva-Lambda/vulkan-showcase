@@ -18,7 +18,7 @@ struct vk_node {
   // real constructor
   vk_node(unsigned int n, std::function<void(vk_graph &)> &f)
       : node_id(n), compute(f) {}
-  void run(vk_graph &g) {
+  virtual void run(vk_graph &g) {
     if (is_singular) {
       if (!is_called) {
         // if not a singular recall the function
@@ -29,5 +29,7 @@ struct vk_node {
       compute(g);
     }
   }
+
+  // merging constructor
 };
 } // namespace vtuto
