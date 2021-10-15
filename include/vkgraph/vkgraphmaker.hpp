@@ -2,67 +2,43 @@
 // functions related to making vkgraphs and vk graph components
 #include <vkgraph/vkgraph.hpp>
 #include <vkgraph/vknode.hpp>
+#include <vkresult/debug.hpp>
 
 using namespace vtuto;
 namespace vtuto {
-
-void addGraphOp(vk_graph &g, const vk_edge &e) { g.add_op(e); }
-
-void mkVkGNode(unsigned int nid, std::function<void(vk_graph &)> &f,
-               vk_node &n) {
-  n = vk_node(nid, f);
+// node making functions
+template <typename VkApp, unsigned int NodeId, bool IsSingular>
+vk_node<VkApp> mkNode(const std::function<vk_output(VkApp &)> &NodeFn) {
+  vk_node<VkApp> n;
+  n.is_singular = IsSingular;
+  n.is_called = false;
+  n.node_id = NodeId;
+  n.compute = NodeFn;
+  return n;
 }
-void mkVkGEdge(unsigned int eid, vk_node &n1, vk_node &n2, unsigned int o,
-               vk_edge &e) {
-  if (n1.node_id == n2.node_id) {
-    std::cerr << "nodes have same id " << std::endl;
-    return;
+//
+template <typename VkApp, unsigned int... Ends>
+Result_Vk addNode(vk_graph<VkApp> &g, vk_node<VkApp> &n) {
+  std::vector<unsigned int> ends = {Ends...};
+  auto mpair = std::make_pair(n.node_id, ends);
+  Result_Vk vr;
+  vr.status = SUCCESS_OP;
+  if (g.is_in(n)) {
+    vr.status = FAIL_OP;
+    vr.context = "node ";
+    vr.context += std::to_string(n.node_id);
+    vr.context += "already exists inside the graph";
+    return vr;
   }
-  e = vk_edge(eid, n1, n2, o);
+  g.adj_lst.insert(mpair);
+  g.nodes.insert(n.node_id, n);
+  return vr;
 }
-
-void mkVkGEdge(unsigned int eid, vk_node &n1, vk_node &n2, vk_edge &e) {
-  mkVkGEdge(eid, n1, n2, 0, e);
+template <typename VkApp, unsigned int NodeId, bool IsSingular,
+          unsigned int... Ends>
+Result_Vk mkAddNode(vk_graph<VkApp> &g,
+                    const std::function<vk_output(VkApp &)> &NodeFn) {
+  auto n = mkNode<VkApp, NodeId, IsSingular>(NodeFn);
+  return addNode<VkApp, Ends...>(g, n);
 }
-void mkVkGEdge(unsigned int start_id, std::function<void(vk_graph &)> &sf,
-               unsigned int end_id, std::function<void(vk_graph &)> &ef,
-               unsigned int edge_id, unsigned int order, vk_edge &edge) {
-  vk_node start;
-  mkVkGNode(start_id, sf, start);
-
-  vk_node end;
-  mkVkGNode(end_id, ef, end);
-
-  // make the edge
-  mkVkGEdge(edge_id, start, end, order, edge);
-}
-
-void mkVkGEdge(unsigned int start_id, std::function<void(vk_graph &)> &sf,
-               unsigned int end_id, std::function<void(vk_graph &)> &ef,
-               unsigned int edge_id, vk_edge &edge) {
-  mkVkGEdge(start_id, sf, end_id, ef, edge_id,
-            0, // order
-            edge);
-}
-void mkAddVkGEdge(vk_graph &g, unsigned int start_id,
-                  std::function<void(vk_graph &)> &sf, unsigned int end_id,
-                  std::function<void(vk_graph &)> &ef, unsigned int edge_id,
-                  unsigned int order) {
-  vk_edge edge;
-  mkVkGEdge(start_id, sf, end_id, ef, edge_id, order, edge);
-  addGraphOp(g, edge);
-}
-
-void mkAddVkGEdge(vk_graph &g, vk_node &n1, vk_node &n2, unsigned int eid,
-                  unsigned int o) {
-  vk_edge e;
-  mkVkGEdge(eid, n1, n2, o, e);
-  addGraphOp(g, e);
-}
-void mkAddVkGEdge(vk_graph &g, vk_node &n1, vk_node &n2, unsigned int eid) {
-  vk_edge e;
-  mkVkGEdge(eid, n1, n2, e);
-  addGraphOp(g, e);
-}
-
 } // namespace vtuto

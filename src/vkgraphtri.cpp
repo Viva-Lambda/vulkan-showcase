@@ -1,13 +1,15 @@
 #include <external.hpp>
+#include <vkapp/vktriapp.hpp>
 #include <vkgraph/vkgraph.hpp>
 #include <vkgraph/vkgraphmaker.hpp>
 #include <vkgraph/vknode.hpp>
+#include <vkresult/debug.hpp>
 
 using namespace vtuto;
 
 static void framebufferResizeCallback(GLFWwindow *window, int width,
                                       int height) {
-  auto app = reinterpret_cast<vk_graph *>(glfwGetWindowUserPointer(window));
+  auto app = reinterpret_cast<vk_triapp *>(glfwGetWindowUserPointer(window));
   app->framebuffer_resized = true;
 }
 const std::vector<const char *> validationLayers = {
@@ -296,18 +298,94 @@ static VkShaderModule createShaderModule(const std::vector<char> &code,
 
 static const int MAX_FRAMES_IN_FLIGHT = 2;
 
+static void drawFrame(vk_triapp &g) {
+  vkWaitForFences(g.ldevice, 1, &g.current_fences[g.current_frame], VK_TRUE,
+                  UINT64_MAX);
+
+  uint32_t imageIndex;
+  VkResult result =
+      vkAcquireNextImageKHR(g.ldevice, g.chain, UINT64_MAX,
+                            g.image_available_semaphores[g.current_frame],
+                            VK_NULL_HANDLE, &imageIndex);
+
+  if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+    recreateSwapChain();
+    return;
+  } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+    std::cerr << "failed to acquire swap chain image!" << std::endl;
+    return;
+  }
+
+  if (g.images_in_flight[imageIndex] != VK_NULL_HANDLE) {
+    vkWaitForFences(device, 1, &g.images_in_flight[imageIndex], VK_TRUE,
+                    UINT64_MAX);
+  }
+  g.images_in_flight[imageIndex] = g.current_fences[g.current_frame];
+
+  VkSubmitInfo submitInfo{};
+  submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+  VkSemaphore waitSemaphores[] = {
+      g.image_available_semaphores[g.current_frame]};
+  VkPipelineStageFlags waitStages[] = {
+      VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+  submitInfo.waitSemaphoreCount = 1;
+  submitInfo.pWaitSemaphores = waitSemaphores;
+  submitInfo.pWaitDstStageMask = waitStages;
+
+  submitInfo.commandBufferCount = 1;
+  submitInfo.pCommandBuffers = &g.cbuffers[imageIndex];
+
+  VkSemaphore signalSemaphores[] = {
+      g.render_finished_semaphores[g.current_frame]};
+  submitInfo.signalSemaphoreCount = 1;
+  submitInfo.pSignalSemaphores = signalSemaphores;
+
+  vkResetFences(g.ldevice, 1, &g.current_fences[g.current_frame]);
+
+  if (vkQueueSubmit(g.graphics_queue, 1, &submitInfo,
+                    g.current_fences[g.current_frame]) != VK_SUCCESS) {
+    std::cerr << "failed to submit draw command buffer!" << std::endl;
+  }
+
+  VkPresentInfoKHR presentInfo{};
+  presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+  presentInfo.waitSemaphoreCount = 1;
+  presentInfo.pWaitSemaphores = signalSemaphores;
+
+  VkSwapchainKHR swapChains[] = {g.chain};
+  presentInfo.swapchainCount = 1;
+  presentInfo.pSwapchains = swapChains;
+
+  presentInfo.pImageIndices = &imageIndex;
+
+  result = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+  if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
+      g.framebuffer_resized) {
+    g.framebuffer_resized = false;
+    recreateSwapChain();
+  } else if (result != VK_SUCCESS) {
+    std::cerr << "failed to present swap chain image!" << std::endl;
+    return;
+  }
+
+  g.current_frame = (g.current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
 int main() {
   // declare graph
-  vk_graph graph;
+  vk_graph<vk_triapp> graph;
   unsigned int node_counter = 1;
 
-  /** init window node */
+  /** init window node:
+    - node id 1
+    - target nodes: {2}
+   */
   // declare node
-  vk_node init_w_node;
   {
-    init_w_node.is_singular = true;
-    init_w_node.is_called = false;
-    init_w_node.compute = [](vk_graph &myg) {
+    std::function<vk_output(vk_triapp &)> f = [](vk_triapp &myg) {
       glfwInit();
 
       glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -316,11 +394,20 @@ int main() {
                                     nullptr, nullptr);
       glfwSetWindowUserPointer(myg.window, &myg);
       glfwSetFramebufferSizeCallback(myg.window, framebufferResizeCallback);
-      return;
+      vk_output out;
+      out.next_node = 2;
+      Result_Vk vr;
+      vr.status = SUCCESS_OP;
+      out.result_info = vr;
+      return out;
     };
-    init_w_node.node_id = node_counter;
-    //
-    node_counter++;
+    auto vr = mkAddNode<vk_triapp, 1, true, 2>(graph, f);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 1 with end node 2";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
 
   /** init vulkan node:
@@ -329,15 +416,22 @@ int main() {
    edges. The node creation can be delegated to other encapsulating functions
    for facilitating reading
    */
-  /** vulkan instance creation node*/
-  vk_node createInstanceNode;
+  /** vulkan instance creation node:
+    - node id 2
+    - target nodes: {3}
+   */
   {
-    createInstanceNode.is_singular = true;
-    createInstanceNode.is_called = false;
-    createInstanceNode.compute = [](vk_graph &myg) {
+    std::function<vk_output(vk_triapp &)> f = [](vk_triapp &myg) {
+      Result_Vk vr;
+      vr.status = SUCCESS_OP;
+      vk_output out;
+      //
       if (enableValidationLayers && !checkValidationLayerSupport()) {
-        std::cerr << "validation layers requested, but not available!"
-                  << std::endl;
+        vr.context = "validation layers requested, but not available!";
+        out.next_node = 0;
+        vr.status = FAIL_OP;
+        out.result_info = vr;
+        return out;
       }
       VkApplicationInfo appInfo{};
       appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -371,64 +465,113 @@ int main() {
         createInfo.pNext = nullptr;
       }
 
-      if (vkCreateInstance(&createInfo, nullptr, &myg.instance) != VK_SUCCESS) {
-        std::cerr << "instance creation failed" << std::endl;
-      }
+      std::string nmsg = "instance creation failed";
+      CHECK_VK(vkCreateInstance(&createInfo, nullptr, &myg.instance), nmsg, vr);
+      out.result_info = vr;
+      out.next_node = 3;
+      return out;
     };
-    createInstanceNode.node_id = node_counter;
-
-    // mkVkGNode(node_counter, create_inst_f, createInstanceNode);
-    node_counter++;
+    auto vr = mkAddNode<vk_triapp, 2, true, 3>(graph, f);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 2 with end node 3";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
 
-  /** vulkan debug messenger node*/
-  vk_node setupDebugMessengerNode;
+  /** vulkan setup debug messenger node:
+    - node id 3
+    - target nodes: {4}
+   */
   {
-    setupDebugMessengerNode.is_singular = true;
-    setupDebugMessengerNode.is_called = false;
-    setupDebugMessengerNode.compute = [](vk_graph &myg) {
-      if (!enableValidationLayers)
-        return;
+    std::function<vk_output(vk_triapp &)> f = [](vk_triapp &myg) {
+      Result_Vk vr;
+      vr.status = SUCCESS_OP;
+      vk_output out;
+      out.result_info = vr;
+      out.next_node = 4;
+
+      if (!enableValidationLayers) {
+        out.next_node = 4;
+        return out;
+      }
 
       VkDebugUtilsMessengerCreateInfoEXT createInfo;
       populateDebugMessengerCreateInfo(createInfo);
 
-      if (CreateDebugUtilsMessengerEXT(myg.instance, &createInfo, nullptr,
-                                       &myg.debugMessenger) != VK_SUCCESS) {
-        std::cerr << "failed to set up debug messenger!" << std::endl;
+      std::string nmsg = "failed to set up debug messenger!";
+      CHECK_VK(CreateDebugUtilsMessengerEXT(myg.instance, &createInfo, nullptr,
+                                            &myg.debugMessenger),
+               nmsg, out.result_info);
+      if (out.result_info.status != SUCCESS_OP) {
+        out.next_node = 0;
+        return out;
+      } else {
+        return out;
       }
     };
-    setupDebugMessengerNode.node_id = node_counter;
-    node_counter++;
+    auto vr = mkAddNode<vk_triapp, 3, true, 4>(graph, f);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 3 with end node 4";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
 
-  /** vulkan create surface node*/
-  vk_node createSurfaceNode;
+  /** vulkan create surface node:
+    - node id 4
+    - target nodes: {5}
+   */
   {
-    createSurfaceNode.is_singular = true;
-    createSurfaceNode.is_called = false;
-    createSurfaceNode.compute = [](vk_graph &myg) {
-      if (glfwCreateWindowSurface(myg.instance, myg.window, nullptr,
-                                  &myg.surface) != VK_SUCCESS) {
-        std::cerr << "failed to create window surface!" << std::endl;
+    std::function<vk_output(vk_triapp &)> f = [](vk_triapp &myg) {
+      Result_Vk vr;
+      vr.status = SUCCESS_OP;
+      vk_output out;
+      out.result_info = vr;
+      out.next_node = 5;
+      std::string nmsg = "failed to create window surface!";
+
+      CHECK_VK(glfwCreateWindowSurface(myg.instance, myg.window, nullptr,
+                                       &myg.surface),
+               nmsg, out.result_info);
+      if (out.result_info.status != SUCCESS_OP) {
+        out.next_node = 0;
+        return out;
+      } else {
+        return out;
       }
     };
-    createSurfaceNode.node_id = node_counter;
-    node_counter++;
+    auto vr = mkAddNode<vk_triapp, 4, true, 5>(graph, f);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 4 with end node 5";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
 
-  /** vulkan pick physical device node*/
-  vk_node pickPhysicalDeviceNode;
+  /** vulkan pick physical device node:
+    - node id 5
+    - target nodes: {6}
+   */
   {
-    pickPhysicalDeviceNode.is_singular = true;
-    pickPhysicalDeviceNode.is_called = false;
-    pickPhysicalDeviceNode.compute = [](vk_graph &myg) {
+    std::function<vk_output(vk_triapp &)> f = [](vk_triapp &myg) {
+      Result_Vk vr;
+      vr.status = SUCCESS_OP;
+      vk_output out;
+      out.result_info = vr;
+      out.next_node = 6;
+
       uint32_t deviceCount = 0;
       vkEnumeratePhysicalDevices(myg.instance, &deviceCount, nullptr);
 
       if (deviceCount == 0) {
-        std::cerr << "failed to find GPUs with Vulkan support!" << std::endl;
-        return;
+        out.result_info.status = FAIL_OP;
+        out.result_info.context = "failed to find GPUs with Vulkan support!";
+        out.next_node = 0;
+        return out;
       }
 
       std::vector<VkPhysicalDevice> devices(deviceCount);
@@ -442,21 +585,35 @@ int main() {
       }
 
       if (myg.pdevice == VK_NULL_HANDLE) {
-        std::cerr << "failed to find a suitable GPU!" << std::endl;
-        return;
+        out.result_info.status = FAIL_OP;
+        out.result_info.context = "failed to find a suitable GPU!";
+        out.next_node = 0;
+        return out;
       }
+      return out;
     };
-    pickPhysicalDeviceNode.node_id = node_counter;
-    node_counter++;
+    auto vr = mkAddNode<vk_triapp, 5, true, 6>(graph, f);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 5 with end node 6";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
 
-  /** vulkan create logical device node*/
-  vk_node createLogicalDeviceNode;
+  /** vulkan create logical device node:
+    - node id 6
+    - target nodes: {7}
+   */
   {
-    createLogicalDeviceNode.is_singular = true;
-    createLogicalDeviceNode.is_called = false;
-    createLogicalDeviceNode.compute = [](vk_graph &myg) {
+    std::function<vk_output(vk_triapp &)> f = [](vk_triapp &myg) {
       //
+      Result_Vk vr;
+      vr.status = SUCCESS_OP;
+      vk_output out;
+      out.result_info = vr;
+      out.next_node = 7;
+
       QueueFamilyIndices indices = findQueueFamilies(myg.pdevice, myg.surface);
 
       std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -496,28 +653,43 @@ int main() {
         createInfo.enabledLayerCount = 0;
       }
 
-      if (vkCreateDevice(myg.pdevice, &createInfo, nullptr, &myg.ldevice) !=
-          VK_SUCCESS) {
-        std::cerr << "failed to create logical device!" << std::endl;
-        return;
+      std::string nmsg = "failed to create logical device!";
+
+      CHECK_VK(vkCreateDevice(myg.pdevice, &createInfo, nullptr, &myg.ldevice),
+               nmsg, out.result_info);
+      if (out.result_info.status != SUCCESS_OP) {
+        out.next_node = 0;
+        return out;
       }
 
       vkGetDeviceQueue(myg.ldevice, indices.graphicsFamily.value(), 0,
                        &myg.graphics_queue);
       vkGetDeviceQueue(myg.ldevice, indices.presentFamily.value(), 0,
                        &myg.present_queue);
+      return out;
     };
-    createLogicalDeviceNode.node_id = node_counter;
-    node_counter++;
+    auto vr = mkAddNode<vk_triapp, 6, true, 7>(graph, f);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 6 with end node 7";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
 
-  /** vulkan create swap chain node*/
-  vk_node createSwapChainNode;
+  /** vulkan create swap chain node:
+    - node id 7
+    - target nodes: {8}
+   */
   {
-    createSwapChainNode.is_singular = true;
-    createSwapChainNode.is_called = false;
-    createSwapChainNode.compute = [](vk_graph &myg) {
+    std::function<vk_output(vk_triapp &)> f = [](vk_triapp &myg) {
       //
+      Result_Vk vr;
+      vr.status = SUCCESS_OP;
+      vk_output out;
+      out.result_info = vr;
+      out.next_node = 8;
+
       SwapChainSupportDetails swapChainSupport =
           querySwapChainSupport(myg.pdevice, myg.surface);
 
@@ -562,9 +734,14 @@ int main() {
       createInfo.presentMode = presentMode;
       createInfo.clipped = VK_TRUE;
 
-      if (vkCreateSwapchainKHR(myg.ldevice, &createInfo, nullptr, &myg.chain) !=
-          VK_SUCCESS) {
-        std::cerr << "failed to create swap chain!" << std::endl;
+      std::string nmsg = "failed to create swap chain!";
+      CHECK_VK(
+          vkCreateSwapchainKHR(myg.ldevice, &createInfo, nullptr, &myg.chain),
+          nmsg, out.result_info);
+
+      if (out.result_info.status != SUCCESS_OP) {
+        out.next_node = 0;
+        return out;
       }
 
       vkGetSwapchainImagesKHR(myg.ldevice, myg.chain, &imageCount, nullptr);
@@ -574,16 +751,28 @@ int main() {
 
       myg.simage_format = surfaceFormat.format;
       myg.sextent = extent;
+      return out;
     };
-    createSwapChainNode.node_id = node_counter;
-    node_counter++;
+    auto vr = mkAddNode<vk_triapp, 7, false, 8>(graph, f);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 7 with end node 8";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
-  /** create swap chain image views*/
-  vk_node createImageViewsNode;
+  /** create swap chain image views node:
+    - node id 8
+    - target nodes {9}
+   */
   {
-    createImageViewsNode.is_singular = true;
-    createImageViewsNode.is_called = false;
-    createImageViewsNode.compute = [](vk_graph &myg) {
+    std::function<vk_output(vk_triapp &)> f = [](vk_triapp &myg) {
+      Result_Vk vr;
+      vr.status = SUCCESS_OP;
+      vk_output out;
+      out.result_info = vr;
+      out.next_node = 9;
+
       myg.views.resize(myg.simages.size());
 
       for (size_t i = 0; i < myg.simages.size(); i++) {
@@ -602,22 +791,39 @@ int main() {
         createInfo.subresourceRange.baseArrayLayer = 0;
         createInfo.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(myg.ldevice, &createInfo, nullptr,
-                              &myg.views[i]) != VK_SUCCESS) {
-          std::cerr << "failed to create image views!" << std::endl;
+        std::string nmsg = "failed to create image views!";
+        CHECK_VK(
+            vkCreateImageView(myg.ldevice, &createInfo, nullptr, &myg.views[i]),
+            nmsg, out.result_info);
+
+        if (out.result_info.status != SUCCESS_OP) {
+          out.next_node = 0;
+          return out;
         }
       }
+      return out;
     };
-    createImageViewsNode.node_id = node_counter;
-    node_counter++;
+    auto vr = mkAddNode<vk_triapp, 8, false, 9>(graph, f);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 8 with end node 9";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
-  /** create render pass for all the images*/
-  vk_node createRenderPassNode;
+  /** create render pass for all the images node:
+    - node id 9
+    - target nodes {10}
+   */
   {
-    createRenderPassNode.is_singular = true;
-    createRenderPassNode.is_called = false;
-    createRenderPassNode.compute = [](vk_graph &myg) {
+    std::function<vk_output(vk_triapp &)> f = [](vk_triapp &myg) {
       //
+      Result_Vk vr;
+      vr.status = SUCCESS_OP;
+      vk_output out;
+      out.result_info = vr;
+      out.next_node = 10;
+
       VkAttachmentDescription colorAttachment{};
       colorAttachment.format = myg.simage_format;
       colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -654,20 +860,40 @@ int main() {
       renderPassInfo.dependencyCount = 1;
       renderPassInfo.pDependencies = &dependency;
 
-      if (vkCreateRenderPass(myg.ldevice, &renderPassInfo, nullptr,
-                             &myg.render_pass) != VK_SUCCESS) {
-        std::cerr << "failed to create render pass!" << std::endl;
+      std::string nmsg = "failed to create render pass!";
+
+      CHECK_VK(vkCreateRenderPass(myg.ldevice, &renderPassInfo, nullptr,
+                                  &myg.render_pass),
+               nmsg, out.result_info);
+      if (out.result_info.status != SUCCESS_OP) {
+        out.next_node = 0;
+        return out;
+      } else {
+        return out;
       }
     };
-    createRenderPassNode.node_id = node_counter;
-    node_counter++;
+    auto vr = mkAddNode<vk_triapp, 9, false, 10>(graph, f);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 9 with end node 10";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
-  /** create graphics pipeline */
-  vk_node createGraphicsPipelineNode;
+  /** create graphics pipeline node:
+    - node id 10
+    - target nodes {11}
+
+    It accesses IO. It can probably be refactored to access it only one time.
+   */
   {
-    createGraphicsPipelineNode.is_singular = true;
-    createGraphicsPipelineNode.is_called = false;
-    createGraphicsPipelineNode.compute = [](vk_graph &myg) {
+    std::function<vk_output(vk_triapp &)> f = [](vk_triapp &myg) {
+      Result_Vk vr;
+      vr.status = SUCCESS_OP;
+      vk_output out;
+      out.result_info = vr;
+      out.next_node = 11;
+
       //
       auto vertShaderCode = readFile("shaders/triangle/triangle.vert.spv");
       auto fragShaderCode = readFile("shaders/triangle/triangle.frag.spv");
@@ -766,9 +992,14 @@ int main() {
       pipelineLayoutInfo.setLayoutCount = 0;
       pipelineLayoutInfo.pushConstantRangeCount = 0;
 
-      if (vkCreatePipelineLayout(myg.ldevice, &pipelineLayoutInfo, nullptr,
-                                 &myg.pipeline_layout) != VK_SUCCESS) {
-        std::cerr << "failed to create pipeline layout!" << std::endl;
+      std::string nmsg = "failed to create pipeline layout!";
+      CHECK_VK(vkCreatePipelineLayout(myg.ldevice, &pipelineLayoutInfo, nullptr,
+                                      &myg.pipeline_layout),
+               nmsg, out.result_info);
+
+      if (out.result_info != SUCCESS_OP) {
+        out.next_node = 0;
+        return out;
       }
 
       VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -785,18 +1016,28 @@ int main() {
       pipelineInfo.renderPass = myg.render_pass;
       pipelineInfo.subpass = 0;
       pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+      nmsg = "failed to create graphics pipeline!";
+      CHECK_VK(vkCreateGraphicsPipelines(myg.ldevice, VK_NULL_HANDLE, 1,
+                                         &pipelineInfo, nullptr,
+                                         &myg.graphics_pipeline),
+               nmsg, out.result_info);
 
-      if (vkCreateGraphicsPipelines(myg.ldevice, VK_NULL_HANDLE, 1,
-                                    &pipelineInfo, nullptr,
-                                    &myg.graphics_pipeline) != VK_SUCCESS) {
-        std::cerr << "failed to create graphics pipeline!" << std::endl;
+      if (out.result_info.status != SUCCESS_OP) {
+        out.next_node = 0;
+        return out;
       }
 
       vkDestroyShaderModule(myg.ldevice, fragShaderModule, nullptr);
       vkDestroyShaderModule(myg.ldevice, vertShaderModule, nullptr);
+      return out;
     };
-    createGraphicsPipelineNode.node_id = node_counter;
-    node_counter++;
+    auto vr = mkAddNode<vk_triapp, 10, false, 11>(graph, f);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 10 with end node 11";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
 
   /** create framebuffers node:
@@ -805,11 +1046,11 @@ int main() {
     - swap chain extent
     - swap chain render pass
    */
-  vk_node createFramebuffersNode;
+  vk_node<vk_triapp> createFramebuffersNode;
   {
     createFramebuffersNode.is_singular = true;
     createFramebuffersNode.is_called = false;
-    createFramebuffersNode.compute = [](vk_graph &myg) {
+    createFramebuffersNode.compute = [](vk_triapp &myg) {
       //
       myg.swapchain_framebuffers.resize(myg.views.size());
 
@@ -841,11 +1082,11 @@ int main() {
     - surface
     - physical device
    */
-  vk_node createCommandPoolNode;
+  vk_node<vk_triapp> createCommandPoolNode;
   {
     createCommandPoolNode.is_singular = true;
     createCommandPoolNode.is_called = false;
-    createCommandPoolNode.compute = [](vk_graph &myg) {
+    createCommandPoolNode.compute = [](vk_triapp &myg) {
       //
       QueueFamilyIndices queueFamilyIndices =
           findQueueFamilies(myg.pdevice, myg.surface);
@@ -864,11 +1105,11 @@ int main() {
   }
 
   /** create command buffers node */
-  vk_node createCommandAllocBuffersNode;
+  vk_node<vk_triapp> createCommandAllocBuffersNode;
   {
     createCommandAllocBuffersNode.is_singular = true;
     createCommandAllocBuffersNode.is_called = false;
-    createCommandAllocBuffersNode.compute = [](vk_graph &myg) {
+    createCommandAllocBuffersNode.compute = [](vk_triapp &myg) {
       //
       myg.cbuffers.resize(myg.swapchain_framebuffers.size());
 
@@ -899,20 +1140,20 @@ int main() {
     - swapchain extent
    */
   // a merging buffer which does not do anything
-  vk_node cmdBufferMergeNode;
+  vk_node<vk_triapp> cmdBufferMergeNode;
   {
     createCommandAllocBuffersNode.is_singular = true;
     createCommandAllocBuffersNode.is_called = false;
-    createCommandAllocBuffersNode.compute = [](vk_graph &myg) {};
+    createCommandAllocBuffersNode.compute = [](vk_triapp &myg) {};
     createCommandAllocBuffersNode.node_id = node_counter;
     node_counter++;
   }
-  vk_node createCommandBufferNode;
+  vk_node<vk_triapp> createCommandBufferNode;
   {
     createCommandBufferNode.is_singular = false;
     createCommandBufferNode.is_called = false;
 
-    createCommandBufferNode.compute = [](vk_graph &myg) {
+    createCommandBufferNode.compute = [](vk_triapp &myg) {
       for (size_t i = 0; i < myg.cbuffers.size(); i++) {
         if (!myg.cbuffers[i]) {
           continue;
@@ -961,12 +1202,12 @@ int main() {
     node_counter++;
   }
 
-  vk_node createSyncObjectsNode;
+  vk_node<vk_triapp> createSyncObjectsNode;
   {
     createSyncObjectsNode.is_singular = false;
     createSyncObjectsNode.is_called = false;
 
-    createSyncObjectsNode.compute = [](vk_graph &myg) {
+    createSyncObjectsNode.compute = [](vk_triapp &myg) {
       //
       myg.image_available_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
       myg.render_finished_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -999,86 +1240,25 @@ int main() {
     node_counter++;
   }
 
-  // edges of the graph
-  unsigned int edge_counter = 1;
+  vk_node<vk_triapp> renderLoopNode;
+  {
+    renderLoopNode.is_singular = false;
+    renderLoopNode.is_called = false;
 
-  mkAddVkGEdge(graph, init_w_node, createInstanceNode, edge_counter);
-  edge_counter++;
+    renderLoopNode.compute = [](vk_triapp &myg) {
+      //
+      while (!glfwWindowShouldClose(myg.window)) {
+        glfwPollEvents();
+        drawFrame(myg);
+      }
 
-  mkAddVkGEdge(graph, createInstanceNode, setupDebugMessengerNode,
-               edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createInstanceNode, createSurfaceNode, edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createSurfaceNode, pickPhysicalDeviceNode, edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, pickPhysicalDeviceNode, createLogicalDeviceNode,
-               edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createLogicalDeviceNode, createSwapChainNode,
-               edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createSwapChainNode, createImageViewsNode, edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createSwapChainNode, createRenderPassNode, edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createRenderPassNode, createGraphicsPipelineNode,
-               edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createRenderPassNode, createFramebuffersNode,
-               edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createLogicalDeviceNode, createCommandPoolNode,
-               edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createCommandPoolNode, createCommandAllocBuffersNode,
-               edge_counter);
-  edge_counter++;
-
-  // merge node for specifying dependencies of a command buffer
-  mkAddVkGEdge(graph, createCommandAllocBuffersNode, cmdBufferMergeNode,
-               edge_counter);
-  edge_counter++;
-  //
-
-  mkAddVkGEdge(graph, createSwapChainNode, cmdBufferMergeNode, edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createFramebuffersNode, cmdBufferMergeNode, edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createRenderPassNode, cmdBufferMergeNode, edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createGraphicsPipelineNode, cmdBufferMergeNode,
-               edge_counter);
-  edge_counter++;
-
-  // now add the create command buffer node
-  mkAddVkGEdge(graph, cmdBufferMergeNode, createCommandBufferNode,
-               edge_counter);
-  edge_counter++;
-
-  mkAddVkGEdge(graph, createCommandBufferNode, createSyncObjectsNode,
-               edge_counter);
-  edge_counter++;
+      vkDeviceWaitIdle(myg.ldevice);
+    };
+    renderLoopNode.node_id = node_counter;
+    node_counter++;
+  }
 
   // run first edge
-  std::vector<vk_edge> ops(graph.ops.begin(), graph.ops.end());
-  for (auto e : ops) {
-    e.start.run(graph);
-    e.end.run(graph);
-  }
 
   std::cout << "everything runs" << std::endl;
 

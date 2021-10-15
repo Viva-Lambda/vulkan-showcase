@@ -168,13 +168,8 @@ enum status_t_vk : uint_least8_t {
   SUCCESS_OP = 0,
   FAIL_OP = 1,
   GLFW_ERROR = 2,
-  STRUCT_PARAM_ERROR_VK = 3,
-  STRUCT_TYPE_ERROR_VK = 4,
-  PNEXT_STYPE_CHAIN_ERROR_VK = 5,
-  INACTIVE_VALIDATION_LAYERS_VK = 6,
-  IMAGE_SUBRESOURCE_RANGE_ERROR_VK = 7,
-  COMPONENT_SWIZZLE_ERROR_VK = 8,
-  IMAGE_CREATE_ERROR_VK = 9,
+  NODE_ERROR = 3,
+  GRAPH_ERROR = 4
 };
 
 std::string toString(status_t_vk r) {
@@ -183,24 +178,14 @@ std::string toString(status_t_vk r) {
     str = "Success :: custom operation SUCCESSFUL";
   } else if (r == FAIL_OP) {
     str = "Error :: FAIL_OP :: custom operation FAILED";
-  } else if (r == STRUCT_PARAM_ERROR_VK) {
-    str = "Error :: STRUCT_PARAM_ERROR_VK :: struct parameter";
-  } else if (r == STRUCT_TYPE_ERROR_VK) {
-    str = "Error :: STRUCT_TYPE_ERROR_VK :: struct type";
-  } else if (r == PNEXT_STYPE_CHAIN_ERROR_VK) {
-    str = "Error :: PNEXT_STYPE_CHAIN_ERROR_VK :: stype error in pnext chain";
-  } else if (r == INACTIVE_VALIDATION_LAYERS_VK) {
-    str =
-        "Error :: INACTIVE_VALIDATION_LAYERS_VK :: inactive validation layers";
   } else if (r == GLFW_ERROR) {
     str = "Error :: GLFW_ERROR :: error in glfw call";
-  } else if (r == IMAGE_SUBRESOURCE_RANGE_ERROR_VK) {
-    str = "Error :: IMAGE_SUBRESOURCE_RANGE_ERROR_VK :: error in image "
-          "subresource range";
-  } else if (r == IMAGE_CREATE_ERROR_VK) {
-    str = "Error :: IMAGE_CREATE_ERROR_VK :: error in ImageCreateInfo "
-          "procedures ";
+  } else if (r == NODE_ERROR) {
+    str = "Error :: NODE_ERROR :: error in node operation call";
+  } else if (r == GRAPH_ERROR) {
+    str = "Error :: GRAPH_ERROR :: error in graph operation call";
   }
+
   return str;
 }
 /**
@@ -229,6 +214,36 @@ struct Result_Vk {
   std::string status_info = "";
   status_t_vk status;
 };
+
+std::string toString(const Result_Vk &r) {
+  //
+  std::string result = "";
+  result += "File path: ";
+  result += r.filepath;
+  result += "\n";
+  result += "Function name: ";
+  result += r.fn_name;
+  result += "\n";
+  result += "Context: ";
+  result += r.context;
+  result += "\n";
+  result += "Call information: ";
+  result += r.call_info;
+  result += "\n";
+  result += "Description: ";
+  result += r.description;
+  result += "\n";
+  result += "Specification information: ";
+  result += r.spec_info;
+  result += "\n";
+  result += "Status information: ";
+  result += r.status_info;
+  result += "\n";
+  result += "Line: ";
+  result += std::to_string(r.line);
+  result += "\n";
+  return result;
+}
 
 #define UPDATE_RESULT_VK(res, msg)                                             \
   do {                                                                         \
