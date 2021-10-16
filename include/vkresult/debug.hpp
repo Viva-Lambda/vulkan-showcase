@@ -205,6 +205,7 @@ std::string toString(status_t_vk r) {
  */
 struct Result_Vk {
   unsigned int line = 0;
+  VkResult result;
   std::string filepath = "";
   std::string fn_name = "";
   std::string context = "";
@@ -265,10 +266,12 @@ std::string toString(const Result_Vk &r) {
       res.call_info = #call;                                                   \
       res.status = FAIL_OP;                                                    \
       res.status_info = toString(FAIL_OP);                                     \
+      res.result = r;                                                          \
     } else {                                                                   \
       res.status = SUCCESS_OP;                                                 \
       res.description = toString(r);                                           \
       res.status_info = toString(SUCCESS_OP);                                  \
+      res.result = r;                                                          \
     }                                                                          \
   } while (0)
 

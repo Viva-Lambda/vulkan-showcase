@@ -8,6 +8,6 @@ namespace vtuto {
 
 struct vk_output {
   Result_Vk result_info;
-  unsigned int next_node;
+  unsigned int signal;
 };
 } // namespace vtuto

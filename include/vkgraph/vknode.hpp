@@ -12,6 +12,7 @@ template <class VkApp> struct vk_node {
   unsigned int node_id;
 
   std::function<vk_output(VkApp &)> compute;
+  std::function<unsigned int(vk_output)> next_node;
   bool is_singular = true;
   bool is_called = false;
 
@@ -19,8 +20,9 @@ template <class VkApp> struct vk_node {
   vk_output node_out;
 
   // real constructor
-  vk_node(unsigned int n, std::function<vk_output(VkApp &)> &f)
-      : node_id(n), compute(f) {}
+  vk_node(unsigned int n, const std::function<vk_output(VkApp &)> &f,
+          const std::function<unsigned int(const vk_output &)> &nn)
+      : node_id(n), compute(f), next_node(nn) {}
   vk_output run(VkApp &g) {
     if (is_singular) {
       // should be called once since it is a singular
@@ -37,6 +39,7 @@ template <class VkApp> struct vk_node {
       return node_out;
     }
   }
+  unsigned int next() { return next_node(node_out); }
 };
 
 } // namespace vtuto

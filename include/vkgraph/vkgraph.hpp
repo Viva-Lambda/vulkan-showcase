@@ -28,13 +28,14 @@ template <class VkApp> struct vk_graph {
         return node_out.result_info;
       }
       // check if we are going to an unknown branch
-      if (adj.find(node_out.next_node) != adj.end()) {
-        node = nodes[node_out.next_node];
-        adj = adj_lst[node_out.next_node];
+      auto next_node = node.next();
+      if (adj.find(next_node) != adj.end()) {
+        node = nodes[next_node];
+        adj = adj_lst[next_node];
       } else {
         Result_Vk vr;
         vr.status = GRAPH_ERROR;
-        std::string next_n = std::to_string(node_out.next_node);
+        std::string next_n = std::to_string(next_node);
         std::string current_n = std::to_string(node.node_id);
         std::string nmsg = "node computation results in non adjacent branch";
         nmsg += " current node id: ";
