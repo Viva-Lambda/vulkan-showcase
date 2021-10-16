@@ -491,84 +491,6 @@ static VkShaderModule createShaderModule(const std::vector<char> &code,
   return shaderModule;
 }
 
-static const int MAX_FRAMES_IN_FLIGHT = 2;
-
-static void drawFrame(vk_triapp &g) {
-  vkWaitForFences(g.ldevice, 1, &g.current_fences[g.current_frame], VK_TRUE,
-                  UINT64_MAX);
-
-  uint32_t imageIndex;
-  VkResult result =
-      vkAcquireNextImageKHR(g.ldevice, g.chain, UINT64_MAX,
-                            g.image_available_semaphores[g.current_frame],
-                            VK_NULL_HANDLE, &imageIndex);
-
-  if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-    recreateSwapChain();
-    return;
-  } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-    std::cerr << "failed to acquire swap chain image!" << std::endl;
-    return;
-  }
-
-  if (g.images_in_flight[imageIndex] != VK_NULL_HANDLE) {
-    vkWaitForFences(device, 1, &g.images_in_flight[imageIndex], VK_TRUE,
-                    UINT64_MAX);
-  }
-  g.images_in_flight[imageIndex] = g.current_fences[g.current_frame];
-
-  VkSubmitInfo submitInfo{};
-  submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-  VkSemaphore waitSemaphores[] = {
-      g.image_available_semaphores[g.current_frame]};
-  VkPipelineStageFlags waitStages[] = {
-      VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-  submitInfo.waitSemaphoreCount = 1;
-  submitInfo.pWaitSemaphores = waitSemaphores;
-  submitInfo.pWaitDstStageMask = waitStages;
-
-  submitInfo.commandBufferCount = 1;
-  submitInfo.pCommandBuffers = &g.cbuffers[imageIndex];
-
-  VkSemaphore signalSemaphores[] = {
-      g.render_finished_semaphores[g.current_frame]};
-  submitInfo.signalSemaphoreCount = 1;
-  submitInfo.pSignalSemaphores = signalSemaphores;
-
-  vkResetFences(g.ldevice, 1, &g.current_fences[g.current_frame]);
-
-  if (vkQueueSubmit(g.graphics_queue, 1, &submitInfo,
-                    g.current_fences[g.current_frame]) != VK_SUCCESS) {
-    std::cerr << "failed to submit draw command buffer!" << std::endl;
-  }
-
-  VkPresentInfoKHR presentInfo{};
-  presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
-  presentInfo.waitSemaphoreCount = 1;
-  presentInfo.pWaitSemaphores = signalSemaphores;
-
-  VkSwapchainKHR swapChains[] = {g.chain};
-  presentInfo.swapchainCount = 1;
-  presentInfo.pSwapchains = swapChains;
-
-  presentInfo.pImageIndices = &imageIndex;
-
-  result = vkQueuePresentKHR(presentQueue, &presentInfo);
-
-  if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
-      g.framebuffer_resized) {
-    g.framebuffer_resized = false;
-    recreateSwapChain();
-  } else if (result != VK_SUCCESS) {
-    std::cerr << "failed to present swap chain image!" << std::endl;
-    return;
-  }
-
-  g.current_frame = (g.current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
-}
-
 std::unordered_map<std::string, std::function<vk_output(vk_triapp &)>>
 vk_triAppFns() {
   //
@@ -1250,9 +1172,9 @@ vk_triAppFns() {
     out.signal = 1;
 
     //
-    myg.image_available_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    myg.render_finished_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    myg.current_fences.resize(MAX_FRAMES_IN_FLIGHT);
+    myg.image_available_semaphores.resize(myg.MAX_FRAMES_IN_FLIGHT);
+    myg.render_finished_semaphores.resize(myg.MAX_FRAMES_IN_FLIGHT);
+    myg.current_fences.resize(myg.MAX_FRAMES_IN_FLIGHT);
     myg.images_in_flight.resize(myg.simages.size(), VK_NULL_HANDLE);
 
     VkSemaphoreCreateInfo semaphoreInfo{};
@@ -1261,8 +1183,9 @@ vk_triAppFns() {
     VkFenceCreateInfo fenceInfo{};
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+    auto max_frames = static_cast<std::size_t>(myg.MAX_FRAMES_IN_FLIGHT);
 
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+    for (size_t i = 0; i < max_frames; i++) {
       std::string nmsg =
           "failed to create synchronization objects for a frame!";
       nmsg += " frame ";
@@ -1275,8 +1198,7 @@ vk_triAppFns() {
 
       CHECK_VK(vkCreateSemaphore(myg.ldevice, &semaphoreInfo, nullptr,
                                  &myg.render_finished_semaphores[i]),
-               nmsg,
-               out.result_info);
+               nmsg, out.result_info);
       bool c2 = out.result_info.status != SUCCESS_OP;
 
       CHECK_VK(vkCreateFence(myg.ldevice, &fenceInfo, nullptr,
@@ -1384,8 +1306,8 @@ vk_triAppFns() {
 
     presentInfo.pImageIndices = &imageIndex;
 
-    std::string nmsg = "failed to present swap chain image!";
-    CHECK_VK(vkQueuePresentKHR(presentQueue, &presentInfo), nmsg,
+    nmsg = "failed to present swap chain image!";
+    CHECK_VK(vkQueuePresentKHR(g.present_queue, &presentInfo), nmsg,
              out.result_info);
 
     bool c1 = out.result_info.result == VK_ERROR_OUT_OF_DATE_KHR;
@@ -1463,3 +1385,4 @@ vk_triAppFns() {
 
   return fm;
 }
+} // namespace vtuto

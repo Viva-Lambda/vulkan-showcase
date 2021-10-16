@@ -1,5 +1,6 @@
 #pragma once
 // functions related to making vkgraphs and vk graph components
+#include <bits/c++config.h>
 #include <external.hpp>
 #include <utility>
 #include <vkgraph/vkgraph.hpp>
@@ -18,23 +19,44 @@ namespace vtuto {
  */
 typedef std::pair<unsigned int, unsigned int> BranchSignal;
 // first: signal, second: node id
-template <unsigned int... Bs, class Tpl>
-std::array<BranchSignal, sizeof...(Bs) / 2>
-getBranchSignals(std::integer_sequence<unsigned int, Bs...>, Tpl ts) {
-  return std::array<BranchSignal, sizeof...(Bs) / 2>{
-      std::make_pair(std::get<2 * Bs>(ts), std::get<2 * Bs + 1>(ts))...};
+
+template <std::size_t... PairIndices, typename Tuple>
+constexpr std::array<BranchSignal, sizeof...(PairIndices)>
+getBranchSignalHelper(std::index_sequence<PairIndices...>, Tuple tpl) {
+
+  return std::array<BranchSignal, sizeof...(PairIndices)>{std::make_pair(
+      std::get<2 * PairIndices>(tpl), std::get<2 * PairIndices + 1>(tpl))...};
 }
 
-template <unsigned int... Bs, class Tpl>
-std::array<unsigned int, sizeof...(Bs) / 2>
-getSignalsFromBranchSignal(std::index_sequence<Bs...>, Tpl tpl) {
-  return std::array<unsigned int, sizeof...(Bs) / 2>{std::get<2 * Bs>(tpl)...};
+template <std::size_t... PairIndices, typename Tuple>
+constexpr std::array<unsigned int, sizeof...(PairIndices)>
+getSignalHelper(std::index_sequence<PairIndices...>, Tuple tpl) {
+  return std::array<unsigned int, sizeof...(PairIndices)>{
+      std::get<2 * PairIndices>(tpl)...};
 }
-template <unsigned int... Bs, class Tpl>
-std::array<unsigned int, sizeof...(Bs) / 2>
-getNodeIdsFromBranchSignals(std::index_sequence<Bs...>, Tpl tpl) {
-  return std::array<unsigned int, sizeof...(Bs) / 2>{
-      std::get<2 * Bs + 1>(tpl)...};
+
+template <std::size_t... PairIndices, typename Tuple>
+constexpr std::array<unsigned int, sizeof...(PairIndices)>
+getNodeIdHelper(std::index_sequence<PairIndices...>, Tuple tpl) {
+  return std::array<unsigned int, sizeof...(PairIndices)>{
+      std::get<2 * PairIndices + 1>(tpl)...};
+}
+
+template <unsigned int... Bs>
+constexpr std::array<BranchSignal, sizeof...(Bs) / 2> getBranchSignal() {
+  constexpr auto tpl = std::make_tuple(Bs...);
+  return getBranchSignalHelper(std::make_index_sequence<sizeof...(Bs) / 2>{},
+                               tpl);
+}
+template <unsigned int... Bs>
+std::array<unsigned int, sizeof...(Bs) / 2> getSignalsFromBranchSignals() {
+  constexpr auto tpl = std::make_tuple(Bs...);
+  return getSignalHelper(std::make_index_sequence<sizeof...(Bs) / 2>{}, tpl);
+}
+template <unsigned int... Bs>
+std::array<unsigned int, sizeof...(Bs) / 2> getNodeIdsFromBranchSignals() {
+  constexpr auto tpl = std::make_tuple(Bs...);
+  return getNodeIdHelper(std::make_index_sequence<sizeof...(Bs) / 2>{}, tpl);
 }
 /**
   The idea is we pass the application type,
@@ -56,9 +78,7 @@ vk_node<VkApp> mkNode(const std::function<vk_output(VkApp &)> &NodeFn) {
   n.compute = NodeFn;
   n.next_node = [](const vk_output &out) {
     const std::size_t BSize = sizeof...(Bs) / 2;
-    std::array<BranchSignal, BSize> bs =
-        getBranchSignals(std::make_integer_sequence<unsigned int, BSize>{},
-                         std::make_tuple(Bs...));
+    constexpr std::array<BranchSignal, BSize> bs = getBranchSignal<Bs...>();
     for (const auto &b : bs) {
       if (b.first == out.signal) {
         return b.second;
@@ -72,8 +92,8 @@ vk_node<VkApp> mkNode(const std::function<vk_output(VkApp &)> &NodeFn) {
 //
 template <typename VkApp, unsigned int... Bs>
 Result_Vk addNode(vk_graph<VkApp> &g, vk_node<VkApp> &n) {
-  std::array<unsigned int, sizeof...(Bs) / 2> arr = getNodeIdsFromBranchSignals(
-      std::make_index_sequence<sizeof...(Bs) / 2>{}, std::make_tuple(Bs...));
+  std::array<unsigned int, sizeof...(Bs) / 2> arr =
+      getNodeIdsFromBranchSignals<Bs...>();
 
   std::vector<unsigned int> ends(arr.begin(), arr.end());
   auto mpair = std::make_pair(n.node_id, ends);
@@ -87,7 +107,8 @@ Result_Vk addNode(vk_graph<VkApp> &g, vk_node<VkApp> &n) {
     return vr;
   }
   g.adj_lst.insert(mpair);
-  g.nodes.insert(n.node_id, n);
+  auto npair = std::make_pair(n.node_id, n);
+  g.nodes.insert(npair);
   return vr;
 }
 
@@ -95,6 +116,7 @@ template <typename VkApp, unsigned int NodeId, bool IsSingular,
           unsigned int... Bs>
 Result_Vk mkAddNode(vk_graph<VkApp> &g,
                     const std::function<vk_output(VkApp &)> &NodeFn) {
+
   auto n = mkNode<VkApp, NodeId, IsSingular, Bs...>(NodeFn);
   return addNode<VkApp, Bs...>(g, n);
 }
