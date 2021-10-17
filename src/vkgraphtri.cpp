@@ -11,6 +11,7 @@ int main() {
   // declare graph
   vk_graph<vk_triapp> graph;
   auto fnmap = vk_triAppFns();
+  vk_triapp triangle;
 
   /** init window node:
     - node id 1
@@ -200,7 +201,7 @@ int main() {
     - target node {13: createCommandBufferAlloc}
    */
   {
-    auto vr = mkAddNode<vk_triapp, 12, false, 1, 13>(
+    auto vr = mkAddNode<vk_triapp, 12, true, 1, 13>(
         graph, fnmap["createCommandPool"]);
     if (vr.status != SUCCESS_OP) {
       std::string str = "node creation failed for node 12 with end node 13";
@@ -216,18 +217,14 @@ int main() {
     - target node {14: createCommandBuffers}
    */
   {
-    auto vr = mkAddNode<vk_triapp, 13, false, 1, 14>(
+    auto vr = mkAddNode<vk_triapp, 13, true, 1, 14>(
         graph, fnmap["createCommandBufferAlloc"]);
     if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 12 with end node 13";
+      std::string str = "node creation failed for node 13 with end node 14";
       UPDATE_RESULT_VK(vr, str);
       std::cerr << toString(vr) << std::endl;
       return EXIT_FAILURE;
     }
-  }
-  // a merging buffer which does not do anything
-  {
-      // add a merging node if need be
   }
 
   /** create command buffer node:
@@ -274,7 +271,7 @@ int main() {
     - target node ids {17: drawFrame, 19: cleanUp}
    */
   {
-    auto vr = mkAddNode<vk_triapp, 16, false, 1, 17, 2, 18>(
+    auto vr = mkAddNode<vk_triapp, 16, false, 1, 17, 2, 28>(
         graph, fnmap["windowShouldClose"]);
     if (vr.status != SUCCESS_OP) {
       std::string str =
@@ -306,76 +303,197 @@ int main() {
     - node id 18
     - target node {19: cleanupSwapChain}
   */
-  {}
+  {
+    auto vr = mkAddNode<vk_triapp, 18, false, 1, 19>(
+        graph, fnmap["recreateSwapChain"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 18 with end node {19}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
 
   /**
     clean up swapchain in recreate swapchain node:
     - node id 20
     - target node id {21: createSwapChain}
    */
-  {} /**
+  {
+    auto vr = mkAddNode<vk_triapp, 20, false, 1, 21>(graph,
+                                                     fnmap["cleanupSwapChain"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 20 with end node {21}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  /**
        createSwapChain in recreate swapchain node:
        - node id 21
        - target node id {22: createImageViews}
       */
-  {} /**
+  {
+    auto vr =
+        mkAddNode<vk_triapp, 21, false, 1, 22>(graph, fnmap["createSwapChain"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 21 with end node {22}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+
+  } /**
        createImageViews in recreate swapchain node:
        - node id 22
        - target node id {23: createRenderPass}
       */
-  {} /**
+  {
+    auto vr = mkAddNode<vk_triapp, 22, false, 1, 23>(graph,
+                                                     fnmap["createImageViews"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 22 with end node {23}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  /**
        createRenderPass in recreate swapchain node:
        - node id 23
        - target node id {24: createGraphicsPipeline}
       */
-  {}
+  {
+    auto vr = mkAddNode<vk_triapp, 23, false, 1, 24>(graph,
+                                                     fnmap["createRenderPass"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 23 with end node {24}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
 
   /**
     createGraphicsPipeline in recreate swapchain node:
-    - node id 23
-    - target node id {24: createFramebuffers}
+    - node id 24
+    - target node id {25: createFramebuffers}
    */
-  {}
+  {
+    auto vr = mkAddNode<vk_triapp, 24, false, 1, 25>(
+        graph, fnmap["createGraphicsPipeline"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 24 with end node {25}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
 
   /**
     createFramebuffers in recreate swapchain node:
-    - node id 24
-    - target node id {25: createCommandBuffers}
+    - node id 25
+    - target node id {26: createCommandBuffers}
    */
-  {}
+  {
+    auto vr = mkAddNode<vk_triapp, 25, false, 1, 26>(
+        graph, fnmap["createFramebuffers"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 25 with end node {26}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
 
   /**
     createCommandBuffers in recreate swapchain node:
-    - node id 25
-    - target node id {26: imagesInFlightResize}
+    - node id 26
+    - target node id {27: imagesInFlightResize}
    */
-  {} /**
+  {
+    auto vr = mkAddNode<vk_triapp, 26, false, 1, 27>(
+        graph, fnmap["createCommandBuffers"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 26 with end node {27}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+
+  } /**
        imagesInFlightResize in recreateSwapChain node:
-       - node id 26
+       - node id 27
        - target node {16: windowShouldClose}
       */
-  {} // recreate swapchain ends, back to window should close now it
-     // is time for cleanup
+  {
+    auto vr = mkAddNode<vk_triapp, 27, false, 1, 16>(
+        graph, fnmap["imagesInFlightResize"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 26 with end node {16}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  // recreate swapchain ends, back to window should close now it
+  // is time for cleanup
   /**
-    cleanup node:
-    - node id: 27
-    - target node {28: cleanupSwapChain}
-   */
-  /**
+    cleanup node start with cleanup swap chain:
+
     cleanupSwapChain in cleanup node:
     - node id: 28
     - target node {29: destroyAll}
    */
-  {} /**
+  {
+    auto vr = mkAddNode<vk_triapp, 28, false, 1, 29>(graph,
+                                                     fnmap["cleanupSwapChain"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 28 with end node {29}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+
+  } /**
        destroyAll in cleanup node:
        - node id: 29
        - target node: END_NODE
 
        Once runs this node terminates the application
       */
-  {}
+  {
+    auto vr =
+        mkAddNode<vk_triapp, 29, false, 1, 30>(graph, fnmap["destroyAll"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 29 with end node {30}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  {
+    auto vr = mkAddNode<vk_triapp, 30, false, 1, 31>(graph, [](vk_triapp &myg) {
+      Result_Vk vr;
+      vr.status = FAIL_OP;
+      vk_output out;
+      out.result_info = vr;
+      out.signal = 1;
+      return out;
+    });
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 29 with end node {30}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
 
   // run first edge
+  auto vr = graph.run_from_to(triangle, 1, 30);
+
+  std::cout << toString(vr) << std::endl;
 
   std::cout << "everything runs" << std::endl;
 

@@ -1091,6 +1091,7 @@ vk_triAppFns() {
     allocInfo.commandPool = myg.pool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = (uint32_t)myg.cbuffers.size();
+    myg.available_cbuffers.resize(myg.cbuffers.size());
     for (unsigned int i = 0; i < myg.cbuffers.size(); i++) {
       myg.available_cbuffers[i] = true;
     }
@@ -1194,19 +1195,23 @@ vk_triAppFns() {
       CHECK_VK(vkCreateSemaphore(myg.ldevice, &semaphoreInfo, nullptr,
                                  &myg.image_available_semaphores[i]),
                nmsg, out.result_info);
-      bool c1 = out.result_info.status != SUCCESS_OP;
+      if (out.result_info.status != SUCCESS_OP) {
+        out.signal = 0;
+        return out;
+      }
 
       CHECK_VK(vkCreateSemaphore(myg.ldevice, &semaphoreInfo, nullptr,
                                  &myg.render_finished_semaphores[i]),
                nmsg, out.result_info);
-      bool c2 = out.result_info.status != SUCCESS_OP;
+      if (out.result_info.status != SUCCESS_OP) {
+        out.signal = 0;
+        return out;
+      }
 
       CHECK_VK(vkCreateFence(myg.ldevice, &fenceInfo, nullptr,
                              &myg.current_fences[i]),
                nmsg, out.result_info);
-      bool c3 = out.result_info.status != SUCCESS_OP;
-
-      if (c1 || c2 || c3) {
+      if (out.result_info.status != SUCCESS_OP) {
         out.signal = 0;
         return out;
       }
@@ -1382,6 +1387,36 @@ vk_triAppFns() {
     return out;
   };
   //
+  fm["destroyAll"] = [](vk_triapp &myg) {
+    for (size_t i = 0; i < myg.MAX_FRAMES_IN_FLIGHT; i++) {
+      vkDestroySemaphore(myg.ldevice, myg.render_finished_semaphores[i],
+                         nullptr);
+      vkDestroySemaphore(myg.ldevice, myg.image_available_semaphores[i],
+                         nullptr);
+      vkDestroyFence(myg.ldevice, myg.current_fences[i], nullptr);
+    }
+
+    vkDestroyCommandPool(myg.ldevice, myg.pool, nullptr);
+
+    vkDestroyDevice(myg.ldevice, nullptr);
+
+    if (enableValidationLayers) {
+      DestroyDebugUtilsMessengerEXT(myg.instance, myg.debugMessenger, nullptr);
+    }
+
+    vkDestroySurfaceKHR(myg.instance, myg.surface, nullptr);
+    vkDestroyInstance(myg.instance, nullptr);
+
+    glfwDestroyWindow(myg.window);
+
+    glfwTerminate();
+    Result_Vk vr;
+    vr.status = SUCCESS_OP;
+    vk_output out;
+    out.result_info = vr;
+    out.signal = 1;
+    return out;
+  };
 
   return fm;
 }

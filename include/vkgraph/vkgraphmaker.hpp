@@ -1,8 +1,7 @@
 #pragma once
 // functions related to making vkgraphs and vk graph components
-#include <bits/c++config.h>
 #include <external.hpp>
-#include <utility>
+#include <iterator>
 #include <vkgraph/vkgraph.hpp>
 #include <vkgraph/vknode.hpp>
 #include <vkresult/debug.hpp>
@@ -49,12 +48,14 @@ constexpr std::array<BranchSignal, sizeof...(Bs) / 2> getBranchSignal() {
                                tpl);
 }
 template <unsigned int... Bs>
-std::array<unsigned int, sizeof...(Bs) / 2> getSignalsFromBranchSignals() {
+constexpr std::array<unsigned int, sizeof...(Bs) / 2>
+getSignalsFromBranchSignals() {
   constexpr auto tpl = std::make_tuple(Bs...);
   return getSignalHelper(std::make_index_sequence<sizeof...(Bs) / 2>{}, tpl);
 }
 template <unsigned int... Bs>
-std::array<unsigned int, sizeof...(Bs) / 2> getNodeIdsFromBranchSignals() {
+constexpr std::array<unsigned int, sizeof...(Bs) / 2>
+getNodeIdsFromBranchSignals() {
   constexpr auto tpl = std::make_tuple(Bs...);
   return getNodeIdHelper(std::make_index_sequence<sizeof...(Bs) / 2>{}, tpl);
 }
@@ -70,7 +71,8 @@ std::array<unsigned int, sizeof...(Bs) / 2> getNodeIdsFromBranchSignals() {
  */
 template <typename VkApp, unsigned int NodeId, bool IsSingular,
           unsigned int... Bs>
-vk_node<VkApp> mkNode(const std::function<vk_output(VkApp &)> &NodeFn) {
+constexpr vk_node<VkApp>
+mkNode(const std::function<vk_output(VkApp &)> &NodeFn) {
   vk_node<VkApp> n;
   n.is_singular = IsSingular;
   n.is_called = false;
@@ -92,22 +94,23 @@ vk_node<VkApp> mkNode(const std::function<vk_output(VkApp &)> &NodeFn) {
 //
 template <typename VkApp, unsigned int... Bs>
 Result_Vk addNode(vk_graph<VkApp> &g, vk_node<VkApp> &n) {
-  std::array<unsigned int, sizeof...(Bs) / 2> arr =
+  constexpr std::array<unsigned int, sizeof...(Bs) / 2> arr =
       getNodeIdsFromBranchSignals<Bs...>();
 
-  std::vector<unsigned int> ends(arr.begin(), arr.end());
+  std::vector<unsigned int> ends(std::make_move_iterator(arr.begin()),
+                                 std::make_move_iterator(arr.end()));
   auto mpair = std::make_pair(n.node_id, ends);
+  auto npair = std::make_pair(n.node_id, n);
   Result_Vk vr;
   vr.status = SUCCESS_OP;
   if (g.is_in(n.node_id)) {
     vr.status = FAIL_OP;
     vr.context = "node ";
     vr.context += std::to_string(n.node_id);
-    vr.context += "already exists inside the graph";
+    vr.context += " already exists inside the graph";
     return vr;
   }
   g.adj_lst.insert(mpair);
-  auto npair = std::make_pair(n.node_id, n);
   g.nodes.insert(npair);
   return vr;
 }
@@ -116,7 +119,6 @@ template <typename VkApp, unsigned int NodeId, bool IsSingular,
           unsigned int... Bs>
 Result_Vk mkAddNode(vk_graph<VkApp> &g,
                     const std::function<vk_output(VkApp &)> &NodeFn) {
-
   auto n = mkNode<VkApp, NodeId, IsSingular, Bs...>(NodeFn);
   return addNode<VkApp, Bs...>(g, n);
 }
