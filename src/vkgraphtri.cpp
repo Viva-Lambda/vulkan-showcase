@@ -201,8 +201,8 @@ int main() {
     - target node {13: createCommandBufferAlloc}
    */
   {
-    auto vr = mkAddNode<vk_triapp, 12, true, 1, 13>(
-        graph, fnmap["createCommandPool"]);
+    auto vr = mkAddNode<vk_triapp, 12, true, 1, 13>(graph,
+                                                    fnmap["createCommandPool"]);
     if (vr.status != SUCCESS_OP) {
       std::string str = "node creation failed for node 12 with end node 13";
       UPDATE_RESULT_VK(vr, str);
@@ -217,7 +217,7 @@ int main() {
     - target node {14: createCommandBuffers}
    */
   {
-    auto vr = mkAddNode<vk_triapp, 13, true, 1, 14>(
+    auto vr = mkAddNode<vk_triapp, 13, false, 1, 14>(
         graph, fnmap["createCommandBufferAlloc"]);
     if (vr.status != SUCCESS_OP) {
       std::string str = "node creation failed for node 13 with end node 14";
@@ -254,10 +254,10 @@ int main() {
     - target node id {16: windowShouldClose}
    */
   {
-    auto vr = mkAddNode<vk_triapp, 15, false, 1, 16>(
+    auto vr = mkAddNode<vk_triapp, 15, true, 1, 16>(
         graph, fnmap["createSyncObjects"]);
     if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 14 with end node 15";
+      std::string str = "node creation failed for node 15 with end node 16";
       UPDATE_RESULT_VK(vr, str);
       std::cerr << toString(vr) << std::endl;
       return EXIT_FAILURE;
@@ -268,10 +268,10 @@ int main() {
     windowShouldClose node:
 
     - node id 16
-    - target node ids {17: drawFrame, 19: cleanUp}
+    - target node ids {17: drawFrame, 29: cleanUp}
    */
   {
-    auto vr = mkAddNode<vk_triapp, 16, false, 1, 17, 2, 28>(
+    auto vr = mkAddNode<vk_triapp, 16, false, 1, 17, 2, 29>(
         graph, fnmap["windowShouldClose"]);
     if (vr.status != SUCCESS_OP) {
       std::string str =
@@ -285,10 +285,10 @@ int main() {
   /**
     draw frame node:
     - node id 17
-    - target node {15: windowShouldClose, 18: recreateSwapChain}
+    - target node {16: windowShouldClose, 18: recreateSwapChain}
    */
   {
-    auto vr = mkAddNode<vk_triapp, 17, false, 1, 15, 2, 18>(graph,
+    auto vr = mkAddNode<vk_triapp, 17, false, 1, 16, 2, 18>(graph,
                                                             fnmap["drawFrame"]);
     if (vr.status != SUCCESS_OP) {
       std::string str =
@@ -301,13 +301,13 @@ int main() {
   /**
     recreate swap chain node:
     - node id 18
-    - target node {19: cleanupSwapChain}
+    - target node {20: cleanupSwapChain}
   */
   {
-    auto vr = mkAddNode<vk_triapp, 18, false, 1, 19>(
+    auto vr = mkAddNode<vk_triapp, 18, false, 1, 20>(
         graph, fnmap["recreateSwapChain"]);
     if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 18 with end node {19}";
+      std::string str = "node creation failed for node 18 with end node {20}";
       UPDATE_RESULT_VK(vr, str);
       std::cerr << toString(vr) << std::endl;
       return EXIT_FAILURE;
@@ -394,7 +394,7 @@ int main() {
   /**
     createFramebuffers in recreate swapchain node:
     - node id 25
-    - target node id {26: createCommandBuffers}
+    - target node id {26: createCommandBufferAlloc}
    */
   {
     auto vr = mkAddNode<vk_triapp, 25, false, 1, 26>(
@@ -406,14 +406,28 @@ int main() {
       return EXIT_FAILURE;
     }
   }
-
   /**
-    createCommandBuffers in recreate swapchain node:
-    - node id 26
-    - target node id {27: imagesInFlightResize}
-   */
+      createCommandBufferAlloc in recreate swapchain node:
+      - node id 26
+      - target node id {27: createCommandBuffers}
+     */
   {
     auto vr = mkAddNode<vk_triapp, 26, false, 1, 27>(
+        graph, fnmap["createCommandBufferAlloc"]);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 26 with end node {27}";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  /**
+    createCommandBuffers in recreate swapchain node:
+    - node id 27
+    - target node id {28: imagesInFlightResize}
+   */
+  {
+    auto vr = mkAddNode<vk_triapp, 27, false, 1, 28>(
         graph, fnmap["createCommandBuffers"]);
     if (vr.status != SUCCESS_OP) {
       std::string str = "node creation failed for node 26 with end node {27}";
@@ -424,11 +438,11 @@ int main() {
 
   } /**
        imagesInFlightResize in recreateSwapChain node:
-       - node id 27
+       - node id 28
        - target node {16: windowShouldClose}
       */
   {
-    auto vr = mkAddNode<vk_triapp, 27, false, 1, 16>(
+    auto vr = mkAddNode<vk_triapp, 28, false, 1, 16>(
         graph, fnmap["imagesInFlightResize"]);
     if (vr.status != SUCCESS_OP) {
       std::string str = "node creation failed for node 26 with end node {16}";
@@ -443,11 +457,11 @@ int main() {
     cleanup node start with cleanup swap chain:
 
     cleanupSwapChain in cleanup node:
-    - node id: 28
-    - target node {29: destroyAll}
+    - node id: 29
+    - target node {30: destroyAll}
    */
   {
-    auto vr = mkAddNode<vk_triapp, 28, false, 1, 29>(graph,
+    auto vr = mkAddNode<vk_triapp, 29, false, 1, 30>(graph,
                                                      fnmap["cleanupSwapChain"]);
     if (vr.status != SUCCESS_OP) {
       std::string str = "node creation failed for node 28 with end node {29}";
@@ -455,17 +469,17 @@ int main() {
       std::cerr << toString(vr) << std::endl;
       return EXIT_FAILURE;
     }
+  }
+  /**
+    destroyAll in cleanup node:
+    - node id: 30
+    - target node: END_NODE
 
-  } /**
-       destroyAll in cleanup node:
-       - node id: 29
-       - target node: END_NODE
-
-       Once runs this node terminates the application
-      */
+    Once runs this node terminates the application
+  */
   {
     auto vr =
-        mkAddNode<vk_triapp, 29, false, 1, 30>(graph, fnmap["destroyAll"]);
+        mkAddNode<vk_triapp, 30, false, 1, 31>(graph, fnmap["destroyAll"]);
     if (vr.status != SUCCESS_OP) {
       std::string str = "node creation failed for node 29 with end node {30}";
       UPDATE_RESULT_VK(vr, str);
@@ -474,7 +488,7 @@ int main() {
     }
   }
   {
-    auto vr = mkAddNode<vk_triapp, 30, false, 1, 31>(graph, [](vk_triapp &myg) {
+    auto vr = mkAddNode<vk_triapp, 31, false, 1, 32>(graph, [](vk_triapp &myg) {
       Result_Vk vr;
       vr.status = FAIL_OP;
       vk_output out;
@@ -483,7 +497,7 @@ int main() {
       return out;
     });
     if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 29 with end node {30}";
+      std::string str = "node creation failed for node 31 with end node {32}";
       UPDATE_RESULT_VK(vr, str);
       std::cerr << toString(vr) << std::endl;
       return EXIT_FAILURE;
@@ -491,7 +505,7 @@ int main() {
   }
 
   // run first edge
-  auto vr = graph.run_from_to(triangle, 1, 30);
+  auto vr = graph.run_from_to(triangle, 1, 31);
 
   std::cout << toString(vr) << std::endl;
 

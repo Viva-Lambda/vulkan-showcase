@@ -77,6 +77,9 @@ template <class VkApp> struct vk_graph {
         return vr;
       }
     }
+    Result_Vk vr;
+    vr.status = SUCCESS_OP;
+    return vr;
   }
 };
 } // namespace vtuto

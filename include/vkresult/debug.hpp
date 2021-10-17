@@ -13,7 +13,8 @@ std::string toString(VkResult r) {
   if (r == VK_SUCCESS) {
     str = "SuccessCode :: VK_SUCCESS :: Command successfully completed";
   } else if (r == VK_NOT_READY) {
-    str = "SuccessCode :: VK_NOT_READY :: A fence or query has not yet completed";
+    str =
+        "SuccessCode :: VK_NOT_READY :: A fence or query has not yet completed";
   } else if (r == VK_TIMEOUT) {
     str =
         R"(SuccessCode :: VK_TIMEOUT :: A wait operation has not completed in the specified time)";
@@ -22,7 +23,8 @@ std::string toString(VkResult r) {
   } else if (r == VK_EVENT_RESET) {
     str = "SuccessCode :: VK_EVENT_RESET :: An event is unsignaled";
   } else if (r == VK_INCOMPLETE) {
-    str = "SuccessCode :: VK_INCOMPLETE :: A return array was too small for the result";
+    str = "SuccessCode :: VK_INCOMPLETE :: A return array was too small for "
+          "the result";
   } else if (r == VK_SUBOPTIMAL_KHR) {
     str =
         R"(
@@ -56,7 +58,8 @@ creation would have required compilation, but the application requested
 compilation to not be performed.
 )";
   } else if (r == VK_ERROR_OUT_OF_HOST_MEMORY) {
-    str = "ErrorCode :: VK_ERROR_OUT_OF_HOST_MEMORY :: A host memory allocation has failed.";
+    str = "ErrorCode :: VK_ERROR_OUT_OF_HOST_MEMORY :: A host memory "
+          "allocation has failed.";
   } else if (r == VK_ERROR_OUT_OF_DEVICE_MEMORY) {
     str = R"(ErrorCode :: VK_ERROR_OUT_OF_DEVICE_MEMORY :: A device memory
     allocation has failed.)";
@@ -69,14 +72,17 @@ could not be completed for implementation-specific reasons
     str = R"(ErrorCode :: VK_ERROR_DEVICE_LOST :: The logical or physical
     device has been lost.)";
   } else if (r == VK_ERROR_MEMORY_MAP_FAILED) {
-    str = "ErrorCode :: VK_ERROR_MEMORY_MAP_FAILED :: Mapping of a memory object has failed";
+    str = "ErrorCode :: VK_ERROR_MEMORY_MAP_FAILED :: Mapping of a memory "
+          "object has failed";
   } else if (r == VK_ERROR_LAYER_NOT_PRESENT) {
-    str =
-        "ErrorCode :: VK_ERROR_LAYER_NOT_PRESENT :: A requested layer is not present or could not be loaded";
+    str = "ErrorCode :: VK_ERROR_LAYER_NOT_PRESENT :: A requested layer is not "
+          "present or could not be loaded";
   } else if (r == VK_ERROR_EXTENSION_NOT_PRESENT) {
-    str = "ErrorCode :: VK_ERROR_EXTENSION_NOT_PRESENT :: A requested extension is not supported";
+    str = "ErrorCode :: VK_ERROR_EXTENSION_NOT_PRESENT :: A requested "
+          "extension is not supported";
   } else if (r == VK_ERROR_FEATURE_NOT_PRESENT) {
-    str = "ErrorCode :: VK_ERROR_FEATURE_NOT_PRESENT :: A requested feature is not supported.";
+    str = "ErrorCode :: VK_ERROR_FEATURE_NOT_PRESENT :: A requested feature is "
+          "not supported.";
   } else if (r == VK_ERROR_INCOMPATIBLE_DRIVER) {
     str = R"(
 ErrorCode :: VK_ERROR_INCOMPATIBLE_DRIVER :: The requested version of Vulkan
@@ -89,7 +95,8 @@ ErrorCode :: VK_ERROR_TOO_MANY_OBJECTS :: Too many objects of the type have
 already been created
 )";
   } else if (r == VK_ERROR_FORMAT_NOT_SUPPORTED) {
-    str = "ErrorCode :: VK_ERROR_FORMAT_NOT_SUPPORTED :: A requested format is not supported on this device";
+    str = "ErrorCode :: VK_ERROR_FORMAT_NOT_SUPPORTED :: A requested format is "
+          "not supported on this device";
   } else if (r == VK_ERROR_FRAGMENTED_POOL) {
     str = R"(
 ErrorCode :: VK_ERROR_FRAGMENTED_POOL :: A pool allocation has failed due to
@@ -100,7 +107,8 @@ if the implementation is certain that the pool allocation failure was due to
 fragmentation.
 )";
   } else if (r == VK_ERROR_SURFACE_LOST_KHR) {
-    str = "ErrorCode :: VK_ERROR_SURFACE_LOST_KHR :: A surface is no longer available";
+    str = "ErrorCode :: VK_ERROR_SURFACE_LOST_KHR :: A surface is no longer "
+          "available";
   } else if (r == VK_ERROR_NATIVE_WINDOW_IN_USE_KHR) {
     str = R"(
 ErrorCode :: VK_ERROR_NATIVE_WINDOW_IN_USE_KHR :: The requested window is
@@ -256,6 +264,12 @@ std::string toString(const Result_Vk &r) {
   result += "\n";
   result += "Status information: ";
   result += r.status_info;
+  result += "\n";
+  result += "Status: ";
+  result += toString(r.status);
+  result += "\n";
+  result += "Vulkan Status: ";
+  result += toString(r.result);
   result += "\n";
   result += "Line: ";
   result += std::to_string(r.line);
