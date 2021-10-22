@@ -3,6 +3,98 @@
 #include <external.hpp>
 namespace vtuto {
 
+/* template utility functions from
+Wei, L. (2021) C++ template metaprogramming in practice: a
+deep learning framework. First edition. Boca Raton, FL: CRC
+Press.
+*/
+/** input - output mapping description
+  Metafunction template basically takes FnOut<int>::type
+ */
+template <typename T> struct FnOut { using type = T; };
+template <> struct FnOut<char> { using type = int; };
+// we use it like FnOut<char>::type h = 3; meaning the
+// function that takes input uint outputs int which is the type declaration
+// of the h
+
+// higher order functions
+// F(T, v) = T(v)
+// we assume here is that T is something like FnOut above
+template <template <typename> class T, typename v> struct F {
+  using type = typename T<v>::type;
+};
+
+template <unsigned int... Vals> struct UintContainer;
+template <int... Vals> struct IntContainer;
+template <std::size_t... Vals> struct SizeContainer;
+
+template <char... Vals> struct CharContainer;
+template <bool... Vals> struct BoolContainer;
+template <typename... Vals> struct TypeContainer;
+
+// compile time arithmetic on numeric templates
+enum class ArtOp : std::uint8_t { PLUS = 1, MINUS = 2, MULTIPLY = 3 };
+
+template <typename T, ArtOp op>
+constexpr T binop = [](T Acc, T arg) -> T {
+  if constexpr (op == ArtOp::PLUS) {
+    return Acc + arg;
+  }
+  if constexpr (op == ArtOp::MINUS) {
+    return Acc - arg;
+  }
+  if constexpr (op == ArtOp::MULTIPLY) {
+    return Acc * arg;
+  }
+};
+// base case: uint
+template <ArtOp op, unsigned int... Nums> constexpr unsigned int uint_foldl() {
+  if constexpr (op == ArtOp::PLUS)
+    return 0;
+  if constexpr (op == ArtOp::MINUS)
+    return 0;
+  if constexpr (op == ArtOp::MULTIPLY)
+    return 1;
+  return 0;
+}
+// recursive case
+template <ArtOp op, unsigned int Acc, unsigned int... Nums>
+constexpr unsigned int uint_foldl() {
+  return binop<unsigned int, op>(Acc, uint_foldl<op, Nums...>);
+}
+// base case: int
+template <ArtOp op, int... Nums> constexpr int int_foldl() {
+  if constexpr (op == ArtOp::PLUS)
+    return 0;
+  if constexpr (op == ArtOp::MINUS)
+    return 0;
+  if constexpr (op == ArtOp::MULTIPLY)
+    return 1;
+  return 0;
+}
+// recursive case
+template <ArtOp op, int Acc, int... Nums> constexpr int int_foldl() {
+  return binop<int, op>(Acc, int_foldl<op, Nums...>);
+}
+// base case: std::size_t
+template <ArtOp op, std::size_t... Nums> constexpr std::size_t size_foldl() {
+  if constexpr (op == ArtOp::PLUS)
+    return static_cast<std::size_t>(0);
+  if constexpr (op == ArtOp::MINUS)
+    return static_cast<std::size_t>(0);
+  if constexpr (op == ArtOp::MULTIPLY)
+    return static_cast<std::size_t>(1);
+  return static_cast<std::size_t>(0);
+}
+// recursive case
+template <ArtOp op, std::size_t Acc, std::size_t... Nums>
+constexpr std::size_t size_foldl() {
+  return binop<std::size_t, op>(Acc, size_foldl<op, Nums...>);
+}
+
+template <template <typename> class... T> struct SingleTemplateCont;
+template <template <typename...> class... T> struct MultiTemplateCont;
+
 template <typename Return, typename OverloadFn, typename... Args> struct op {
   Return operator()(const OverloadFn &f, Args... args) { return f(args...); }
 };
@@ -95,7 +187,8 @@ struct merger {};
 
 template <typename OverloadedFn, typename... RetVals, typename... Args1,
           typename... Args2>
-struct merger<OverloadedFn, TypeList<RetVals...>, TypeList<Args1...>, TypeList<Args2...>> {
+struct merger<OverloadedFn, TypeList<RetVals...>, TypeList<Args1...>,
+              TypeList<Args2...>> {
 
   std::tuple<RetVals...> operator()(const OverloadedFn &fn, Args1... args1,
                                     Args2... args2) {

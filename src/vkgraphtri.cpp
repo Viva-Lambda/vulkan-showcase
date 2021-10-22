@@ -9,7 +9,7 @@ using namespace vtuto;
 
 int main() {
   // declare graph
-  vk_graph<vk_triapp> graph;
+  vk_graph<vk_triapp, NodeIdVk> graph;
   auto fnmap = vk_triAppFns();
   vk_triapp triangle;
 

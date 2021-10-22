@@ -6,10 +6,12 @@
 
 namespace vtuto {
 
-template <class VkApp> struct vk_graph {
+typedef unsigned int NodeId;
+
+template <class VkApp, class NextNodeT> struct vk_graph {
   //
-  std::map<unsigned int, vk_node<VkApp>> nodes;
-  std::map<unsigned int, std::vector<unsigned int>> adj_lst;
+  std::map<unsigned int, vk_node<VkApp, NextNodeT>> nodes;
+  std::map<unsigned int, std::vector<NextNodeT>> adj_lst;
 
   bool is_in(unsigned int node_id) const {
     if (nodes.count(node_id) == 1) {
@@ -25,13 +27,13 @@ template <class VkApp> struct vk_graph {
     nmsg += std::to_string(node_id);
     return nmsg;
   }
-  std::string mkContextInfo(unsigned int node_id, unsigned int next_node_id,
+  std::string mkContextInfo(unsigned int node_id, NextNodeT next_node_info,
                             const std::string &msg) const {
     std::string nmsg = msg;
     nmsg += "\n current node id ";
     nmsg += std::to_string(node_id);
-    nmsg += "\n next node id ";
-    nmsg += std::to_string(next_node_id);
+    nmsg += "\n next node ";
+    nmsg += std::to_string(next_node_info);
     return nmsg;
   }
   Result_Vk run_from_to(VkApp &app, unsigned int start_node,

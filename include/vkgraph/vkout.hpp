@@ -5,9 +5,9 @@
 #include <vkresult/debug.hpp>
 
 namespace vtuto {
-
+typedef unsigned int SignalVk;
 struct vk_output {
   Result_Vk result_info;
-  unsigned int signal;
+  SignalVk signal;
 };
 } // namespace vtuto
