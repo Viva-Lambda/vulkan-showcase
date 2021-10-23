@@ -14,7 +14,8 @@ Press.
 template <typename T> struct FnOut { using type = T; };
 template <> struct FnOut<char> { using type = int; };
 // we use it like FnOut<char>::type h = 3; meaning the
-// function that takes input uint outputs int which is the type declaration
+// function that takes input uint outputs int which is the
+// type declaration
 // of the h
 
 // higher order functions
@@ -27,10 +28,84 @@ template <template <typename> class T, typename v> struct F {
 template <unsigned int... Vals> struct UintContainer;
 template <int... Vals> struct IntContainer;
 template <std::size_t... Vals> struct SizeContainer;
-
 template <char... Vals> struct CharContainer;
 template <bool... Vals> struct BoolContainer;
-template <typename... Vals> struct TypeContainer;
+
+// get for compile time
+
+// compile time search operation on non type templates
+
+// base case: uint
+template <unsigned int... Nums>
+constexpr std::pair<bool, unsigned int> find_nontype(const unsigned int &&e) {
+  //
+  return std::make_pair(false, e);
+}
+// recursive case
+template <unsigned int El, unsigned int... Nums>
+constexpr std::pair<bool, unsigned int> find_nontype(const unsigned int &&e) {
+  if constexpr (El == e) {
+    return std::make_pair(true, El);
+  }
+  return find_nontype<Nums...>(e);
+}
+// base case: int
+template <int... Nums>
+constexpr std::pair<bool, int> find_nontype(const int &&e) {
+  //
+  return std::make_pair(false, e);
+}
+// recursive case
+template <int El, int... Nums>
+constexpr std::pair<bool, int> find_nontype(const int &&e) {
+  if constexpr (El == e) {
+    return std::make_pair(true, El);
+  }
+  return find_nontype<Nums...>(e);
+}
+
+// base case: char
+template <char... Nums>
+constexpr std::pair<bool, char> find_nontype(const char &&e) {
+  //
+  return std::make_pair(false, e);
+}
+// recursive case
+template <char El, char... Nums>
+constexpr std::pair<bool, char> find_nontype(const char &&e) {
+  if constexpr (El == e) {
+    return std::make_pair(true, El);
+  }
+  return find_nontype<Nums...>(e);
+}
+// base case: bool
+template <bool... Nums>
+constexpr std::pair<bool, bool> find_nontype(const bool &&e) {
+  //
+  return std::make_pair(false, e);
+}
+// recursive case
+template <bool El, bool... Nums>
+constexpr std::pair<bool, bool> find_nontype(const bool &&e) {
+  if constexpr (e == El) {
+    return std::make_pair(true, El);
+  }
+  return find_nontype<Nums...>(e);
+}
+// base case: size_t
+template <std::size_t... Nums>
+constexpr std::pair<bool, std::size_t> find_nontype(const std::size_t &&e) {
+  //
+  return std::make_pair(false, e);
+}
+// recursive case
+template <std::size_t El, std::size_t... Nums>
+constexpr std::pair<bool, std::size_t> find_nontype(const std::size_t &&e) {
+  if constexpr (e == El) {
+    return std::make_pair(true, El);
+  }
+  return find_nontype<Nums...>(e);
+}
 
 // compile time arithmetic on numeric templates
 enum class ArtOp : std::uint8_t { PLUS = 1, MINUS = 2, MULTIPLY = 3 };
@@ -91,6 +166,8 @@ template <ArtOp op, std::size_t Acc, std::size_t... Nums>
 constexpr std::size_t size_foldl() {
   return binop<std::size_t, op>(Acc, size_foldl<op, Nums...>);
 }
+
+template <typename... Vals> struct TypeContainer;
 
 template <template <typename> class... T> struct SingleTemplateCont;
 template <template <typename...> class... T> struct MultiTemplateCont;

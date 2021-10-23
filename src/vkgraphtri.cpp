@@ -13,6 +13,38 @@ int main() {
   auto fnmap = vk_triAppFns();
   vk_triapp triangle;
 
+  vk_graph<vk_triapp, const_str> ngraph;
+
+  /** init window node:
+    - node id 1,
+    - node label: initWindowNode
+    - target node ids: {2}
+    - target node label: {"createInstanceNode"}
+   */
+  {
+    const char nlabel[] = "initWindowNode";
+    const NodeIdVk node_id = 1;
+    std::function<vk_output(vk_triapp &)> nf = fnmap["initWindow"];
+    std::function<const_str(const vk_output &)> nnf = [](const vk_output &out) {
+      if (out.signal == 1) {
+        return const_str("createInstanceNode");
+      }
+      return const_str("");
+    };
+    const const_str targets[] = {const_str("createInstanceNode")};
+    const NodeIdVk signals[] = {1};
+    auto cuints = const_uints(signals);
+    auto bsignal = BranchSignal2(targets, cuints);
+    auto vr = mkAddNode<vk_triapp, node_id, const_str, true>(ngraph, nf, nnf,
+                                                             nlabel, bsignal);
+    if (vr.status != SUCCESS_OP) {
+      std::string str = "node creation failed for node 1 with end node 2";
+      UPDATE_RESULT_VK(vr, str);
+      std::cerr << toString(vr) << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
   /** init window node:
     - node id 1
     - target nodes: {2}
@@ -254,8 +286,8 @@ int main() {
     - target node id {16: windowShouldClose}
    */
   {
-    auto vr = mkAddNode<vk_triapp, 15, true, 1, 16>(
-        graph, fnmap["createSyncObjects"]);
+    auto vr = mkAddNode<vk_triapp, 15, true, 1, 16>(graph,
+                                                    fnmap["createSyncObjects"]);
     if (vr.status != SUCCESS_OP) {
       std::string str = "node creation failed for node 15 with end node 16";
       UPDATE_RESULT_VK(vr, str);

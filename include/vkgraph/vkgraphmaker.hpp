@@ -22,12 +22,12 @@ typedef std::pair<unsigned int, unsigned int> BranchSignal;
 
 struct BranchSignal2 {
   const const_str *targets;
-  const_ints signals;
+  const_uints signals;
   const std::size_t nb_targets;
 
   template <std::size_t NbTarget>
   constexpr BranchSignal2(const const_str (&a)[NbTarget],
-                          const const_ints &ints)
+                          const const_uints &ints)
       : targets(a), signals(ints), nb_targets(NbTarget) {}
 };
 
@@ -105,10 +105,11 @@ mkNode(const std::function<vk_output(VkApp &)> &NodeFn) {
 
 template <> struct FnOut<const vk_output &> { using type = unsigned int; };
 
-template <typename VkApp, typename NextNodeT, unsigned int NodeId,
-          bool IsSingular, unsigned int... Bs>
+template <typename VkApp, typename NextNodeT, NodeIdVk NodeId, bool IsSingular,
+          unsigned int... Bs>
 constexpr vk_node<VkApp, NextNodeT>
-mkNode2(const std::function<vk_output(VkApp &)> &NodeFn, const char nlabel[]) {
+mkNode2(const std::function<vk_output(VkApp &)> &NodeFn,
+        const const_str &nlabel) {
   constexpr vk_cnode<VkApp, NextNodeT, NodeId, IsSingular> cnode(nlabel);
   cnode.compute = NodeFn;
   FnOut<const vk_output &>::type nfunc = [](const vk_output &out) {
@@ -127,17 +128,16 @@ mkNode2(const std::function<vk_output(VkApp &)> &NodeFn, const char nlabel[]) {
   node.is_singular = cnode.is_singular;
   return node;
 }
-template <typename VkApp, typename NextNodeT, unsigned int NodeId,
-          bool IsSingular>
+template <typename VkApp, typename NextNodeT, NodeIdVk NodeId, bool IsSingular>
 constexpr vk_node<VkApp, NextNodeT>
 mkNode2(const std::function<vk_output(VkApp &)> &NodeFn,
         const std::function<NextNodeT(const vk_output &)> &nfunc,
-        const char nlabel[]) {
-  constexpr vk_cnode<VkApp, NextNodeT, NodeId, IsSingular> cnode(nlabel);
+        const const_str &nlabel) {
+  vk_cnode<VkApp, NextNodeT, NodeId, IsSingular> cnode(nlabel);
   cnode.compute = NodeFn;
   cnode.next_node = nfunc;
-  vk_node<VkApp, NextNodeT> node(cnode.node_id, cnode.compute, cnode.next_node);
-  node.is_singular = cnode.is_singular;
+  vk_node<VkApp, NextNodeT> node(cnode.node_id, cnode.compute, cnode.next_node,
+                                 cnode.is_singular);
   return node;
 }
 
@@ -155,9 +155,8 @@ Result_Vk addNode2(vk_graph<VkApp, NextNodeT> &g,
     vr.context += " already exists inside the graph";
     return vr;
   }
-  std::vector<const_str> arr;
-  arr.resize(bsignals.nb_targets);
-  std::copy(arr.begin(), arr.end(), bsignals.targets);
+  std::vector<const_str> arr(bsignals.targets,
+                             bsignals.targets + bsignals.nb_targets);
   auto mpair = std::make_pair(n.node_id, arr);
   auto npair = std::make_pair(n.node_id, n);
   g.adj_lst.insert(mpair);
@@ -189,11 +188,20 @@ Result_Vk addNode(vk_graph<VkApp, NodeIdVk> &g, vk_node<VkApp, NodeIdVk> &n) {
   return vr;
 }
 
-template <typename VkApp, unsigned int NodeId, bool IsSingular,
-          unsigned int... Bs>
+template <typename VkApp, NodeIdVk NodeId, bool IsSingular, unsigned int... Bs>
 Result_Vk mkAddNode(vk_graph<VkApp, NodeIdVk> &g,
                     const std::function<vk_output(VkApp &)> &NodeFn) {
   auto n = mkNode<VkApp, NodeId, IsSingular, Bs...>(NodeFn);
   return addNode<VkApp, Bs...>(g, n);
 }
+
+template <typename VkApp, NodeIdVk NodeId, class NextNodeT, bool IsSingular>
+Result_Vk mkAddNode(vk_graph<VkApp, NextNodeT> &g,
+                    const std::function<vk_output(VkApp &)> &NodeFn,
+                    const std::function<NextNodeT(const vk_output &)> &nnf,
+                    const const_str &nlabel, const BranchSignal2 &b) {
+  auto n = mkNode2<VkApp, NextNodeT, NodeId, IsSingular>(NodeFn, nnf, nlabel);
+  return addNode2<VkApp, NextNodeT>(g, n, b);
+}
+
 } // namespace vtuto

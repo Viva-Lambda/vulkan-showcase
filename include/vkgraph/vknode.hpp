@@ -13,16 +13,14 @@ template <class VkApp, class NextNodeT, NodeIdVk NodeId, bool IsSingular>
 struct vk_cnode {
   const NodeIdVk node_id = NodeId;
 
-  const char *label;
-  std::size_t len;
+  const_str label;
 
   std::function<vk_output(VkApp &)> compute;
   std::function<NextNodeT(const vk_output &)> next_node;
   const bool is_singular = IsSingular;
   bool is_called = false;
 
-  template <std::size_t N>
-  constexpr vk_cnode(const char *(&a)[N]) : label(a), len(N - 1) {}
+  constexpr vk_cnode(const const_str &nlabel) : label(nlabel) {}
 
   /**contains the result status of compute and next node to run*/
   vk_output node_out;
@@ -56,7 +54,7 @@ template <class VkApp, class NextNodeT> struct vk_node {
 
   // real constructor
   vk_node(NodeIdVk n, const std::function<vk_output(VkApp &)> &f,
-          const std::function<unsigned int(const vk_output &)> &nn, bool isS)
+          const std::function<NextNodeT(const vk_output &)> &nn, bool isS)
       : node_id(n), compute(f), next_node(nn), is_singular(isS) {}
   void run(VkApp &g) {
     if (is_singular) {
