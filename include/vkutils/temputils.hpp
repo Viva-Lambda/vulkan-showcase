@@ -25,6 +25,12 @@ template <template <typename> class T, typename v> struct F {
   using type = typename T<v>::type;
 };
 
+/**
+  couple of metafunctions provided by type traits
+  std::remove_reference<int&>::type h = 3;
+  which changes int& to int, basically reference to value conversion.
+ */
+
 template <unsigned int... Vals> struct UintContainer;
 template <int... Vals> struct IntContainer;
 template <std::size_t... Vals> struct SizeContainer;

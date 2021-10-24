@@ -2,12 +2,32 @@
 // graph like architecture
 #include <external.hpp>
 #include <vkgraph/vkout.hpp>
+#include <vkgraph/vktask.hpp>
 #include <vkutils/litutils.hpp>
 #include <vkutils/temputils.hpp>
 
 namespace vtuto {
 
 typedef unsigned int NodeIdVk;
+
+template <class VkApp, NodeIdVk NodeId, TaskIdVk TaskId, bool IsSingular>
+struct vk_tnode {
+  NodeIdVk id = NodeId;
+  const_str label;
+
+  const std::pair<SignalVk, const_str> *posteriors;
+  const std::size_t nb_senders;
+
+  vk_ctask<VkApp, TaskId, IsSingular> task;
+
+  template <std::size_t NbSenders>
+  constexpr vk_tnode(const const_str &nlabel,
+                     const std::pair<SignalVk, const_str> (&ss)[NbSenders],
+                     const vk_ctask<VkApp, TaskId, IsSingular> &t)
+      : label(nlabel), posteriors(ss), task(t) {}
+  void run() { task.run(); }
+  SignalVk next() const { return task.node_out.signal; }
+};
 
 template <class VkApp, class NextNodeT, NodeIdVk NodeId, bool IsSingular>
 struct vk_cnode {
