@@ -2,7 +2,6 @@
 // graph like architecture
 #include <external.hpp>
 #include <vkgraph/vkout.hpp>
-#include <vkgraph/vktask.hpp>
 #include <vkutils/litutils.hpp>
 #include <vkutils/temputils.hpp>
 
@@ -10,23 +9,57 @@ namespace vtuto {
 
 typedef unsigned int NodeIdVk;
 
-template <class VkApp, NodeIdVk NodeId, TaskIdVk TaskId, bool IsSingular>
-struct vk_tnode {
-  NodeIdVk id = NodeId;
-  const_str label;
+enum class BranchType : std::uint8_t { COND = 1, UNCOND = 2 };
 
-  const std::pair<SignalVk, const_str> *posteriors;
-  const std::size_t nb_senders;
+typedef std::pair<BranchType, const_str> branch;
 
-  vk_ctask<VkApp, TaskId, IsSingular> task;
+typedef std::pair<Result_Vk, const_str> next_info;
 
-  template <std::size_t NbSenders>
-  constexpr vk_tnode(const const_str &nlabel,
-                     const std::pair<SignalVk, const_str> (&ss)[NbSenders],
-                     const vk_ctask<VkApp, TaskId, IsSingular> &t)
-      : label(nlabel), posteriors(ss), task(t) {}
-  void run() { task.run(); }
-  SignalVk next() const { return task.node_out.signal; }
+template <class VkApp> struct vk_tnode {
+  NodeIdVk id;
+  const char *label;
+
+  const branch *outgoing_neigbours;
+  const std::size_t nb_neighbours;
+
+  const bool is_singular;
+  bool is_called = false;
+
+  std::function<vk_output(VkApp &)> compute;
+
+  /**contains the result status of compute and next node to
+   * run*/
+  vk_output node_out;
+
+  template <std::size_t NbN>
+  constexpr vk_tnode(NodeIdVk nid, const char *nlabel, bool s,
+                     const branch (&neighbours)[NbN],
+                     const std::function<vk_output(VkApp &)> &f)
+      : id(nid), label(nlabel), outgoing_neigbours(neighbours),
+        nb_neighbours(NbN), is_singular(s), compute(f) {}
+
+  void run(VkApp &g) {
+    if (is_singular && !is_called) {
+      // should be called once since it is a singular
+      node_out = compute(g);
+      is_called = true;
+    } else {
+      // if not a singular recall the function
+      node_out = compute(g);
+    }
+  }
+  next_info next() const {
+    Result_Vk vr;
+    vr.status = SUCCESS_OP;
+    SignalVk s = node_out.signal - 1;
+    if (s <= 0) {
+      vr.status = FAIL_OP;
+      vr.context = "node signal is 0 or less. Indicating a failure in the "
+                   "assigned computation or badly assigned neighbour";
+      return std::make_pair(vr, const_str(""));
+    }
+    return std::make_pair(vr, outgoing_neigbours[s].second);
+  }
 };
 
 template <class VkApp, class NextNodeT, NodeIdVk NodeId, bool IsSingular>
@@ -42,7 +75,8 @@ struct vk_cnode {
 
   constexpr vk_cnode(const const_str &nlabel) : label(nlabel) {}
 
-  /**contains the result status of compute and next node to run*/
+  /**contains the result status of compute and next node to
+   * run*/
   vk_output node_out;
 
   void run(VkApp &g) {
@@ -69,7 +103,8 @@ template <class VkApp, class NextNodeT> struct vk_node {
   bool is_singular = true;
   bool is_called = false;
 
-  /**contains the result status of compute and next node to run*/
+  /**contains the result status of compute and next node to
+   * run*/
   vk_output node_out;
 
   // real constructor

@@ -13,7 +13,7 @@ int main() {
   auto fnmap = vk_triAppFns();
   vk_triapp triangle;
 
-  vk_graph<vk_triapp, const_str> ngraph;
+  vk_graph2<vk_triapp> ngraph;
 
   /** init window node:
     - node id 1,
@@ -25,18 +25,11 @@ int main() {
     const char nlabel[] = "initWindowNode";
     const NodeIdVk node_id = 1;
     std::function<vk_output(vk_triapp &)> nf = fnmap["initWindow"];
-    std::function<const_str(const vk_output &)> nnf = [](const vk_output &out) {
-      if (out.signal == 1) {
-        return const_str("createInstanceNode");
-      }
-      return const_str("");
+    const branch neighbours[] = {
+        std::make_pair(BranchType::UNCOND, const_str("createInstanceNode"))
     };
-    const const_str targets[] = {const_str("createInstanceNode")};
-    const NodeIdVk signals[] = {1};
-    auto cuints = const_uints(signals);
-    auto bsignal = BranchSignal2(targets, cuints);
-    auto vr = mkAddNode<vk_triapp, node_id, const_str, true>(ngraph, nf, nnf,
-                                                             nlabel, bsignal);
+    auto vr =
+        mkAddNode2<vk_triapp, node_id, true>(ngraph, nlabel, nf, neighbours);
     if (vr.status != SUCCESS_OP) {
       std::string str = "node creation failed for node 1 with end node 2";
       UPDATE_RESULT_VK(vr, str);

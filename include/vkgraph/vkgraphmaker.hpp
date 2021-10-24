@@ -8,6 +8,7 @@
 #include <vkutils/temputils.hpp>
 
 using namespace vtuto;
+
 namespace vtuto {
 
 // typedef std::pair<unsigned int, unsigned int> BranchSignal;
@@ -19,17 +20,6 @@ namespace vtuto {
  */
 typedef std::pair<unsigned int, unsigned int> BranchSignal;
 // first: signal, second: node id
-
-struct BranchSignal2 {
-  const const_str *targets;
-  const_uints signals;
-  const std::size_t nb_targets;
-
-  template <std::size_t NbTarget>
-  constexpr BranchSignal2(const const_str (&a)[NbTarget],
-                          const const_uints &ints)
-      : targets(a), signals(ints), nb_targets(NbTarget) {}
-};
 
 template <std::size_t... PairIndices, typename Tuple>
 constexpr std::array<BranchSignal, sizeof...(PairIndices)>
@@ -141,29 +131,6 @@ mkNode2(const std::function<vk_output(VkApp &)> &NodeFn,
   return node;
 }
 
-template <typename VkApp, typename NextNodeT>
-Result_Vk addNode2(vk_graph<VkApp, NextNodeT> &g,
-                   const vk_node<VkApp, NextNodeT> &n,
-                   const BranchSignal2 &bsignals) {
-  //
-  Result_Vk vr;
-  vr.status = SUCCESS_OP;
-  if (g.is_in(n.node_id)) {
-    vr.status = FAIL_OP;
-    vr.context = "node ";
-    vr.context += std::to_string(n.node_id);
-    vr.context += " already exists inside the graph";
-    return vr;
-  }
-  std::vector<const_str> arr(bsignals.targets,
-                             bsignals.targets + bsignals.nb_targets);
-  auto mpair = std::make_pair(n.node_id, arr);
-  auto npair = std::make_pair(n.node_id, n);
-  g.adj_lst.insert(mpair);
-  g.nodes.insert(npair);
-  return vr;
-}
-
 //
 template <typename VkApp, unsigned int... Bs>
 Result_Vk addNode(vk_graph<VkApp, NodeIdVk> &g, vk_node<VkApp, NodeIdVk> &n) {
@@ -195,13 +162,22 @@ Result_Vk mkAddNode(vk_graph<VkApp, NodeIdVk> &g,
   return addNode<VkApp, Bs...>(g, n);
 }
 
-template <typename VkApp, NodeIdVk NodeId, class NextNodeT, bool IsSingular>
-Result_Vk mkAddNode(vk_graph<VkApp, NextNodeT> &g,
-                    const std::function<vk_output(VkApp &)> &NodeFn,
-                    const std::function<NextNodeT(const vk_output &)> &nnf,
-                    const const_str &nlabel, const BranchSignal2 &b) {
-  auto n = mkNode2<VkApp, NextNodeT, NodeId, IsSingular>(NodeFn, nnf, nlabel);
-  return addNode2<VkApp, NextNodeT>(g, n, b);
+template <typename VkApp, NodeIdVk NodeId, bool IsSingular, std::size_t NbN>
+Result_Vk mkAddNode2(vk_graph2<VkApp> &g, const char *label,
+                     const std::function<vk_output(VkApp &)> &NodeFn,
+                     const branch (&neighbours)[NbN]) {
+  Result_Vk vr;
+  vr.status = SUCCESS_OP;
+  if (g.is_in(label)) {
+    vr.status = FAIL_OP;
+    vr.context = "node ";
+    vr.context += std::string(label);
+    vr.context += " already exists inside the graph";
+    return vr;
+  }
+  vk_tnode<VkApp> n(NodeId, label, IsSingular, neighbours, NodeFn);
+  g.nodes.insert(std::make_pair(label, n));
+  return vr;
 }
 
 } // namespace vtuto
