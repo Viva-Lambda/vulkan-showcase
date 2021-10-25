@@ -163,15 +163,16 @@ Result_Vk mkAddNode(vk_graph<VkApp, NodeIdVk> &g,
 }
 
 template <typename VkApp, NodeIdVk NodeId, bool IsSingular, std::size_t NbN>
-Result_Vk mkAddNode2(vk_graph2<VkApp> &g, const char *label,
-                     const std::function<vk_output(VkApp &)> &NodeFn,
-                     const branch (&neighbours)[NbN]) {
+Result_Vk mkAddNode2(
+    vk_graph2<VkApp> &g, const_str label,
+    const std::pair<const char *, std::function<vk_output(VkApp &)>> &NodeFn,
+    const branch (&neighbours)[NbN]) {
   Result_Vk vr;
   vr.status = SUCCESS_OP;
   if (g.is_in(label)) {
     vr.status = FAIL_OP;
     vr.context = "node ";
-    vr.context += std::string(label);
+    vr.context += std::string(label.obj());
     vr.context += " already exists inside the graph";
     return vr;
   }

@@ -8,6 +8,7 @@
 namespace vtuto {
 
 typedef unsigned int NodeIdVk;
+typedef const_str NodeLabelVk;
 
 enum class BranchType : std::uint8_t { COND = 1, UNCOND = 2 };
 
@@ -17,7 +18,7 @@ typedef std::pair<Result_Vk, const_str> next_info;
 
 template <class VkApp> struct vk_tnode {
   NodeIdVk id;
-  const char *label;
+  const_str label;
 
   const branch *outgoing_neigbours;
   const std::size_t nb_neighbours;
@@ -25,34 +26,39 @@ template <class VkApp> struct vk_tnode {
   const bool is_singular;
   bool is_called = false;
 
-  std::function<vk_output(VkApp &)> compute;
+  std::pair<const char *, std::function<vk_output(VkApp &)>> task;
 
   /**contains the result status of compute and next node to
    * run*/
   vk_output node_out;
 
   template <std::size_t NbN>
-  constexpr vk_tnode(NodeIdVk nid, const char *nlabel, bool s,
-                     const branch (&neighbours)[NbN],
-                     const std::function<vk_output(VkApp &)> &f)
+  constexpr vk_tnode(
+      NodeIdVk nid, const_str nlabel, bool s, const branch (&neighbours)[NbN],
+      const std::pair<const char *, std::function<vk_output(VkApp &)>> &f)
       : id(nid), label(nlabel), outgoing_neigbours(neighbours),
-        nb_neighbours(NbN), is_singular(s), compute(f) {}
+        nb_neighbours(NbN), is_singular(s), task(f) {}
+  constexpr vk_tnode(const vk_tnode<VkApp> &node)
+      : id(node.id), label(node.label),
+        outgoing_neigbours(node.outgoing_neigbours),
+        nb_neighbours(node.nb_neighbours), is_singular(node.is_singular),
+        is_called(node.is_called), task(node.task), node_out(node.node_out) {}
 
   void run(VkApp &g) {
     if (is_singular && !is_called) {
       // should be called once since it is a singular
-      node_out = compute(g);
+      node_out = task.second(g);
       is_called = true;
     } else {
       // if not a singular recall the function
-      node_out = compute(g);
+      node_out = task.second(g);
     }
   }
   next_info next() const {
     Result_Vk vr;
     vr.status = SUCCESS_OP;
     SignalVk s = node_out.signal - 1;
-    if (s <= 0) {
+    if (s < 0) {
       vr.status = FAIL_OP;
       vr.context = "node signal is 0 or less. Indicating a failure in the "
                    "assigned computation or badly assigned neighbour";

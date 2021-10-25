@@ -33,6 +33,10 @@ add_executable(
     vkgraphtri.out 
     "src/vkgraphtri.cpp"
 )
+add_executable(
+    vkgraphtri2.out 
+    "src/vkgraphtri02.cpp"
+)
 
 include_directories("./include/")
 
@@ -58,6 +62,9 @@ target_link_libraries(vktriangle.out VulkanLib)
 # simple graph triangle
 target_link_libraries(vkgraphtri.out VulkanLib)
 
+# simple graph2 triangle
+target_link_libraries(vkgraphtri2.out VulkanLib)
+
 # glfw
 # find_package(glfw3 REQUIRED)
 add_library(glfwLib SHARED IMPORTED)
@@ -73,6 +80,9 @@ target_link_libraries(vktriangle.out glfwLib)
 
 # simple graph triangle
 target_link_libraries(vkgraphtri.out glfwLib)
+
+# simple graph triangle
+target_link_libraries(vkgraphtri2.out glfwLib)
 
 # glm
 # find_package(glm REQUIRED)
@@ -100,6 +110,9 @@ target_link_libraries(vktriangle.out AssimpLib)
 # simple graph triangle
 target_link_libraries(vkgraphtri.out AssimpLib)
 
+# simple graph2 triangle
+target_link_libraries(vkgraphtri2.out AssimpLib)
+
 # libs
 
 install(TARGETS vulkantuto.out DESTINATION "${PROJECT_SOURCE_DIR}/bin/")
@@ -107,3 +120,5 @@ install(TARGETS vulkantuto.out DESTINATION "${PROJECT_SOURCE_DIR}/bin/")
 install(TARGETS vktriangle.out DESTINATION "${PROJECT_SOURCE_DIR}/bin/")
 
 install(TARGETS vkgraphtri.out DESTINATION "${PROJECT_SOURCE_DIR}/bin/")
+
+install(TARGETS vkgraphtri2.out DESTINATION "${PROJECT_SOURCE_DIR}/bin/")
