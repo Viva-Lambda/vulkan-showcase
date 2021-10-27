@@ -20,10 +20,9 @@ template <class VkApp> struct vk_tnode {
   NodeIdVk id;
   const_str label;
 
-  const branch *outgoing_neigbours;
-  const std::size_t nb_neighbours;
+  std::vector<branch> outgoing_neigbours;
 
-  const bool is_singular;
+  bool is_singular;
   bool is_called = false;
 
   std::pair<const char *, std::function<vk_output(VkApp &)>> task;
@@ -32,17 +31,16 @@ template <class VkApp> struct vk_tnode {
    * run*/
   vk_output node_out;
 
-  template <std::size_t NbN>
-  constexpr vk_tnode(
-      NodeIdVk nid, const_str nlabel, bool s, const branch (&neighbours)[NbN],
-      const std::pair<const char *, std::function<vk_output(VkApp &)>> &f)
-      : id(nid), label(nlabel), outgoing_neigbours(neighbours),
-        nb_neighbours(NbN), is_singular(s), task(f) {}
-  constexpr vk_tnode(const vk_tnode<VkApp> &node)
+  vk_tnode(NodeIdVk nid, const_str nlabel, bool s,
+           const std::vector<branch> &neighbours,
+           const std::pair<const char *, std::function<vk_output(VkApp &)>> &f)
+      : id(nid), label(nlabel), outgoing_neigbours(neighbours), is_singular(s),
+        task(f) {}
+  vk_tnode(const vk_tnode<VkApp> &node)
       : id(node.id), label(node.label),
         outgoing_neigbours(node.outgoing_neigbours),
-        nb_neighbours(node.nb_neighbours), is_singular(node.is_singular),
-        is_called(node.is_called), task(node.task), node_out(node.node_out) {}
+        is_singular(node.is_singular), is_called(node.is_called),
+        task(node.task), node_out(node.node_out) {}
 
   void run(VkApp &g) {
     if (is_singular && !is_called) {

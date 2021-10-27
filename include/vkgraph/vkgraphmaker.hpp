@@ -176,7 +176,11 @@ Result_Vk mkAddNode2(
     vr.context += " already exists inside the graph";
     return vr;
   }
-  vk_tnode<VkApp> n(NodeId, label, IsSingular, neighbours, NodeFn);
+  std::vector<branch> ns;
+  for (unsigned int i = 0; i < NbN; i++) {
+    ns.push_back(neighbours[i]);
+  }
+  vk_tnode<VkApp> n(NodeId, label, IsSingular, ns, NodeFn);
   g.nodes.insert(std::make_pair(label, n));
   return vr;
 }

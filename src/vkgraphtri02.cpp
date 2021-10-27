@@ -35,7 +35,6 @@ int main() {
       return EXIT_FAILURE;
     }
   }
-
   /** init vulkan node:
    It can be implemented either as a single node or a chain of sub nodes.
    I implement it as a sequence of nodes whose execution order is fixed by its

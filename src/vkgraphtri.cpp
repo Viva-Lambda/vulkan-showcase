@@ -13,16 +13,11 @@ int main() {
   auto fnmap = vk_triAppFns();
   vk_triapp triangle;
 
-
   /** init window node:
     - node id 1,
     - node label: initWindowNode
     - target node ids: {2}
     - target node label: {"createInstanceNode"}
-   */
-  /** init window node:
-    - node id 1
-    - target nodes: {2}
    */
   // declare node
   {
@@ -386,6 +381,7 @@ int main() {
     createGraphicsPipeline in recreate swapchain node:
     - node id 24
     - target node id {25: createFramebuffers}
+
    */
   {
     auto vr = mkAddNode<vk_triapp, 24, false, 1, 25>(

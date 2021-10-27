@@ -111,7 +111,7 @@ template <class VkApp> struct vk_graph2 {
         return vr;
       }
       // next label is in graph
-      vk_tnode<VkApp> node(nodes.at(next_label));
+      node = vk_tnode<VkApp>(nodes.at(next_label));
     }
     vr.status = SUCCESS_OP;
     return vr;
