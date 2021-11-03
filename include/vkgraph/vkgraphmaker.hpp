@@ -185,4 +185,27 @@ Result_Vk mkAddNode2(
   return vr;
 }
 
+template <typename VkApp, NodeIdVk node_id, bool IsSingular>
+std::pair<Result_Vk, std::string> mkAddNodeRuntime(
+    vk_graph2<VkApp> &ngraph,
+    std::unordered_map<std::string, std::function<vk_output(VkApp &)>>
+        &fnmap,
+    const const_str &node_label, const const_str &neighbour_label,
+    const char *taskName) {
+  const_str nlabel = node_label;
+  std::string taskLabel = std::string(taskName);
+  std::function<vk_output(VkApp &)> nf = fnmap[taskLabel];
+  const branch neighbours[] = {
+      std::make_pair(BranchType::UNCOND, neighbour_label)};
+  auto task = std::make_pair(taskName, nf);
+  auto vr =
+      mkAddNode2<VkApp, node_id, IsSingular>(ngraph, nlabel, task, neighbours);
+  if (vr.status != SUCCESS_OP) {
+    std::string str = "node creation failed for node ";
+    str += std::string(node_label.obj());
+    str += "with branching to " + std::string(neighbour_label.obj());
+    return std::make_pair(vr, str);
+  }
+  return std::make_pair(vr, std::string(""));
+}
 } // namespace vtuto

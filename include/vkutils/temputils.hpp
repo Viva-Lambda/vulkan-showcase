@@ -186,9 +186,8 @@ template <class...> struct TypeList {};
 
 // 1 - N
 template <typename OverloadFn, typename InArg, typename... OutArgs>
-struct vec_fn {
-  constexpr std::tuple<OutArgs...> operator()(const OverloadFn &f,
-                                              const InArg &inArg) {
+struct expander {
+  std::tuple<OutArgs...> operator()(const OverloadFn &f, const InArg &inArg) {
     return f(inArg);
   }
 };
