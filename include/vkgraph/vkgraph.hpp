@@ -1,7 +1,6 @@
 #pragma once
 // graph like architecture
 #include <external.hpp>
-#include <vertex.hpp>
 #include <vkgraph/vknode.hpp>
 #include <vkutils/litutils.hpp>
 

@@ -9,7 +9,7 @@ namespace vtuto {
 /**
   Enable validation layers for debug build. NDEBUG macro is
   a part of c++ standard.
- */
+*/
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -32,7 +32,6 @@ std::ostream &operator<<(std::ostream &out,
   }
   return out;
 }
-
 std::ostream &operator<<(std::ostream &out,
                          VkDebugUtilsMessageTypeFlagBitsEXT b) {
   if (b == VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT) {
@@ -253,7 +252,7 @@ template <> struct StructChecker<DebugUtilsCreateInfoExt> {
     return vr;
   }
 };
-
+/*
 Result_Vk createDebugMessenger(VkInstance &instance,
                                VkDebugUtilsMessengerCreateInfoEXT &info,
                                VkDebugUtilsMessengerEXT &messenger) {
@@ -267,5 +266,5 @@ Result_Vk createDebugMessenger(VkInstance &instance,
            msg, vr);
   return vr;
 }
-
+*/
 } // namespace vtuto

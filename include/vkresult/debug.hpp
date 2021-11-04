@@ -5,6 +5,16 @@
 namespace vtuto {
 
 /**
+  Enable validation layers for debug build. NDEBUG macro is
+  a part of c++ standard.
+*/
+#ifdef NDEBUG
+const bool enableValidationLayers = false;
+#else
+const bool enableValidationLayers = true;
+#endif
+
+/**
   All success code explanations are taken from
   vulkan specification 1.2
  */

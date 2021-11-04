@@ -44,11 +44,11 @@ int main() {
     - target nodes: {3}
    */
   {
-    auto pr = mkAddNodeRuntime<vk_triapp, 1, true>(
+    auto pr = mkAddNodeRuntime<vk_triapp, 2, true>(
         ngraph, fnmap,
-        const_str("createInstanceNode"),     // node label
+        const_str("createInstanceNode"),      // node label
         const_str("setupDebugMessengerNode"), // neighbour_label
-        "createInstance"                     // task name
+        "createInstance"                      // task name
     );
     if (pr.first.status != SUCCESS_OP) {
       UPDATE_RESULT_VK(pr.first, pr.second);
@@ -60,13 +60,12 @@ int main() {
     - node id 3
     - target nodes: {4: createSurfaceNode, }
    */
-
   {
-    auto pr = mkAddNodeRuntime<vk_triapp, 1, true>(
+    auto pr = mkAddNodeRuntime<vk_triapp, 3, true>(
         ngraph, fnmap,
-        const_str("setupDebugMessengerNode"),     // node label
-        const_str("createSurfaceNode"), // neighbour_label
-        "setupDebugMessenger"                     // task name
+        const_str("setupDebugMessengerNode"), // node label
+        const_str("createSurfaceNode"),       // neighbour_label
+        "setupDebugMessenger"                 // task name
     );
     if (pr.first.status != SUCCESS_OP) {
       UPDATE_RESULT_VK(pr.first, pr.second);
@@ -79,18 +78,15 @@ int main() {
     - target nodes: {5: pickPhysicalDevice}
    */
   {
-    const_str nlabel = const_str("createSurfaceNode");
-    const NodeIdVk node_id = 4;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createSurface"];
-    const branch neighbours[] = {std::make_pair(
-        BranchType::UNCOND, const_str("pickPhysicalDeviceNode"))};
-    auto task = std::make_pair("createSurface", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, true>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 4, true>(
+        ngraph, fnmap,
+        const_str("createSurfaceNode"),      // node label
+        const_str("pickPhysicalDeviceNode"), // neighbour_label
+        "createSurface"                      // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -99,18 +95,15 @@ int main() {
     - target nodes: {6: createLogicalDevice}
    */
   {
-    const_str nlabel = const_str("pickPhysicalDeviceNode");
-    const NodeIdVk node_id = 5;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["pickPhysicalDevice"];
-    const branch neighbours[] = {std::make_pair(
-        BranchType::UNCOND, const_str("createLogicalDeviceNode"))};
-    auto task = std::make_pair("pickPhysicalDevice", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, true>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 5, true>(
+        ngraph, fnmap,
+        const_str("pickPhysicalDeviceNode"),  // node label
+        const_str("createLogicalDeviceNode"), // neighbour_label
+        "pickPhysicalDevice"                  // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -118,39 +111,35 @@ int main() {
     - node id 6
     - target nodes: {7: createSwapChain}
    */
+
   {
-    const_str nlabel = const_str("createLogicalDeviceNode");
-    const NodeIdVk node_id = 6;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createLogicalDevice"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("createSwapChainNode"))};
-    auto task = std::make_pair("createLogicalDevice", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, true>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 6, true>(
+        ngraph, fnmap,
+        const_str("createLogicalDeviceNode"), // node label
+        const_str("createSwapChainNode"),     // neighbour_label
+        "createLogicalDevice"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
+
   /** vulkan create swap chain node:
     - node id 7
     - target nodes: {8: createImageViews}
    */
   {
-    const_str nlabel = const_str("createSwapChainNode");
-    const NodeIdVk node_id = 7;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createSwapChain"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("createImageViewsNode"))};
-    auto task = std::make_pair("createSwapChain", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 8, false>(
+        ngraph, fnmap,
+        const_str("createSwapChainNode"),  // node label
+        const_str("createImageViewsNode"), // neighbour_label
+        "createSwapChain"                  // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -159,18 +148,15 @@ int main() {
     - target nodes {9: createRenderPass}
    */
   {
-    const_str nlabel = const_str("createImageViewsNode");
-    const NodeIdVk node_id = 8;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createImageViews"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("createRenderPassNode"))};
-    auto task = std::make_pair("createImageViews", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 8, false>(
+        ngraph, fnmap,
+        const_str("createImageViewsNode"), // node label
+        const_str("createRenderPassNode"), // neighbour_label
+        "createImageViews"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -179,18 +165,15 @@ int main() {
     - target nodes {10: createGraphicsPipeline}
    */
   {
-    const_str nlabel = const_str("createRenderPassNode");
-    const NodeIdVk node_id = 9;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createRenderPass"];
-    const branch neighbours[] = {std::make_pair(
-        BranchType::UNCOND, const_str("createGraphicsPipelineNode"))};
-    auto task = std::make_pair("createRenderPass", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 9, false>(
+        ngraph, fnmap,
+        const_str("createRenderPassNode"),       // node label
+        const_str("createGraphicsPipelineNode"), // neighbour_label
+        "createRenderPass"                       // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -201,18 +184,15 @@ int main() {
     It accesses IO. It can probably be refactored to access it only one time.
    */
   {
-    const_str nlabel = const_str("createGraphicsPipelineNode");
-    const NodeIdVk node_id = 10;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createGraphicsPipeline"];
-    const branch neighbours[] = {std::make_pair(
-        BranchType::UNCOND, const_str("createFramebuffersNode"))};
-    auto task = std::make_pair("createGraphicsPipeline", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 10, false>(
+        ngraph, fnmap,
+        const_str("createGraphicsPipelineNode"), // node label
+        const_str("createFramebuffersNode"),     // neighbour_label
+        "createGraphicsPipeline"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -226,18 +206,15 @@ int main() {
     - target node {12: createCommandPool}
    */
   {
-    const_str nlabel = const_str("createFramebuffersNode");
-    const NodeIdVk node_id = 11;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createFramebuffers"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("createCommandPoolNode"))};
-    auto task = std::make_pair("createFramebuffers", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 11, false>(
+        ngraph, fnmap,
+        const_str("createFramebuffersNode"), // node label
+        const_str("createCommandPoolNode"),  // neighbour_label
+        "createFramebuffers"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -251,18 +228,15 @@ int main() {
     - target node {13: createCommandBufferAlloc}
    */
   {
-    const_str nlabel = const_str("createCommandPoolNode");
-    const NodeIdVk node_id = 12;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createCommandPool"];
-    const branch neighbours[] = {std::make_pair(
-        BranchType::UNCOND, const_str("createCommandBufferAllocNode"))};
-    auto task = std::make_pair("createCommandPool", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 12, false>(
+        ngraph, fnmap,
+        const_str("createCommandPoolNode"),    // node label
+        const_str("createCommandBufferAllocNode"), // neighbour_label
+        "createCommandPool"                    // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -274,19 +248,15 @@ int main() {
     - target node {14: createCommandBuffers}
    */
   {
-    const_str nlabel = const_str("createCommandBufferAllocNode");
-    const NodeIdVk node_id = 13;
-    std::function<vk_output(vk_triapp &)> nf =
-        fnmap["createCommandBufferAlloc"];
-    const branch neighbours[] = {std::make_pair(
-        BranchType::UNCOND, const_str("createCommandBuffersNode"))};
-    auto task = std::make_pair("createCommandBufferAlloc", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 13, false>(
+        ngraph, fnmap,
+        const_str("createCommandBufferAllocNode"), // node label
+        const_str("createCommandBuffersNode"),     // neighbour_label
+        "createCommandBufferAlloc"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -302,18 +272,15 @@ int main() {
     - target node id {15: createSyncObjects}
    */
   {
-    const_str nlabel = const_str("createCommandBuffersNode");
-    const NodeIdVk node_id = 14;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createCommandBuffers"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("createSyncObjectsNode"))};
-    auto task = std::make_pair("createCommandBuffers", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 14, false>(
+        ngraph, fnmap,
+        const_str("createCommandBuffersNode"), // node label
+        const_str("createSyncObjectsNode"),    // neighbour_label
+        "createCommandBuffers"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -323,18 +290,15 @@ int main() {
     - target node id {16: windowShouldClose}
    */
   {
-    const_str nlabel = const_str("createSyncObjectsNode");
-    const NodeIdVk node_id = 15;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createSyncObjects"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("windowShouldCloseNode"))};
-    auto task = std::make_pair("createSyncObjects", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, true>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 15, false>(
+        ngraph, fnmap,
+        const_str("createSyncObjectsNode"), // node label
+        const_str("windowShouldCloseNode"), // neighbour_label
+        "createSyncObjects"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -345,19 +309,18 @@ int main() {
     - target node ids {17: drawFrame, 29: cleanUp}
    */
   {
-    const_str nlabel = const_str("windowShouldCloseNode");
-    const NodeIdVk node_id = 16;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["windowShouldClose"];
     const branch neighbours[] = {
         std::make_pair(BranchType::UNCOND, const_str("drawFrameNode")),
         std::make_pair(BranchType::UNCOND, const_str("cleanupSwapChainNode2"))};
-    auto task = std::make_pair("windowShouldClose", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 16, false>(
+        ngraph, fnmap,
+        const_str("windowShouldCloseNode"), // node label
+        neighbours,                         // neighbour_label
+        "windowShouldClose"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -367,19 +330,18 @@ int main() {
     - target node {16: windowShouldClose, 18: recreateSwapChain}
    */
   {
-    const_str nlabel = const_str("drawFrameNode");
-    const NodeIdVk node_id = 17;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["drawFrame"];
     const branch neighbours[] = {
         std::make_pair(BranchType::UNCOND, const_str("windowShouldCloseNode")),
         std::make_pair(BranchType::UNCOND, const_str("recreateSwapChainNode"))};
-    auto task = std::make_pair("drawFrame", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 17, false>(
+        ngraph, fnmap,
+        const_str("drawFrameNode"), // node label
+        neighbours,                 // neighbour_label
+        "drawFrame"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -388,19 +350,17 @@ int main() {
     - node id 18
     - target node {20: cleanupSwapChain}
   */
+
   {
-    const_str nlabel = const_str("recreateSwapChainNode");
-    const NodeIdVk node_id = 18;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["recreateSwapChain"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("cleanupSwapChainNode"))};
-    auto task = std::make_pair("recreateSwapChain", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 18, false>(
+        ngraph, fnmap,
+        const_str("recreateSwapChainNode"), // node label
+        const_str("cleanupSwapChainNode"),  // neighbour_label
+        "recreateSwapChain"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -410,18 +370,15 @@ int main() {
     - target node id {21: createSwapChain}
    */
   {
-    const_str nlabel = const_str("cleanupSwapChainNode");
-    const NodeIdVk node_id = 20;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["cleanupSwapChain"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("createSwapChainNode2"))};
-    auto task = std::make_pair("cleanupSwapChain", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 20, false>(
+        ngraph, fnmap,
+        const_str("cleanupSwapChainNode"), // node label
+        const_str("createSwapChainNode2"), // neighbour_label
+        "cleanupSwapChainNode"             // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -431,18 +388,15 @@ int main() {
     - target node id {22: createImageViews}
    */
   {
-    const_str nlabel = const_str("createSwapChainNode2");
-    const NodeIdVk node_id = 21;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createSwapChain"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("createImageViewsNode2"))};
-    auto task = std::make_pair("createSwapChain", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 21, false>(
+        ngraph, fnmap,
+        const_str("createSwapChainNode2"),  // node label
+        const_str("createImageViewsNode2"), // neighbour_label
+        "createSwapChain"                   // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -452,18 +406,15 @@ int main() {
     - target node id {23: createRenderPass}
    */
   {
-    const_str nlabel = const_str("createImageViewsNode2");
-    const NodeIdVk node_id = 22;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createImageViews"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("createRenderPassNode2"))};
-    auto task = std::make_pair("createImageViews", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 22, false>(
+        ngraph, fnmap,
+        const_str("createImageViewsNode2"), // node label
+        const_str("createRenderPassNode2"), // neighbour_label
+        "createImageViews"                  // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -473,39 +424,34 @@ int main() {
     - target node id {24: createGraphicsPipeline}
    */
   {
-    const_str nlabel = const_str("createRenderPassNode2");
-    const NodeIdVk node_id = 23;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createRenderPass"];
-    const branch neighbours[] = {std::make_pair(
-        BranchType::UNCOND, const_str("createGraphicsPipelineNode2"))};
-    auto task = std::make_pair("createRenderPass", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 23, false>(
+        ngraph, fnmap,
+        const_str("createRenderPassNode2"),       // node label
+        const_str("createGraphicsPipelineNode2"), // neighbour_label
+        "createRenderPass"                        // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
+
   /**
     createGraphicsPipeline in recreate swapchain node:
     - node id 24
     - target node id {25: createFramebuffers}
    */
   {
-    const_str nlabel = const_str("createGraphicsPipelineNode2");
-    const NodeIdVk node_id = 24;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createGraphicsPipeline"];
-    const branch neighbours[] = {std::make_pair(
-        BranchType::UNCOND, const_str("createFramebuffersNode2"))};
-    auto task = std::make_pair("createGraphicsPipeline", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 24, false>(
+        ngraph, fnmap,
+        const_str("createGraphicsPipelineNode2"), // node label
+        const_str("createFramebuffersNode2"),     // neighbour_label
+        "createGraphicsPipeline"                  // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -515,18 +461,15 @@ int main() {
     - target node id {26: createCommandBufferAlloc}
    */
   {
-    const_str nlabel = const_str("createFramebuffersNode2");
-    const NodeIdVk node_id = 25;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createFramebuffers"];
-    const branch neighbours[] = {std::make_pair(
-        BranchType::UNCOND, const_str("createCommandBufferAllocNode2"))};
-    auto task = std::make_pair("createFramebuffers", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 25, false>(
+        ngraph, fnmap,
+        const_str("createFramebuffersNode2"),       // node label
+        const_str("createCommandBufferAllocNode2"), // neighbour_label
+        "createFramebuffers"                        // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -536,40 +479,34 @@ int main() {
       - target node id {27: createCommandBuffers}
      */
   {
-    const_str nlabel = const_str("createCommandBufferAllocNode2");
-    const NodeIdVk node_id = 26;
-    std::function<vk_output(vk_triapp &)> nf =
-        fnmap["createCommandBufferAlloc"];
-    const branch neighbours[] = {std::make_pair(
-        BranchType::UNCOND, const_str("createCommandBuffersNode2"))};
-    auto task = std::make_pair("createCommandBufferAlloc", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 26, false>(
+        ngraph, fnmap,
+        const_str("createCommandBufferAllocNode2"), // node label
+        const_str("createCommandBuffersNode2"),     // neighbour_label
+        "createCommandBufferAlloc"                  // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
+
   /**
     createCommandBuffers in recreate swapchain node:
     - node id 27
     - target node id {28: imagesInFlightResize}
    */
   {
-    const_str nlabel = const_str("createCommandBuffersNode2");
-    const NodeIdVk node_id = 27;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["createCommandBuffers"];
-    const branch neighbours[] = {std::make_pair(
-        BranchType::UNCOND, const_str("imagesInFlightResizeNode"))};
-    auto task = std::make_pair("createCommandBuffers", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 27, false>(
+        ngraph, fnmap,
+        const_str("createCommandBuffersNode2"), // node label
+        const_str("imagesInFlightResizeNode"),  // neighbour_label
+        "createCommandBuffers"                  // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -579,18 +516,15 @@ int main() {
     - target node {16: windowShouldClose}
    */
   {
-    const_str nlabel = const_str("imagesInFlightResizeNode");
-    const NodeIdVk node_id = 28;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["imagesInFlightResize"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("windowShouldCloseNode"))};
-    auto task = std::make_pair("imagesInFlightResize", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 28, false>(
+        ngraph, fnmap,
+        const_str("imagesInFlightResizeNode"), // node label
+        const_str("windowShouldCloseNode"),    // neighbour_label
+        "imagesInFlightResize"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -604,22 +538,18 @@ int main() {
     - target node {30: destroyAll}
    */
   {
-    const_str nlabel = const_str("cleanupSwapChainNode2");
-    const NodeIdVk node_id = 29;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["cleanupSwapChain"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("destroyAllNode"))};
-    auto task = std::make_pair("cleanupSwapChain", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 29, false>(
+        ngraph, fnmap,
+        const_str("cleanupSwapChainNode2"), // node label
+        const_str("destroyAllNode"),        // neighbour_label
+        "cleanupSwapChain"                  // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
-
   /**
     destroyAll in cleanup node:
     - node id: 30
@@ -628,21 +558,19 @@ int main() {
     Once runs this node terminates the application
   */
   {
-    const_str nlabel = const_str("destroyAllNode");
-    const NodeIdVk node_id = 30;
-    std::function<vk_output(vk_triapp &)> nf = fnmap["destroyAll"];
-    const branch neighbours[] = {
-        std::make_pair(BranchType::UNCOND, const_str("END"))};
-    auto task = std::make_pair("destroyAll", nf);
-    auto vr =
-        mkAddNode2<vk_triapp, node_id, false>(ngraph, nlabel, task, neighbours);
-    if (vr.status != SUCCESS_OP) {
-      std::string str = "node creation failed for node 1 with end node 2";
-      UPDATE_RESULT_VK(vr, str);
-      std::cerr << toString(vr) << std::endl;
+    auto pr = mkAddNodeRuntime<vk_triapp, 30, false>(
+        ngraph, fnmap,
+        const_str("destroyAllNode"), // node label
+        const_str("END"),            // neighbour_label
+        "destroyAll"                 // task name
+    );
+    if (pr.first.status != SUCCESS_OP) {
+      UPDATE_RESULT_VK(pr.first, pr.second);
+      std::cerr << toString(pr.first) << std::endl;
       return EXIT_FAILURE;
     }
   }
+  // repeat end node out of caution
   {
     const_str nlabel = const_str("END");
     const NodeIdVk node_id = 31;

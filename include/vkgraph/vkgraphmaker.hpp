@@ -188,8 +188,7 @@ Result_Vk mkAddNode2(
 template <typename VkApp, NodeIdVk node_id, bool IsSingular>
 std::pair<Result_Vk, std::string> mkAddNodeRuntime(
     vk_graph2<VkApp> &ngraph,
-    std::unordered_map<std::string, std::function<vk_output(VkApp &)>>
-        &fnmap,
+    std::unordered_map<std::string, std::function<vk_output(VkApp &)>> &fnmap,
     const const_str &node_label, const const_str &neighbour_label,
     const char *taskName) {
   const_str nlabel = node_label;
@@ -204,6 +203,25 @@ std::pair<Result_Vk, std::string> mkAddNodeRuntime(
     std::string str = "node creation failed for node ";
     str += std::string(node_label.obj());
     str += "with branching to " + std::string(neighbour_label.obj());
+    return std::make_pair(vr, str);
+  }
+  return std::make_pair(vr, std::string(""));
+}
+template <typename VkApp, NodeIdVk node_id, bool IsSingular, std::size_t B>
+std::pair<Result_Vk, std::string> mkAddNodeRuntime(
+    vk_graph2<VkApp> &ngraph,
+    std::unordered_map<std::string, std::function<vk_output(VkApp &)>> &fnmap,
+    const const_str &node_label, const branch (&ns_)[B], const char *taskName) {
+  const_str nlabel = node_label;
+  std::string taskLabel = std::string(taskName);
+  std::function<vk_output(VkApp &)> nf = fnmap[taskLabel];
+  auto task = std::make_pair(taskName, nf);
+  auto vr =
+      mkAddNode2<VkApp, node_id, IsSingular>(ngraph, nlabel, task, ns_);
+  if (vr.status != SUCCESS_OP) {
+    std::string str = "node creation failed for node ";
+    str += std::string(node_label.obj());
+    str += "with branching to " + std::to_string(B) + " number of branches";
     return std::make_pair(vr, str);
   }
   return std::make_pair(vr, std::string(""));
