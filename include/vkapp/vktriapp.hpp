@@ -7,6 +7,7 @@
 #include <vertex.hpp>
 #include <vkdebug/debug.hpp>
 #include <vkgraph/vknode.hpp>
+#include <vkqueuefamily/index.hpp>
 
 namespace vtuto {
 
@@ -312,16 +313,6 @@ static void populateDebugMessengerCreateInfo(
 
   createInfo = mkDebugMessengerCreateInfo(severities, mtypes, debugCallback);
 }
-
-struct QueueFamilyIndices {
-  std::optional<uint32_t> graphicsFamily;
-  std::optional<uint32_t> presentFamily;
-
-  bool isComplete() {
-    return graphicsFamily.has_value() && presentFamily.has_value();
-  }
-};
-
 struct SwapChainSupportDetails {
   VkSurfaceCapabilitiesKHR capabilities;
   std::vector<VkSurfaceFormatKHR> formats;
