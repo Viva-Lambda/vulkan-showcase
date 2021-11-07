@@ -1,8 +1,5 @@
 #pragma once
 #include <external.hpp>
-#include <vkresult/paramchecker.hpp>
-
-using namespace vtuto;
 
 namespace vtuto {
 /**
