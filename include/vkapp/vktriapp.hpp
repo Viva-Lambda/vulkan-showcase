@@ -8,6 +8,7 @@
 #include <vkdebug/debug.hpp>
 #include <vkgraph/vknode.hpp>
 #include <vkqueuefamily/index.hpp>
+#include <vkqueuefamily/queue.hpp>
 
 namespace vtuto {
 
@@ -47,8 +48,9 @@ struct vk_triapp {
   /** logical device handler */
   VkDevice ldevice;
 
+  /** queues */
   /** graphics queue */
-  VkQueue graphics_queue;
+  queue_map queues = {std::make_pair(VK_QUEUE_GRAPHICS_BIT, VkQueue{})};
 
   /** window surface queue */
   VkQueue present_queue;
@@ -321,34 +323,8 @@ struct SwapChainSupportDetails {
 
 static QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device,
                                             VkSurfaceKHR surface) {
-  QueueFamilyIndices indices;
-
-  uint32_t queueFamilyCount = 0;
-  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-
-  std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount,
-                                           queueFamilies.data());
-
-  int i = 0;
-  for (const auto &queueFamily : queueFamilies) {
-    if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-      indices.graphicsFamily = i;
-    }
-
-    VkBool32 presentSupport = false;
-    vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
-
-    if (presentSupport) {
-      indices.presentFamily = i;
-    }
-
-    if (indices.isComplete()) {
-      break;
-    }
-    i++;
-  }
-
+  QueueFamilyIndices indices =
+      find_queue_families<VK_QUEUE_GRAPHICS_BIT>(device, surface);
   return indices;
 }
 static bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
@@ -635,8 +611,9 @@ vk_triAppFns() {
     QueueFamilyIndices indices = findQueueFamilies(myg.pdevice, myg.surface);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(),
-                                              indices.presentFamily.value()};
+    auto indice_values = indices.values();
+    std::set<uint32_t> uniqueQueueFamilies(indice_values.begin(),
+                                           indice_values.end());
 
     float queuePriority = 1.0f;
     for (uint32_t queueFamily : uniqueQueueFamilies) {
@@ -680,8 +657,11 @@ vk_triAppFns() {
       return out;
     }
 
-    vkGetDeviceQueue(myg.ldevice, indices.graphicsFamily.value(), 0,
-                     &myg.graphics_queue);
+    uint32_t graphics_family = 0;
+    indices.index<VK_QUEUE_GRAPHICS_BIT>(graphics_family);
+
+    vkGetDeviceQueue(myg.ldevice, graphics_family, 0,
+                     &myg.queues[VK_QUEUE_GRAPHICS_BIT]);
     vkGetDeviceQueue(myg.ldevice, indices.presentFamily.value(), 0,
                      &myg.present_queue);
     return out;
@@ -723,13 +703,14 @@ vk_triAppFns() {
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
     QueueFamilyIndices indices = findQueueFamilies(myg.pdevice, myg.surface);
-    uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(),
-                                     indices.presentFamily.value()};
+    const auto queueFamilyIndices = indices.values();
+    uint32_t graphicsFamily = 0;
+    indices.index<VK_QUEUE_GRAPHICS_BIT>(graphicsFamily);
 
-    if (indices.graphicsFamily != indices.presentFamily) {
+    if (graphicsFamily != indices.presentFamily.value()) {
       createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
       createInfo.queueFamilyIndexCount = 2;
-      createInfo.pQueueFamilyIndices = queueFamilyIndices;
+      createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
     } else {
       createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     }
@@ -1040,12 +1021,14 @@ vk_triAppFns() {
     out.result_info = vr;
     out.signal = 1;
 
-    QueueFamilyIndices queueFamilyIndices =
-        findQueueFamilies(myg.pdevice, myg.surface);
+    QueueFamilyIndices indices = findQueueFamilies(myg.pdevice, myg.surface);
+
+    uint32_t graphicsFamily = 0;
+    indices.index<VK_QUEUE_GRAPHICS_BIT>(graphicsFamily);
 
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+    poolInfo.queueFamilyIndex = graphicsFamily;
 
     std::string nmsg = "failed to create command pool!";
 
@@ -1272,7 +1255,7 @@ vk_triAppFns() {
     vkResetFences(g.ldevice, 1, &g.current_fences[g.current_frame]);
 
     nmsg = "failed to submit draw command buffer!";
-    CHECK_VK(vkQueueSubmit(g.graphics_queue, 1, &submitInfo,
+    CHECK_VK(vkQueueSubmit(g.queues[VK_QUEUE_GRAPHICS_BIT], 1, &submitInfo,
                            g.current_fences[g.current_frame]),
              nmsg, out.result_info);
 
