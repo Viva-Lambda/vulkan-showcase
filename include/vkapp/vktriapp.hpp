@@ -6,9 +6,11 @@
 #include <initvk/vkinstance.hpp>
 #include <vertex.hpp>
 #include <vkdebug/debug.hpp>
+#include <vkdevice/physical.hpp>
 #include <vkgraph/vknode.hpp>
 #include <vkqueuefamily/index.hpp>
 #include <vkqueuefamily/queue.hpp>
+#include <vkswapchain/support.hpp>
 
 namespace vtuto {
 
@@ -216,9 +218,6 @@ static void framebufferResizeCallback(GLFWwindow *window, int width,
 const std::vector<const char *> validationLayers = {
     "VK_LAYER_KHRONOS_validation"};
 
-const std::vector<const char *> deviceExtensions = {
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-
 static VkResult CreateDebugUtilsMessengerEXT(
     VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
     const VkAllocationCallbacks *pAllocator,
@@ -291,18 +290,8 @@ debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
   return VK_FALSE;
 }
 
-static void populateDebugMessengerCreateInfo(
+void populateDebugMessengerCreateInfo(
     VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
-  /*
-  createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-  createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-  createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-                           VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-                           VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-  createInfo.pfnUserCallback = debugCallback;
-  */
   auto severities = concat_bits<VkDebugUtilsMessageSeverityFlagBitsEXT>(
       VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
       VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT,
@@ -315,80 +304,7 @@ static void populateDebugMessengerCreateInfo(
 
   createInfo = mkDebugMessengerCreateInfo(severities, mtypes, debugCallback);
 }
-struct SwapChainSupportDetails {
-  VkSurfaceCapabilitiesKHR capabilities;
-  std::vector<VkSurfaceFormatKHR> formats;
-  std::vector<VkPresentModeKHR> presentModes;
-};
 
-static QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device,
-                                            VkSurfaceKHR surface) {
-  QueueFamilyIndices indices =
-      find_queue_families<VK_QUEUE_GRAPHICS_BIT>(device, surface);
-  return indices;
-}
-static bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
-  uint32_t extensionCount;
-  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
-                                       nullptr);
-
-  std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
-                                       availableExtensions.data());
-
-  std::set<std::string> requiredExtensions(deviceExtensions.begin(),
-                                           deviceExtensions.end());
-
-  for (const auto &extension : availableExtensions) {
-    requiredExtensions.erase(extension.extensionName);
-  }
-
-  return requiredExtensions.empty();
-}
-static SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device,
-                                                     VkSurfaceKHR surface) {
-  SwapChainSupportDetails details;
-
-  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface,
-                                            &details.capabilities);
-
-  uint32_t formatCount;
-  vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
-
-  if (formatCount != 0) {
-    details.formats.resize(formatCount);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount,
-                                         details.formats.data());
-  }
-
-  uint32_t presentModeCount;
-  vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount,
-                                            nullptr);
-
-  if (presentModeCount != 0) {
-    details.presentModes.resize(presentModeCount);
-    vkGetPhysicalDeviceSurfacePresentModesKHR(
-        device, surface, &presentModeCount, details.presentModes.data());
-  }
-
-  return details;
-}
-
-static bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface) {
-  QueueFamilyIndices indices = findQueueFamilies(device, surface);
-
-  bool extensionsSupported = checkDeviceExtensionSupport(device);
-
-  bool swapChainAdequate = false;
-  if (extensionsSupported) {
-    SwapChainSupportDetails swapChainSupport =
-        querySwapChainSupport(device, surface);
-    swapChainAdequate = !swapChainSupport.formats.empty() &&
-                        !swapChainSupport.presentModes.empty();
-  }
-
-  return indices.isComplete() && extensionsSupported && swapChainAdequate;
-}
 static VkSurfaceFormatKHR chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR> &availableFormats) {
   for (const auto &availableFormat : availableFormats) {
@@ -608,7 +524,8 @@ vk_triAppFns() {
     out.result_info = vr;
     out.signal = 1;
 
-    QueueFamilyIndices indices = findQueueFamilies(myg.pdevice, myg.surface);
+    QueueFamilyIndices indices =
+        find_queue_families<VK_QUEUE_GRAPHICS_BIT>(myg.pdevice, myg.surface);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     auto indice_values = indices.values();
@@ -636,9 +553,14 @@ vk_triAppFns() {
 
     createInfo.pEnabledFeatures = &deviceFeatures;
 
-    createInfo.enabledExtensionCount =
-        static_cast<uint32_t>(deviceExtensions.size());
-    createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+    std::array<VkExtensionProperties, 1> arr = {
+        {{VK_KHR_SWAPCHAIN_EXTENSION_NAME, 1}}};
+    PhysicalDeviceExtensionQuery pext(arr);
+
+    createInfo.enabledExtensionCount = pext.size();
+    auto char_arr = pext.cdata();
+    auto vptr = char_arr.data();
+    createInfo.ppEnabledExtensionNames = vptr->data();
 
     if (enableValidationLayers) {
       createInfo.enabledLayerCount =
@@ -681,7 +603,7 @@ vk_triAppFns() {
     VkSurfaceFormatKHR surfaceFormat =
         chooseSwapSurfaceFormat(swapChainSupport.formats);
     VkPresentModeKHR presentMode =
-        chooseSwapPresentMode(swapChainSupport.presentModes);
+        chooseSwapPresentMode(swapChainSupport.present_modes);
     VkExtent2D extent =
         chooseSwapExtent(swapChainSupport.capabilities, myg.window);
 
@@ -702,14 +624,15 @@ vk_triAppFns() {
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    QueueFamilyIndices indices = findQueueFamilies(myg.pdevice, myg.surface);
+    QueueFamilyIndices indices =
+        find_queue_families<VK_QUEUE_GRAPHICS_BIT>(myg.pdevice, myg.surface);
     const auto queueFamilyIndices = indices.values();
     uint32_t graphicsFamily = 0;
     indices.index<VK_QUEUE_GRAPHICS_BIT>(graphicsFamily);
 
     if (graphicsFamily != indices.presentFamily.value()) {
       createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-      createInfo.queueFamilyIndexCount = 2;
+      createInfo.queueFamilyIndexCount = queueFamilyIndices.size();
       createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
     } else {
       createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -1021,7 +944,8 @@ vk_triAppFns() {
     out.result_info = vr;
     out.signal = 1;
 
-    QueueFamilyIndices indices = findQueueFamilies(myg.pdevice, myg.surface);
+    QueueFamilyIndices indices =
+        find_queue_families<VK_QUEUE_GRAPHICS_BIT>(myg.pdevice, myg.surface);
 
     uint32_t graphicsFamily = 0;
     indices.index<VK_QUEUE_GRAPHICS_BIT>(graphicsFamily);

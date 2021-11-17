@@ -8,4 +8,4 @@ public:
   VDeviceType device();
   void destroy() {}
 };
-}
+} // namespace vtuto
