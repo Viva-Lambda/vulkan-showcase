@@ -11,6 +11,7 @@
 #include <vkqueuefamily/index.hpp>
 #include <vkqueuefamily/queue.hpp>
 #include <vkswapchain/support.hpp>
+#include <vkswapchain/swapchain.hpp>
 
 namespace vtuto {
 
@@ -305,50 +306,6 @@ void populateDebugMessengerCreateInfo(
   createInfo = mkDebugMessengerCreateInfo(severities, mtypes, debugCallback);
 }
 
-static VkSurfaceFormatKHR chooseSwapSurfaceFormat(
-    const std::vector<VkSurfaceFormatKHR> &availableFormats) {
-  for (const auto &availableFormat : availableFormats) {
-    if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
-        availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-      return availableFormat;
-    }
-  }
-
-  return availableFormats[0];
-}
-
-static VkPresentModeKHR chooseSwapPresentMode(
-    const std::vector<VkPresentModeKHR> &availablePresentModes) {
-  for (const auto &availablePresentMode : availablePresentModes) {
-    if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-      return availablePresentMode;
-    }
-  }
-
-  return VK_PRESENT_MODE_FIFO_KHR;
-}
-
-static VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities,
-                                   GLFWwindow *window) {
-  if (capabilities.currentExtent.width != UINT32_MAX) {
-    return capabilities.currentExtent;
-  } else {
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-
-    VkExtent2D actualExtent = {static_cast<uint32_t>(width),
-                               static_cast<uint32_t>(height)};
-
-    actualExtent.width =
-        std::clamp(actualExtent.width, capabilities.minImageExtent.width,
-                   capabilities.maxImageExtent.width);
-    actualExtent.height =
-        std::clamp(actualExtent.height, capabilities.minImageExtent.height,
-                   capabilities.maxImageExtent.height);
-
-    return actualExtent;
-  }
-}
 static std::vector<char> readFile(const std::string &filename) {
   std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
@@ -597,13 +554,29 @@ vk_triAppFns() {
     out.result_info = vr;
     out.signal = 1;
 
+    VkSwapchainCreateInfoKHR createInfo{};
+    std::uint32_t imageCount = 0;
+    VkSurfaceFormatKHR surfaceFormat;
+    VkExtent2D extent;
+    createSwapChainInfo<
+        VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
+        VK_PRESENT_MODE_MAILBOX_KHR, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+        VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_TRUE, VK_QUEUE_GRAPHICS_BIT>(
+        createInfo, myg.pdevice, myg.surface, myg.window, imageCount,
+        surfaceFormat, extent);
+
+    /*
+
     SwapChainSupportDetails swapChainSupport =
         querySwapChainSupport(myg.pdevice, myg.surface);
 
     VkSurfaceFormatKHR surfaceFormat =
-        chooseSwapSurfaceFormat(swapChainSupport.formats);
+        chooseSwapSurfaceFormat<VK_FORMAT_B8G8R8A8_SRGB,
+                                VK_COLOR_SPACE_SRGB_NONLINEAR_KHR>(
+            swapChainSupport.formats);
     VkPresentModeKHR presentMode =
-        chooseSwapPresentMode(swapChainSupport.present_modes);
+        chooseSwapPresentMode<VK_PRESENT_MODE_MAILBOX_KHR>(
+            swapChainSupport.present_modes);
     VkExtent2D extent =
         chooseSwapExtent(swapChainSupport.capabilities, myg.window);
 
@@ -642,6 +615,7 @@ vk_triAppFns() {
     createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     createInfo.presentMode = presentMode;
     createInfo.clipped = VK_TRUE;
+    */
 
     std::string nmsg = "failed to create swap chain!";
     CHECK_VK(
