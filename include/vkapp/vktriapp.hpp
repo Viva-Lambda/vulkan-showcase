@@ -554,39 +554,30 @@ vk_triAppFns() {
     out.result_info = vr;
     out.signal = 1;
 
-    VkSwapchainCreateInfoKHR createInfo{};
-    std::uint32_t imageCount = 0;
+    // std::uint32_t imageCount = 0;
+    // VkSurfaceFormatKHR surfaceFormat;
+    // VkExtent2D extent;
+    // createSwapChainInfo<
+    //    VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
+    //    VK_PRESENT_MODE_MAILBOX_KHR, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+    //    VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_TRUE, VK_QUEUE_GRAPHICS_BIT>(
+    //    createInfo, myg.pdevice, myg.surface, myg.window, imageCount,
+    //    surfaceFormat, extent);
+
     VkSurfaceFormatKHR surfaceFormat;
     VkExtent2D extent;
-    createSwapChainInfo<
-        VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
-        VK_PRESENT_MODE_MAILBOX_KHR, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-        VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_TRUE, VK_QUEUE_GRAPHICS_BIT>(
-        createInfo, myg.pdevice, myg.surface, myg.window, imageCount,
-        surfaceFormat, extent);
-
-    /*
-
-    SwapChainSupportDetails swapChainSupport =
-        querySwapChainSupport(myg.pdevice, myg.surface);
-
-    VkSurfaceFormatKHR surfaceFormat =
-        chooseSwapSurfaceFormat<VK_FORMAT_B8G8R8A8_SRGB,
-                                VK_COLOR_SPACE_SRGB_NONLINEAR_KHR>(
-            swapChainSupport.formats);
-    VkPresentModeKHR presentMode =
-        chooseSwapPresentMode<VK_PRESENT_MODE_MAILBOX_KHR>(
-            swapChainSupport.present_modes);
-    VkExtent2D extent =
-        chooseSwapExtent(swapChainSupport.capabilities, myg.window);
-
-    uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
-    if (swapChainSupport.capabilities.maxImageCount > 0 &&
-        imageCount > swapChainSupport.capabilities.maxImageCount) {
-      imageCount = swapChainSupport.capabilities.maxImageCount;
-    }
+    std::uint32_t imageCount = 0;
 
     VkSwapchainCreateInfoKHR createInfo{};
+    createSwapChainInfo<
+        VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
+        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+        VK_TRUE, 1, VK_QUEUE_GRAPHICS_BIT>(createInfo, myg.pdevice, myg.surface,
+                                           myg.window, surfaceFormat, extent,
+                                           imageCount);
+
+    // VkSwapchainCreateInfoKHR createInfo{};
+    /*
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     createInfo.surface = myg.surface;
 

@@ -189,23 +189,22 @@ image
 template <
     VkFormat Format = VK_FORMAT_B8G8R8A8_SRGB,
     VkColorSpaceKHR ColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
-    VkPresentModeKHR PresMode = VK_PRESENT_MODE_MAILBOX_KHR,
     VkImageUsageFlags ImufBits = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
     VkCompositeAlphaFlagBitsKHR AlphaBits = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-    VkBool32 IsClipped = VK_TRUE, VkQueueFlagBits... FBits>
+    VkBool32 IsClipped = VK_TRUE, unsigned int ImageArrayLayers = 1,
+    VkQueueFlagBits... FBits>
 void createSwapChainInfo(VkSwapchainCreateInfoKHR &createInfo,
                          VkPhysicalDevice &pdevice, VkSurfaceKHR &surface,
-                         GLFWwindow *window, std::uint32_t &imageCount,
-                         VkSurfaceFormatKHR &surfaceFormat,
-                         VkExtent2D &extent) {
+                         GLFWwindow *window, VkSurfaceFormatKHR &surfaceFormat,
+                         VkExtent2D &extent, std::uint32_t &imageCount) {
 
   SwapChainSupportDetails swapChainSupport =
       querySwapChainSupport(pdevice, surface);
-
   surfaceFormat =
       chooseSwapSurfaceFormat<Format, ColorSpace>(swapChainSupport.formats);
   VkPresentModeKHR presentMode =
-      chooseSwapPresentMode<PresMode>(swapChainSupport.present_modes);
+      chooseSwapPresentMode<VK_PRESENT_MODE_MAILBOX_KHR>(
+          swapChainSupport.present_modes);
   extent = chooseSwapExtent(swapChainSupport.capabilities, window);
 
   imageCount = swapChainSupport.capabilities.minImageCount + 1;
@@ -223,9 +222,10 @@ void createSwapChainInfo(VkSwapchainCreateInfoKHR &createInfo,
   createInfo.imageFormat = surfaceFormat.format;
   createInfo.imageColorSpace = surfaceFormat.colorSpace;
   createInfo.imageExtent = extent;
+  createInfo.imageArrayLayers = ImageArrayLayers;
+  createInfo.imageUsage = ImufBits;
 
   //
-  createInfo.imageUsage = ImufBits;
   createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
   createInfo.presentMode = presentMode;
 
