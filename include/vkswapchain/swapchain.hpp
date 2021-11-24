@@ -184,68 +184,74 @@ VK_IMAGE_USAGE_VIDEO_ENCODE_DST_BIT_KHR is required for a DPB image resource
 because the reconstructed picture resulting from an encode operation will be
 written to it. VK_IMAGE_USAGE_VIDEO_ENCODE_SRC_BIT_KHR is required for DPB
 image
-
  */
-template <
-    VkFormat Format = VK_FORMAT_B8G8R8A8_SRGB,
-    VkColorSpaceKHR ColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
-    VkImageUsageFlags ImufBits = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-    VkCompositeAlphaFlagBitsKHR AlphaBits = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-    VkBool32 IsClipped = VK_TRUE, unsigned int ImageArrayLayers = 1,
-    VkQueueFlagBits... FBits>
-void createSwapChainInfo(VkSwapchainCreateInfoKHR &createInfo,
-                         VkPhysicalDevice &pdevice, VkSurfaceKHR &surface,
-                         GLFWwindow *window, VkSurfaceFormatKHR &surfaceFormat,
-                         VkExtent2D &extent, std::uint32_t &imageCount) {
+struct SwapchainCreateInfoKHR_VK {
+  VkSwapchainCreateInfoKHR createInfo;
 
-  SwapChainSupportDetails swapChainSupport =
-      querySwapChainSupport(pdevice, surface);
-  surfaceFormat =
-      chooseSwapSurfaceFormat<Format, ColorSpace>(swapChainSupport.formats);
-  VkPresentModeKHR presentMode =
-      chooseSwapPresentMode<VK_PRESENT_MODE_MAILBOX_KHR>(
-          swapChainSupport.present_modes);
-  extent = chooseSwapExtent(swapChainSupport.capabilities, window);
+  SwapchainCreateInfoKHR_VK() {}
 
-  imageCount = swapChainSupport.capabilities.minImageCount + 1;
-  if (swapChainSupport.capabilities.maxImageCount > 0 &&
-      imageCount > swapChainSupport.capabilities.maxImageCount) {
-    imageCount = swapChainSupport.capabilities.maxImageCount;
+  template <
+      VkFormat Format = VK_FORMAT_B8G8R8A8_SRGB,
+      VkColorSpaceKHR ColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
+      VkImageUsageFlags ImufBits = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+      VkCompositeAlphaFlagBitsKHR AlphaBits = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+      VkBool32 IsClipped = VK_TRUE, unsigned int ImageArrayLayers = 1,
+      VkQueueFlagBits... FBits>
+  void set(VkPhysicalDevice &pdevice, VkSurfaceKHR &surface, GLFWwindow *window,
+           VkSurfaceFormatKHR &surfaceFormat, VkExtent2D &extent,
+           std::uint32_t &imageCount) {
+    SwapChainSupportDetails swapChainSupport =
+        querySwapChainSupport(pdevice, surface);
+    surfaceFormat =
+        chooseSwapSurfaceFormat<Format, ColorSpace>(swapChainSupport.formats);
+    VkPresentModeKHR presentMode =
+        chooseSwapPresentMode<VK_PRESENT_MODE_MAILBOX_KHR>(
+            swapChainSupport.present_modes);
+    extent = chooseSwapExtent(swapChainSupport.capabilities, window);
+
+    imageCount = swapChainSupport.capabilities.minImageCount + 1;
+    if (swapChainSupport.capabilities.maxImageCount > 0 &&
+        imageCount > swapChainSupport.capabilities.maxImageCount) {
+      imageCount = swapChainSupport.capabilities.maxImageCount;
+    }
+    VkSwapchainCreateInfoKHR _createInfo{};
+
+    //
+    _createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    _createInfo.surface = surface;
+    _createInfo.minImageCount = imageCount;
+
+    // queried info from surface and physical device
+    _createInfo.imageFormat = surfaceFormat.format;
+    _createInfo.imageColorSpace = surfaceFormat.colorSpace;
+    _createInfo.imageExtent = extent;
+    _createInfo.imageArrayLayers = ImageArrayLayers;
+    _createInfo.imageUsage = ImufBits;
+
+    //
+    _createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+    _createInfo.presentMode = presentMode;
+
+    //
+    _createInfo.compositeAlpha = AlphaBits;
+    _createInfo.presentMode = presentMode;
+    _createInfo.clipped = IsClipped;
+    //
+    QueueFamilyIndices indices =
+        find_queue_families<FBits...>(pdevice, surface);
+    const auto queueFamilyIndices = indices.values();
+    uint32_t graphicsFamily = 0;
+    indices.index<FBits...>(graphicsFamily);
+
+    if (graphicsFamily != indices.presentFamily.value()) {
+      _createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+      _createInfo.queueFamilyIndexCount = queueFamilyIndices.size();
+      _createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
+    } else {
+      _createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    }
+    createInfo = _createInfo;
   }
-
-  //
-  createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-  createInfo.surface = surface;
-  createInfo.minImageCount = imageCount;
-
-  // queried info from surface and physical device
-  createInfo.imageFormat = surfaceFormat.format;
-  createInfo.imageColorSpace = surfaceFormat.colorSpace;
-  createInfo.imageExtent = extent;
-  createInfo.imageArrayLayers = ImageArrayLayers;
-  createInfo.imageUsage = ImufBits;
-
-  //
-  createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
-  createInfo.presentMode = presentMode;
-
-  //
-  createInfo.compositeAlpha = AlphaBits;
-  createInfo.presentMode = presentMode;
-  createInfo.clipped = IsClipped;
-  //
-  QueueFamilyIndices indices = find_queue_families<FBits...>(pdevice, surface);
-  const auto queueFamilyIndices = indices.values();
-  uint32_t graphicsFamily = 0;
-  indices.index<FBits...>(graphicsFamily);
-
-  if (graphicsFamily != indices.presentFamily.value()) {
-    createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-    createInfo.queueFamilyIndexCount = queueFamilyIndices.size();
-    createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
-  } else {
-    createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-  }
-}
+};
 
 } // namespace vtuto

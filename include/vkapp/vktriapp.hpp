@@ -8,6 +8,7 @@
 #include <vkdebug/debug.hpp>
 #include <vkdevice/physical.hpp>
 #include <vkgraph/vknode.hpp>
+#include <vkimageview/imageview.hpp>
 #include <vkqueuefamily/index.hpp>
 #include <vkqueuefamily/queue.hpp>
 #include <vkswapchain/support.hpp>
@@ -219,7 +220,7 @@ static void framebufferResizeCallback(GLFWwindow *window, int width,
 const std::vector<const char *> validationLayers = {
     "VK_LAYER_KHRONOS_validation"};
 
-static VkResult CreateDebugUtilsMessengerEXT(
+VkResult CreateDebugUtilsMessengerEXT(
     VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
     const VkAllocationCallbacks *pAllocator,
     VkDebugUtilsMessengerEXT *pDebugMessenger) {
@@ -567,15 +568,15 @@ vk_triAppFns() {
     constexpr VkBool32 IsClipped = VK_TRUE;
     constexpr unsigned int SCImageArrayLayers = 1;
 
-    VkSwapchainCreateInfoKHR createInfo{};
-    createSwapChainInfo<SCFormat, SCColorSpace, SCImgUsage, SCAlphaBits,
-                        IsClipped, SCImageArrayLayers, VK_QUEUE_GRAPHICS_BIT>(
-        createInfo, myg.pdevice, myg.surface, myg.window, surfaceFormat, extent,
+    SwapchainCreateInfoKHR_VK scinfo;
+    scinfo.set<SCFormat, SCColorSpace, SCImgUsage, SCAlphaBits, IsClipped,
+               SCImageArrayLayers, VK_QUEUE_GRAPHICS_BIT>(
+        myg.pdevice, myg.surface, myg.window, surfaceFormat, extent,
         imageCount);
 
     std::string nmsg = "failed to create swap chain!";
     CHECK_VK(
-        vkCreateSwapchainKHR(myg.ldevice, &createInfo, nullptr, &myg.chain),
+        vkCreateSwapchainKHR(myg.ldevice, &scinfo.createInfo, nullptr, &myg.chain),
         nmsg, out.result_info);
 
     if (out.result_info.status != SUCCESS_OP) {
@@ -604,20 +605,21 @@ vk_triAppFns() {
 
     for (size_t i = 0; i < myg.simages.size(); i++) {
       VkImageViewCreateInfo createInfo{};
-      createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-      createInfo.image = myg.simages[i];
-      createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-      createInfo.format = myg.simage_format;
-      createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-      createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-      createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-      createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-      createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-      createInfo.subresourceRange.baseMipLevel = 0;
-      createInfo.subresourceRange.levelCount = 1;
-      createInfo.subresourceRange.baseArrayLayer = 0;
-      createInfo.subresourceRange.layerCount = 1;
-
+      //
+      ImageViewCreateInfo_VK imview_create;
+      imview_create.set<VK_IMAGE_VIEW_TYPE_2D,         // ImageViewType
+                        VK_FORMAT_B8G8R8A8_SRGB,       // ImageFormat
+                        VK_COMPONENT_SWIZZLE_IDENTITY, // R
+                        VK_COMPONENT_SWIZZLE_IDENTITY, // G
+                        VK_COMPONENT_SWIZZLE_IDENTITY, // B
+                        VK_COMPONENT_SWIZZLE_IDENTITY, // A
+                        1,                             // LayerCount
+                        0,                             // BaseArrayLayer
+                        0,                             // BaseMipLevel
+                        1,                             // LevelCount
+                        VK_IMAGE_ASPECT_COLOR_BIT      // aspect flag
+                        >(myg.simages[i]);
+      createInfo = imview_create.createInfo;
       std::string nmsg = "failed to create image views!";
       CHECK_VK(
           vkCreateImageView(myg.ldevice, &createInfo, nullptr, &myg.views[i]),
