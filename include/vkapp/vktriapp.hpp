@@ -13,6 +13,8 @@
 #include <vkqueuefamily/queue.hpp>
 #include <vkswapchain/support.hpp>
 #include <vkswapchain/swapchain.hpp>
+// render pass test
+#include <vkrenderpass/vkattachment.hpp>
 
 namespace vtuto {
 
@@ -575,9 +577,9 @@ vk_triAppFns() {
         imageCount);
 
     std::string nmsg = "failed to create swap chain!";
-    CHECK_VK(
-        vkCreateSwapchainKHR(myg.ldevice, &scinfo.createInfo, nullptr, &myg.chain),
-        nmsg, out.result_info);
+    CHECK_VK(vkCreateSwapchainKHR(myg.ldevice, &scinfo.createInfo, nullptr,
+                                  &myg.chain),
+             nmsg, out.result_info);
 
     if (out.result_info.status != SUCCESS_OP) {
       out.signal = 0;
@@ -641,6 +643,7 @@ vk_triAppFns() {
     out.result_info = vr;
     out.signal = 1;
 
+    /*
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = myg.simage_format;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -654,6 +657,20 @@ vk_triAppFns() {
     VkAttachmentReference colorAttachmentRef{};
     colorAttachmentRef.attachment = 0;
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    */
+    AttachmentDescriptionVk colorDescr(myg.simage_format);
+    colorDescr.set<VK_SAMPLE_COUNT_1_BIT,            //
+                   VK_ATTACHMENT_LOAD_OP_CLEAR,      //
+                   VK_ATTACHMENT_STORE_OP_CLEAR,     //
+                   VK_ATTACHMENT_LOAD_OP_DONT_CARE,  //
+                   VK_ATTACHMENT_STORE_OP_DONT_CARE, //
+                   VK_IMAGE_LAYOUT_UNDEFINED,        //
+                   VK_IMAGE_LAYOUT_PRESENT_SRC_KHR>(std::nullopt);
+    VkAttachmentDescription colorAttachment = colorDescr.attachDescr;
+    AttachmentReferenceVk colorRef;
+    colorRef.set<0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL>();
+
+    colorAttachmentRef = colorRef.attachRef;
 
     VkSubpassDescription subpass{};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
