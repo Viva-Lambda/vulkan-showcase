@@ -71,7 +71,7 @@ struct AttachmentDescriptionVk {
       VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,               //
       VkImageLayout finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR            //
       >
-  void set(std::optional<VkFormat &> imformat) { //
+  void set(std::optional<VkFormat> &imformat) { //
     if (imformat.has_value()) {
       attachDescr.format = imformat.value();
     }
@@ -107,7 +107,7 @@ struct AttachmentReferenceVk {
   //
   VkAttachmentReference attachRef;
 
-  template <uint32_t attachment = 0,
+  template <std::uint32_t attachment = 0,
             VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL //
             >
   void set() { //

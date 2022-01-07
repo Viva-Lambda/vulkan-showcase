@@ -15,6 +15,7 @@
 #include <vkswapchain/swapchain.hpp>
 // render pass test
 #include <vkrenderpass/vkattachment.hpp>
+#include <vkrenderpass/vksubpass.hpp>
 
 namespace vtuto {
 
@@ -643,21 +644,6 @@ vk_triAppFns() {
     out.result_info = vr;
     out.signal = 1;
 
-    /*
-    VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = myg.simage_format;
-    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-    VkAttachmentReference colorAttachmentRef{};
-    colorAttachmentRef.attachment = 0;
-    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    */
     AttachmentDescriptionVk colorDescr(myg.simage_format);
     colorDescr.set<VK_SAMPLE_COUNT_1_BIT,            //
                    VK_ATTACHMENT_LOAD_OP_CLEAR,      //
@@ -670,21 +656,30 @@ vk_triAppFns() {
     AttachmentReferenceVk colorRef;
     colorRef.set<0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL>();
 
-    colorAttachmentRef = colorRef.attachRef;
+    VkAttachmentReference colorAttachmentRef = colorRef.attachRef;
 
-    VkSubpassDescription subpass{};
-    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpass.colorAttachmentCount = 1;
-    subpass.pColorAttachments = &colorAttachmentRef;
+    // subpass etc
+    std::array<VkAttachmentReference> colorArr = {colorAttachmentRef};
+    auto colorOpt = std::make_optional(colorArr);
 
-    VkSubpassDependency dependency{};
-    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-    dependency.dstSubpass = 0;
-    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.srcAccessMask = 0;
-    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    SubpassDescriptionVk subDescr(colorOpt,
+                                  std::nullopt, // input refs
+                                  std::nullopt, // resolve refs
+                                  std::nullopt, // depth stencil refs
+                                  std::nullopt, // preserve refs
+                                  std::nullopt);
+    subDescr.set<VK_PIPELINE_BIND_POINT_GRAPHICS>();
+    auto subpass = subDescr.subpass;
 
+    SubpassDependencyVk subDeps(std::nullopt);
+    subDeps.set<VK_SUBPASS_EXTERNAL,                           // src subpass
+                0,                                             // dst subpass
+                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // src stage
+                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // dst stage
+                0,                                       // src access mask
+                VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT>(); // dst access mask
+    VkSubpassDependency dependency = subDeps.dependency;
+    
     VkRenderPassCreateInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     renderPassInfo.attachmentCount = 1;
