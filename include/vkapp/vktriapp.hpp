@@ -16,6 +16,8 @@
 // render pass test
 #include <vkrenderpass/vkattachment.hpp>
 #include <vkrenderpass/vksubpass.hpp>
+// utility functions
+#include <vkutils/ioutils.hpp>
 
 namespace vtuto {
 
@@ -310,25 +312,8 @@ void populateDebugMessengerCreateInfo(
   createInfo = mkDebugMessengerCreateInfo(severities, mtypes, debugCallback);
 }
 
-static std::vector<char> readFile(const std::string &filename) {
-  std::ifstream file(filename, std::ios::ate | std::ios::binary);
-
-  if (!file.is_open()) {
-    std::cerr << "failed to open file! " << filename << std::endl;
-  }
-
-  size_t fileSize = (size_t)file.tellg();
-  std::vector<char> buffer(fileSize);
-
-  file.seekg(0);
-  file.read(buffer.data(), fileSize);
-
-  file.close();
-
-  return buffer;
-}
-static VkShaderModule createShaderModule(const std::vector<char> &code,
-                                         VkDevice device) {
+VkShaderModule createShaderModule(const std::vector<char> &code,
+                                  VkDevice device) {
   VkShaderModuleCreateInfo createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
   createInfo.codeSize = code.size();
@@ -679,15 +664,15 @@ vk_triAppFns() {
                 0,                                       // src access mask
                 VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT>(); // dst access mask
     VkSubpassDependency dependency = subDeps.dependency;
-    
+
     VkRenderPassCreateInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.attachmentCount = 1;
-    renderPassInfo.pAttachments = &colorAttachment;
-    renderPassInfo.subpassCount = 1;
-    renderPassInfo.pSubpasses = &subpass;
-    renderPassInfo.dependencyCount = 1;
-    renderPassInfo.pDependencies = &dependency;
+    std::array<VkAttachmentDescription> arefs = {colorAttachment};
+    std::array<VkSubpassDependency> adeps = {dependency};
+    std::array<VkSubpassDescription> adescr = {subpass};
+    RenderPassCreateInfoVk cinfo(std::nullopt, std::make_optional(arefs),
+                                 std::make_optional(adeps),
+                                 std::make_optional(adescr));
+    renderPassInfo = cinfo.renderPassInfo;
 
     std::string nmsg = "failed to create render pass!";
 
@@ -712,9 +697,21 @@ vk_triAppFns() {
     auto fragShaderCode = readFile("shaders/triangle/triangle.frag.spv");
 
     VkShaderModule vertShaderModule =
-        createShaderModule(vertShaderCode, myg.ldevice);
+        ShaderModuleCreateInfoVk vertInfo(vertShaderCode);
+    VkShaderModule vertShaderModule;
+    auto vertCreateInfo = vertInfo.createInfo;
+    if (vkCreateShaderModule(myg.ldevice, &vertCreateInfo, nullptr, &vertShaderModule) !=
+        VK_SUCCESS) {
+      std::cerr << "failed to create vertex shader module!" << std::endl;
+    }
     VkShaderModule fragShaderModule =
-        createShaderModule(fragShaderCode, myg.ldevice);
+        ShaderModuleCreateInfoVk fragInfo(fragShaderCode);
+    VkShaderModule fragShaderModule;
+    auto fragCreateInfo = fragInfo.createInfo;
+    if (vkCreateShaderModule(myg.ldevice, &fragCreateInfo, nullptr, &fragShaderModule) !=
+        VK_SUCCESS) {
+      std::cerr << "failed to create vertex shader module!" << std::endl;
+    }
 
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
     vertShaderStageInfo.sType =
