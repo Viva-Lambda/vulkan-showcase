@@ -700,35 +700,33 @@ vk_triAppFns() {
         ShaderModuleCreateInfoVk vertInfo(vertShaderCode);
     VkShaderModule vertShaderModule;
     auto vertCreateInfo = vertInfo.createInfo;
-    if (vkCreateShaderModule(myg.ldevice, &vertCreateInfo, nullptr, &vertShaderModule) !=
-        VK_SUCCESS) {
+    if (vkCreateShaderModule(myg.ldevice, &vertCreateInfo, nullptr,
+                             &vertShaderModule) != VK_SUCCESS) {
       std::cerr << "failed to create vertex shader module!" << std::endl;
     }
     VkShaderModule fragShaderModule =
         ShaderModuleCreateInfoVk fragInfo(fragShaderCode);
     VkShaderModule fragShaderModule;
     auto fragCreateInfo = fragInfo.createInfo;
-    if (vkCreateShaderModule(myg.ldevice, &fragCreateInfo, nullptr, &fragShaderModule) !=
-        VK_SUCCESS) {
+    if (vkCreateShaderModule(myg.ldevice, &fragCreateInfo, nullptr,
+                             &fragShaderModule) != VK_SUCCESS) {
       std::cerr << "failed to create vertex shader module!" << std::endl;
     }
 
-    VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
-    vertShaderStageInfo.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vertShaderStageInfo.module = vertShaderModule;
-    vertShaderStageInfo.pName = "main";
+    PipelineShaderStageCreateInfoVk vertSInfo<VK_SHADER_STAGE_VERTEX_BIT>(
+        std::nullopt,  // flagrefs
+        std::nullopt,  // pname
+        std::nullopt, // special info
+        vertShaderModule); 
 
-    VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
-    fragShaderStageInfo.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    fragShaderStageInfo.module = fragShaderModule;
-    fragShaderStageInfo.pName = "main";
+    PipelineShaderStageCreateInfoVk fragSInfo<VK_SHADER_STAGE_FRAGMENT_BIT>(
+        std::nullopt,  // flagrefs
+        std::nullopt,  // pname
+        std::nullopt, // special info
+        fragShaderModule)
 
-    VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo,
-                                                      fragShaderStageInfo};
+    VkPipelineShaderStageCreateInfo shaderStages[] = {vertSInfo.createInfo,
+                                                      fragSInfo.createInfo};
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType =
