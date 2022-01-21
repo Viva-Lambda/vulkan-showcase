@@ -18,6 +18,9 @@
 #include <vkrenderpass/vksubpass.hpp>
 // utility functions
 #include <vkutils/ioutils.hpp>
+//
+#include <vkpipeline/vkinputassembly.hpp>
+#include <vkpipeline/vkvertexinput.hpp>
 
 namespace vtuto {
 
@@ -714,31 +717,46 @@ vk_triAppFns() {
     }
 
     PipelineShaderStageCreateInfoVk vertSInfo<VK_SHADER_STAGE_VERTEX_BIT>(
-        std::nullopt,  // flagrefs
-        std::nullopt,  // pname
+        std::nullopt, // flagrefs
+        std::nullopt, // pname
         std::nullopt, // special info
-        vertShaderModule); 
+        vertShaderModule);
 
     PipelineShaderStageCreateInfoVk fragSInfo<VK_SHADER_STAGE_FRAGMENT_BIT>(
-        std::nullopt,  // flagrefs
-        std::nullopt,  // pname
+        std::nullopt, // flagrefs
+        std::nullopt, // pname
         std::nullopt, // special info
         fragShaderModule)
 
-    VkPipelineShaderStageCreateInfo shaderStages[] = {vertSInfo.createInfo,
-                                                      fragSInfo.createInfo};
+        VkPipelineShaderStageCreateInfo shaderStages[] = {vertSInfo.createInfo,
+                                                          fragSInfo.createInfo};
 
+    //
+    /*
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType =
         VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexBindingDescriptionCount = 0;
     vertexInputInfo.vertexAttributeDescriptionCount = 0;
-
+    */
+    auto vinfo =
+        PipelineVertexInputStateCreateInfoVk(std::nullopt, // bindingRefs
+                                             std::nullopt, // attributeRefs
+                                             std::nullopt  // flags
+        );
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+    vertexInputInfo.createInfo = vinfo.createInfo;
+    /*
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
     inputAssembly.sType =
         VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
+    */
+    auto iassembly = PipelineInputAssemblyStateCerateInfoVk<
+        VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE>(std::nullopt);
+    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+    inputAssembly = iassembly.createInfo;
 
     VkViewport viewport{};
     viewport.x = 0.0f;
