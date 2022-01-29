@@ -4,10 +4,14 @@
 #include <vkutils/varia.hpp>
 
 namespace vtuto {
+
 typedef std::tuple<VkSampleCountFlagBits, VkAttachmentLoadOp,
                    VkAttachmentStoreOp, VkAttachmentLoadOp, VkAttachmentStoreOp,
                    VkImageLayout, VkImageLayout>
-    OptionalAttachmentDescriptorFlags;
+    AttachmentDescriptorFlags;
+
+typedef std::tuple<VkFormat> AttachmentDescriptorArgs;
+
 /**
 typedef struct VkAttachmentDescription {
 
@@ -63,16 +67,14 @@ the store operations that execute as part of the last subpass that uses the
 attachment.
  */
 template <>
-struct VkStructSetter<VkAttachmentDescription,           // ObjType
-                      OptionalAttachmentDescriptorFlags, // Flags
-                      std::optional<VkFormat>            // Opts
+struct VkStructSetter<VkAttachmentDescription,   // ObjType
+                      AttachmentDescriptorFlags, // Flags
+                      AttachmentDescriptorArgs   // Opts
                       > {
   static void set(VkAttachmentDescription &attachDescr,
-                  OptionalAttachmentDescriptorFlags &flags,
-                  std::optional<VkFormat> &imformat) {
-    if (imformat.has_value()) {
-      attachDescr.format = imformat.value();
-    }
+                  AttachmentDescriptorFlags &flags,
+                  VkFormat &imformat) {
+    attachDescr.format = imformat;
     //
     attachDescr.samples = std::get<0>(flags);
     attachDescr.loadOp = std::get<1>(flags);

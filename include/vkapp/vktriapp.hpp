@@ -635,7 +635,7 @@ vk_triAppFns() {
     out.result_info = vr;
     out.signal = 1;
 
-    OptionalAttachmentDescriptorFlags colorDescrFlag =
+    AttachmentDescriptorFlags colorDescrFlag =
         std::make_tuple(VK_SAMPLE_COUNT_1_BIT,            //
                         VK_ATTACHMENT_LOAD_OP_CLEAR,      //
                         VK_ATTACHMENT_STORE_OP_DONT_CARE, //
@@ -643,11 +643,12 @@ vk_triAppFns() {
                         VK_ATTACHMENT_STORE_OP_DONT_CARE, //
                         VK_IMAGE_LAYOUT_UNDEFINED,        //
                         VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
-    std::optional<VkFormat> optImFormat = std::make_optional(myg.simage_format);
+
     VkAttachmentDescription colorAttachment{};
-    VkStructSetter<VkAttachmentDescription, decltype(colorDescrFlag),
-                   decltype(optImFormat)>::set(colorAttachment, colorDescrFlag,
-                                               optImFormat);
+    VkStructSetter<VkAttachmentDescription, AttachmentDescriptorFlags,
+                   AttachmentDescriptorArgs>::set(colorAttachment,
+                                                  colorDescrFlag,
+                                                  myg.simage_format);
 
     auto attachRefFlags =
         std::make_tuple(static_cast<std::uint32_t>(0),
