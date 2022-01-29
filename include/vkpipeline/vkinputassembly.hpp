@@ -1,8 +1,11 @@
 // input assembly related
 #include <external.hpp>
+#include <vkutils/varia.hpp>
 
 namespace vtuto {
-
+typedef std::tuple<VkPrimitiveTopology, VkBool32> InputAssemblyArgs;
+typedef std::tuple<std::optional<VkPipelineInputAssemblyStateCreateFlags>>
+    InputAssemblyOpts;
 /**
 
 typedef struct VkPipelineInputAssemblyStateCreateInfo {
@@ -32,27 +35,18 @@ VK_INDEX_TYPE_UINT32, 0xFF when indexType is equal to VK_INDEX_TYPE_UINT8_EXT,
 or 0xFFFF when indexType is equal to VK_INDEX_TYPE_UINT16. Primitive restart
 is not allowed for “list” topologies.
  */
-struct PipelineInputAssemblyStateCerateInfoVk {
-  VkPipelineInputAssemblyStateCerateInfo createInfo;
-
-  template <typename T> void set(std::optional<T> &pNext) {
-    createInfo.topology = topologyRef;
-    if (pNext.has_value()) {
-      auto val = pNext.value();
-      if (std::is_pointer(T)) {
-        createInfo.pNext = static_cast<void *>(val);
-      } else {
-        createInfo.pNext = static_cast<void *>(&val);
-      }
-    }
-  }
-  template <VkPrimitiveTopology topology, VkBool32 restartEnabled>
-  PipelineInputAssemblyStateCerateInfoVk(
-      std::optional<VkPipelineInputAssemblyStateCreateFlags> &flagRefs) {
+template <>
+struct VkStructSetter<VkPipelineInputAssemblyStateCreateInfo, // ObjType
+                      InputAssemblyOpts,                      // Opts
+                      InputAssemblyArgs                       // Args
+                      > {
+  static void set(VkPipelineInputAssemblyStateCreateInfo &createInfo,
+                  InputAssemblyOpts &opts, InputAssemblyArgs &topologyRestart) {
     createInfo.sType =
         VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    createInfo.topology = topology;
-    createInfo.primitiveRestartEnable = restartEnabled;
+    auto flagRefs = std::get<0>(opts);
+    createInfo.topology = std::get<0>(topologyRestart);
+    createInfo.primitiveRestartEnable = std::get<1>(topologyRestart);
     if (flagRefs.has_value()) {
       auto flags = flagRefs.value();
       createInfo.flags = flags;

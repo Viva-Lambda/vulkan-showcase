@@ -173,7 +173,9 @@ constexpr std::size_t size_foldl() {
   return binop<std::size_t, op>(Acc, size_foldl<op, Nums...>);
 }
 
-template <typename... Vals> struct TypeContainer;
+template <typename... Vals> struct TypeContainer {
+  static std::tuple<Vals...> values;
+};
 
 template <template <typename> class... T> struct SingleTemplateCont;
 template <template <typename...> class... T> struct MultiTemplateCont;

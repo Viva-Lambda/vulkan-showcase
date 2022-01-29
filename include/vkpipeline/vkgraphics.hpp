@@ -6,10 +6,6 @@ namespace vtuto {
 
 struct PipelineTessellationStateCreateInfoVk {};
 
-struct PipelineViewportStateCreateInfoVk {};
-
-struct PipelineRasterizationStateCreateInfoVk {};
-
 struct PipelineMultisampleStateCreateInfoVk {};
 
 struct PipelineDepthStencilStateCreateInfoVk {};

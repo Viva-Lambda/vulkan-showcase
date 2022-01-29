@@ -5,7 +5,7 @@
 
 namespace vtuto {
 
-std::array<char> readFile(const std::string &filename) {
+std::vector<char> readFile(const std::string &filename) {
   std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
   if (!file.is_open()) {
@@ -13,7 +13,7 @@ std::array<char> readFile(const std::string &filename) {
   }
 
   std::size_t fileSize = static_cast<std::size_t>(file.tellg());
-  std::array<char> buffer(fileSize);
+  std::vector<char> buffer(fileSize);
 
   file.seekg(0);
   file.read(buffer.data(), fileSize);

@@ -15,9 +15,12 @@
 #include <vkswapchain/swapchain.hpp>
 // render pass test
 #include <vkrenderpass/vkattachment.hpp>
+#include <vkrenderpass/vkrenderpass.hpp>
 #include <vkrenderpass/vksubpass.hpp>
 // utility functions
 #include <vkutils/ioutils.hpp>
+// shader related
+#include <vkshader/vkshadermodule.hpp>
 //
 #include <vkpipeline/vkinputassembly.hpp>
 #include <vkpipeline/vkvertexinput.hpp>
@@ -632,50 +635,75 @@ vk_triAppFns() {
     out.result_info = vr;
     out.signal = 1;
 
-    AttachmentDescriptionVk colorDescr(myg.simage_format);
-    colorDescr.set<VK_SAMPLE_COUNT_1_BIT,            //
-                   VK_ATTACHMENT_LOAD_OP_CLEAR,      //
-                   VK_ATTACHMENT_STORE_OP_CLEAR,     //
-                   VK_ATTACHMENT_LOAD_OP_DONT_CARE,  //
-                   VK_ATTACHMENT_STORE_OP_DONT_CARE, //
-                   VK_IMAGE_LAYOUT_UNDEFINED,        //
-                   VK_IMAGE_LAYOUT_PRESENT_SRC_KHR>(std::nullopt);
-    VkAttachmentDescription colorAttachment = colorDescr.attachDescr;
-    AttachmentReferenceVk colorRef;
-    colorRef.set<0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL>();
+    OptionalAttachmentDescriptorFlags colorDescrFlag =
+        std::make_tuple(VK_SAMPLE_COUNT_1_BIT,            //
+                        VK_ATTACHMENT_LOAD_OP_CLEAR,      //
+                        VK_ATTACHMENT_STORE_OP_DONT_CARE, //
+                        VK_ATTACHMENT_LOAD_OP_DONT_CARE,  //
+                        VK_ATTACHMENT_STORE_OP_DONT_CARE, //
+                        VK_IMAGE_LAYOUT_UNDEFINED,        //
+                        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+    std::optional<VkFormat> optImFormat = std::make_optional(myg.simage_format);
+    VkAttachmentDescription colorAttachment{};
+    VkStructSetter<VkAttachmentDescription, decltype(colorDescrFlag),
+                   decltype(optImFormat)>::set(colorAttachment, colorDescrFlag,
+                                               optImFormat);
 
-    VkAttachmentReference colorAttachmentRef = colorRef.attachRef;
+    auto attachRefFlags =
+        std::make_tuple(static_cast<std::uint32_t>(0),
+                        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    VkAttachmentReference colorAttachmentRef{};
+    VkStructSetter<VkAttachmentReference, decltype(attachRefFlags)>::set(
+        colorAttachmentRef, attachRefFlags);
 
     // subpass etc
-    std::array<VkAttachmentReference> colorArr = {colorAttachmentRef};
+    VkAttachmentReference attachArr[] = {{colorAttachmentRef}};
+    array_vk<VkAttachmentReference> colorArr(attachArr);
     auto colorOpt = std::make_optional(colorArr);
 
-    SubpassDescriptionVk subDescr(colorOpt,
-                                  std::nullopt, // input refs
-                                  std::nullopt, // resolve refs
-                                  std::nullopt, // depth stencil refs
-                                  std::nullopt, // preserve refs
-                                  std::nullopt);
-    subDescr.set<VK_PIPELINE_BIND_POINT_GRAPHICS>();
-    auto subpass = subDescr.subpass;
+    SubpassDescriptionFlags subDescrFlags =
+        std::make_tuple(VK_PIPELINE_BIND_POINT_GRAPHICS);
 
-    SubpassDependencyVk subDeps(std::nullopt);
-    subDeps.set<VK_SUBPASS_EXTERNAL,                           // src subpass
-                0,                                             // dst subpass
-                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // src stage
-                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // dst stage
-                0,                                       // src access mask
-                VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT>(); // dst access mask
-    VkSubpassDependency dependency = subDeps.dependency;
+    OptionalSubpassDescriptions subDescrOpts =
+        std::make_tuple(colorOpt,
+                        std::nullopt, // input refs
+                        std::nullopt, // resolve refs
+                        std::nullopt, // depth stencil refs
+                        std::nullopt, // preserve refs
+                        std::nullopt  // flag refs
+        );
+    VkSubpassDescription subpass{};
+    VkStructSetter<VkSubpassDescription, OptionalSubpassDescriptions,
+                   SubpassDescriptionFlags>::set(subpass, subDescrOpts,
+                                                 subDescrFlags);
 
+    SubpassDependencyFlags subDepFlags = std::make_tuple(
+        //
+        VK_SUBPASS_EXTERNAL,                           // src subpass
+        0,                                             // dst subpass
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // src stage
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // dst stage
+        0,                                             // src access mask
+        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT           // dst access mask
+    );
+    SubpassDependencyOpts subDepOpts = std::make_tuple(std::nullopt);
+
+    VkSubpassDependency dependency{};
+    VkStructSetter<VkSubpassDependency, SubpassDependencyFlags,
+                   SubpassDependencyOpts>::set(dependency, subDepFlags,
+                                               subDepOpts);
+    // subpass dependency to renderpass
     VkRenderPassCreateInfo renderPassInfo{};
-    std::array<VkAttachmentDescription> arefs = {colorAttachment};
-    std::array<VkSubpassDependency> adeps = {dependency};
-    std::array<VkSubpassDescription> adescr = {subpass};
-    RenderPassCreateInfoVk cinfo(std::nullopt, std::make_optional(arefs),
-                                 std::make_optional(adeps),
-                                 std::make_optional(adescr));
-    renderPassInfo = cinfo.renderPassInfo;
+    VkAttachmentDescription arefs[] = {colorAttachment};
+    auto arefss = std::make_optional(array_vk(arefs));
+    VkSubpassDependency adeps[] = {dependency};
+    auto adepss = std::make_optional(array_vk(adeps));
+    VkSubpassDescription adescr[] = {subpass};
+    auto adescrs = std::make_optional(array_vk(adescr));
+    std::optional<array_vk<VkRenderPassCreateFlagBits>> rpbits = std::nullopt;
+    RenderPassOpts rpassOpts = std::make_tuple(rpbits, arefss, adescrs, adepss);
+    VkStructSetter<VkRenderPassCreateInfo, RenderPassOpts>::set(renderPassInfo,
+                                                                rpassOpts);
 
     std::string nmsg = "failed to create render pass!";
 
@@ -700,64 +728,55 @@ vk_triAppFns() {
     auto fragShaderCode = readFile("shaders/triangle/triangle.frag.spv");
 
     VkShaderModule vertShaderModule =
-        ShaderModuleCreateInfoVk vertInfo(vertShaderCode);
-    VkShaderModule vertShaderModule;
-    auto vertCreateInfo = vertInfo.createInfo;
-    if (vkCreateShaderModule(myg.ldevice, &vertCreateInfo, nullptr,
-                             &vertShaderModule) != VK_SUCCESS) {
-      std::cerr << "failed to create vertex shader module!" << std::endl;
-    }
+        createShaderModule(vertShaderCode, myg.ldevice);
+
     VkShaderModule fragShaderModule =
-        ShaderModuleCreateInfoVk fragInfo(fragShaderCode);
-    VkShaderModule fragShaderModule;
-    auto fragCreateInfo = fragInfo.createInfo;
-    if (vkCreateShaderModule(myg.ldevice, &fragCreateInfo, nullptr,
-                             &fragShaderModule) != VK_SUCCESS) {
-      std::cerr << "failed to create vertex shader module!" << std::endl;
-    }
+        createShaderModule(fragShaderCode, myg.ldevice);
 
-    PipelineShaderStageCreateInfoVk vertSInfo<VK_SHADER_STAGE_VERTEX_BIT>(
-        std::nullopt, // flagrefs
-        std::nullopt, // pname
-        std::nullopt, // special info
-        vertShaderModule);
+    VkPipelineShaderStageCreateInfo vertSInfo{};
+    ShaderStageOpts ssOpts = std::make_tuple(std::nullopt, // flagrefs
+                                             std::nullopt, // pname
+                                             std::nullopt  // special info
+    );
+    ShaderStageFlags stageFlag = std::make_tuple(VK_SHADER_STAGE_VERTEX_BIT);
+    VkStructSetter<VkPipelineShaderStageCreateInfo, ShaderStageFlags,
+                   ShaderStageOpts, VkShaderModule>::set(vertSInfo, stageFlag,
+                                                         ssOpts,
+                                                         vertShaderModule);
 
-    PipelineShaderStageCreateInfoVk fragSInfo<VK_SHADER_STAGE_FRAGMENT_BIT>(
-        std::nullopt, // flagrefs
-        std::nullopt, // pname
-        std::nullopt, // special info
-        fragShaderModule)
+    // set fragment shader values
+    VkPipelineShaderStageCreateInfo fragSInfo{};
+    ShaderStageOpts ssOptsF = std::make_tuple(std::nullopt, // flagrefs
+                                              std::nullopt, // pname
+                                              std::nullopt  // special info
+    );
+    ShaderStageFlags stageFlagF = std::make_tuple(VK_SHADER_STAGE_FRAGMENT_BIT);
+    VkStructSetter<VkPipelineShaderStageCreateInfo, ShaderStageFlags,
+                   ShaderStageOpts, VkShaderModule>::set(fragSInfo, stageFlagF,
+                                                         ssOptsF,
+                                                         fragShaderModule);
 
-        VkPipelineShaderStageCreateInfo shaderStages[] = {vertSInfo.createInfo,
-                                                          fragSInfo.createInfo};
+    VkPipelineShaderStageCreateInfo shaderStages[] = {vertSInfo, fragSInfo};
 
     //
-    /*
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-    vertexInputInfo.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    */
-    auto vinfo =
-        PipelineVertexInputStateCreateInfoVk(std::nullopt, // bindingRefs
-                                             std::nullopt, // attributeRefs
-                                             std::nullopt  // flags
-        );
-    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-    vertexInputInfo.createInfo = vinfo.createInfo;
-    /*
-    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-    inputAssembly.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-    inputAssembly.primitiveRestartEnable = VK_FALSE;
-    */
-    auto iassembly = PipelineInputAssemblyStateCerateInfoVk<
-        VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE>(std::nullopt);
-    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-    inputAssembly = iassembly.createInfo;
+    VertexInputOpts vertInOpts = std::make_tuple(std::nullopt, // bindingRefs
+                                                 std::nullopt, // attributeRefs
+                                                 std::nullopt  // flags
+    );
+    //
+    VkStructSetter<VkPipelineVertexInputStateCreateInfo, VertexInputOpts>::set(
+        vertexInputInfo, vertInOpts);
+    //
 
+    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+    InputAssemblyArgs iAssemblyArgs =
+        std::make_tuple(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_FALSE);
+    InputAssemblyOpts iAssemblyOpts = std::make_tuple(std::nullopt);
+    VkStructSetter<VkPipelineInputAssemblyStateCreateInfo, InputAssemblyOpts,
+                   InputAssemblyArgs>::set(inputAssembly, iAssemblyOpts,
+                                           iAssemblyArgs);
+    //
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;

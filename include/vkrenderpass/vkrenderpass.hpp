@@ -1,6 +1,8 @@
 #pragma once
 // multiview and single view render passes.
 #include <external.hpp>
+#include <vkutils/litutils.hpp>
+#include <vkutils/varia.hpp>
 
 namespace vtuto { //
 
@@ -18,50 +20,47 @@ typedef struct VkRenderPassCreateInfo {
 } VkRenderPassCreateInfo;
 
  */
-struct RenderPassCreateInfoVk {
-  VkRenderPassCreateInfo renderPassInfo;
 
-  template <typename T> void set(std::optional<T> &pNext) {
-    if (pNext.has_value()) {
-      auto val = pNext.value();
-      if (std::is_pointer(T)) {
-        renderPassInfo.pNext = static_cast<void *>(val);
-      } else {
-        renderPassInfo.pNext = static_cast<void *>(&val);
-      }
-    }
-  }
+typedef std::tuple<std::optional<array_vk<VkRenderPassCreateFlagBits>>,
+                   std::optional<array_vk<VkAttachmentDescription>>,
+                   std::optional<array_vk<VkSubpassDescription>>,
+                   std::optional<array_vk<VkSubpassDependency>>>
+    RenderPassOpts;
 
-  RenderPassCreateInfoVk(
-      std::optional<std::array<VkRenderPassCreateFlagBits>> &flagBitRefs,
-      std::optional<std::array<VkAttachmentDescription>> &attachmentRefs,
-      std::optional<std::array<VkSubpassDescription>> &subpassDescrRefs,
-      std::optional<std::array<VkSubpassDependency>> &subpassDepRefs) {
+template <> struct VkStructSetter<VkRenderPassCreateInfo, RenderPassOpts> {
+  static void set(VkRenderPassCreateInfo &renderPassInfo,
+                  RenderPassOpts &opts) {
+    auto flagBitRefs = std::get<0>(opts);
+    auto attachmentRefs = std::get<1>(opts);
+    auto subpassDescrRefs = std::get<2>(opts);
+    auto subpassDepRefs = std::get<3>(opts);
     //
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     if (flagBitRefs.has_value()) {
       auto flagBits = flagBitRefs.value();
-      VkRenderPassCreateFlags f = flagBits[0];
-      for (unsigned int i = 0; i < flagBits.size(); i++) {
-        f |= flagBits[i];
+      VkRenderPassCreateFlags f = flagBits.obj()[0];
+      unsigned int size = static_cast<unsigned int>(flagBits.length());
+      for (unsigned int i = 0; i < size; i++) {
+        f |= flagBits.obj()[i];
       }
       renderPassInfo.flags = f;
     }
     if (attachmentRefs.has_value()) {
       auto attachments = attachmentRefs.value();
-      renderPassInfo.pAttachments = attachments.data();
-      renderPassInfo.attachmentCount = attachments.size();
+      renderPassInfo.pAttachments = attachments.obj();
+      renderPassInfo.attachmentCount = attachments.length();
     }
     if (subpassDescrRefs.has_value()) {
       auto subpasses = subpassDescrRefs.value();
-      renderPassInfo.pSubpasses = subpasses.data();
-      renderPassInfo.subpassCount = subpasses.size();
+      renderPassInfo.pSubpasses = subpasses.obj();
+      renderPassInfo.subpassCount = subpasses.length();
     }
     if (subpassDepRefs.has_value()) {
       auto dependencies = subpassDepRefs.value();
-      renderPassInfo.pDependencies = dependencies.data();
-      renderPassInfo.dependencyCount = dependencies.size();
+      renderPassInfo.pDependencies = dependencies.obj();
+      renderPassInfo.dependencyCount = dependencies.length();
     }
   }
 };
-}; // namespace vtuto
+
+} // namespace vtuto

@@ -1,7 +1,13 @@
 // vertex input state related
 #include <external.hpp>
+#include <vkutils/varia.hpp>
 
 namespace vtuto {
+typedef std::tuple<std::optional<array_vk<VkVertexInputBindingDescription>>,
+                   std::optional<array_vk<VkVertexInputAttributeDescription>>,
+                   std::optional<VkPipelineVertexInputStateCreateFlags>>
+    VertexInputOpts;
+// typedef std::tuple<> VertexInputFlags;
 /**
 typedef struct VkPipelineVertexInputStateCreateInfo {
 
@@ -32,43 +38,35 @@ descriptions provided in pVertexAttributeDescriptions.
 VkVertexInputAttributeDescription structures.
 
  */
-struct PipelineVertexInputStateCreateInfoVk {
-
-  VkPipelineVertexInputStateCreateInfo createInfo;
-
-  template <typename T> void set(std::optional<T> &pNext) {
-    if (pNext.has_value()) {
-      auto val = pNext.value();
-      if (std::is_pointer(T)) {
-        createInfo.pNext = static_cast<void *>(val);
-      } else {
-        createInfo.pNext = static_cast<void *>(&val);
-      }
-    }
-  }
-
-  PipelineVertexInputStateCreateInfoVk(
-      std::optional<std::array<VkVertexInputBindingDescription>> bindingRefs,
-      std::optional<std::array<VkVertexInputAttributeDescription>> attrRefs,
-      std::optional<VkPipelineVertexInputStateCreateFlags> flagRefs) {
+template <>
+struct VkStructSetter<VkPipelineVertexInputStateCreateInfo, // ObjType
+                      VertexInputOpts                       // Opts
+                      > {
+  static void set(VkPipelineVertexInputStateCreateInfo &createInfo,
+                  VertexInputOpts &opts) {
     createInfo.sType =
         VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+    auto bindingRefs = std::get<0>(opts);
+    auto attrRefs = std::get<1>(opts);
+    auto flagRefs = std::get<2>(opts);
 
     if (bindingRefs.has_value()) {
       auto bindings = bindingRefs.value();
       createInfo.vertexBindingDescriptionCount =
-          static_cast<std::uint32_t>(bindings.size());
-      createInfo.pVertexBindingDescriptions = bindings.data();
+          static_cast<std::uint32_t>(bindings.length());
+      createInfo.pVertexBindingDescriptions = bindings.obj();
     } else {
       createInfo.vertexBindingDescriptionCount = static_cast<std::uint32_t>(0);
     }
     if (attrRefs.has_value()) {
       auto attrs = attrRefs.value();
       createInfo.vertexAttributeDescriptionCount =
-          static_cast<std::uint32_t>(attrs.size());
-      createInfo.pVertexAttributeDescriptions = attrs.data();
+          static_cast<std::uint32_t>(attrs.length());
+      createInfo.pVertexAttributeDescriptions = attrs.obj();
     } else {
-      createInfo.vertexAttributeDescriptionCount = 0;
+      createInfo.vertexAttributeDescriptionCount =
+          static_cast<std::uint32_t>(0);
     }
     if (flagRefs.has_value()) {
       createInfo.flags = flagRefs.value();

@@ -3,6 +3,19 @@
 #include <external.hpp>
 namespace vtuto {
 
+template <class T> class array_vk {
+  const T *_obj;
+  std::size_t _max_index;
+  std::size_t len;
+
+public:
+  template <std::size_t Nb>
+  array_vk(const T (&arr)[Nb]) : _obj(arr), _max_index(Nb - 1), len(Nb) {}
+  const T *obj() const { return _obj; }
+  std::size_t last() const { return _max_index; }
+  std::size_t length() const { return len; }
+};
+
 template <class T> class const_obj {
   const T *_obj;
   std::size_t _max_index;
@@ -38,6 +51,7 @@ typedef const_obj<char> const_str;
 typedef const_obj<int> const_ints;
 typedef const_obj<bool> const_bools;
 typedef const_obj<unsigned int> const_uints;
+typedef const_obj<std::uint32_t> const_uint32s;
 typedef const_obj<float> const_floats;
 typedef const_obj<double> const_doubles;
 

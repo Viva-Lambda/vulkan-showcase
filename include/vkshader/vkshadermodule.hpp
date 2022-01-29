@@ -3,6 +3,8 @@
 
 #include <external.hpp>
 #include <vkutils/ioutils.hpp>
+#include <vkutils/temputils.hpp>
+#include <vkutils/varia.hpp>
 
 namespace vtuto {
 //
@@ -33,29 +35,29 @@ struct ShaderModuleCreateInfoVk {
   VkShaderModuleCreateInfo createInfo;
   //
 
-  template <typename T> void set(std::optional<T> &pNext) {
-    if (pNext.has_value()) {
-      auto val = pNext.value();
-      if (std::is_pointer(T)) {
-        createInfo.pNext = static_cast<void *>(val);
-      } else {
-        createInfo.pNext = static_cast<void *>(&val);
-      }
-    }
-  }
-  ShaderModuleCreateInfoVk(const std::array<char> &shaderCode) {
+  ShaderModuleCreateInfoVk(const std::vector<char> &shaderCode) {
     //
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.codeSize = shaderCode.size();
-    createInfo.pCode = reinterpret_cast<const uint32_t *>(shaderCode.data());
+    createInfo.pCode =
+        reinterpret_cast<const std::uint32_t *>(shaderCode.data());
   }
   ShaderModuleCreateInfoVk(const std::string &shaderPath) {
     auto shaderCode = readFile(shaderPath);
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.codeSize = shaderCode.size();
-    createInfo.pCode = reinterpret_cast<const uint32_t *>(shaderCode.data());
+    createInfo.pCode =
+        reinterpret_cast<const std::uint32_t *>(shaderCode.data());
   }
 };
+
+typedef std::tuple<std::optional<array_vk<VkPipelineShaderStageCreateFlagBits>>,
+                   std::optional<std::string>,
+                   std::optional<VkSpecializationInfo>>
+    ShaderStageOpts;
+
+typedef std::tuple<VkShaderStageFlagBits> ShaderStageFlags;
+
 /**
 typedef struct VkPipelineShaderStageCreateInfo {
 
@@ -91,46 +93,41 @@ point name of the shader for this stage.
 structure, as
 described in Specialization Constants, or NULL.
  */
-struct PipelineShaderStageCreateInfoVk {
-  //
-  VkPipelineShaderStageCreateInfo createInfo;
-
-  template <typename T> void set(std::optional<T> &pNext) {
-    if (pNext.has_value()) {
-      auto val = pNext.value();
-      if (std::is_pointer(T)) {
-        createInfo.pNext = static_cast<void *>(val);
-      } else {
-        createInfo.pNext = static_cast<void *>(&val);
-      }
-    }
-  }
-  template <VkShaderStageFlagBits stageFlag>
-  PipelineShaderStageCreateInfoVk(
-      std::optional<std::array<VkPipelineShaderStageCreateFlagBits>>
-          &flagRefs, //
-      std::optional<std::string> &pname,
-      std::optional<VkSpecializationInfo> &specialInfoRef,
-      VkShaderModule &shaderModule) {
+template <>
+struct VkStructSetter<VkPipelineShaderStageCreateInfo, // ObjType
+                      ShaderStageFlags,                // Flags
+                      ShaderStageOpts,                 // Optional
+                      VkShaderModule> {
+  static void set(VkPipelineShaderStageCreateInfo &createInfo,
+                  ShaderStageFlags &stageFlag, ShaderStageOpts &opts,
+                  VkShaderModule &shaderModule) {
     createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    createInfo.stage = stageFlag;
+    createInfo.stage = std::get<0>(stageFlag);
+    auto flagRefs = std::get<0>(opts);
     if (flagRefs.has_value()) {
       auto flags = flagRefs.value();
-      VkPipelineShaderStageCreateFlags f = flags[0];
-      for (unsigned int i = 1; i < flags.size(); i++) {
-        f |= flags[i];
+      VkPipelineShaderStageCreateFlags f = flags.obj()[0];
+      unsigned int size = static_cast<unsigned int>(flags.length());
+      for (unsigned int i = 1; i < size; i++) {
+        f |= flags.obj()[i];
       }
       createInfo.flags = f;
+    } else {
+      createInfo.flags = static_cast<VkPipelineShaderStageCreateFlags>(NULL);
     }
     //
     createInfo.module = shaderModule;
 
+    //
+    auto pname = std::get<1>(opts);
     if (pname.has_value()) {
       std::string sval = pname.value();
       createInfo.pName = sval.c_str();
     } else {
       createInfo.pName = "main";
     }
+    //
+    auto specialInfoRef = std::get<2>(opts);
     if (specialInfoRef.has_value()) {
       auto specialInfo = specialInfoRef.value();
       createInfo.pSpecializationInfo = &specialInfo;

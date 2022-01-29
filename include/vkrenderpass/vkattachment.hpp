@@ -1,9 +1,13 @@
 #pragma once
 // attachment to render pass
 #include <external.hpp>
+#include <vkutils/varia.hpp>
 
 namespace vtuto {
-
+typedef std::tuple<VkSampleCountFlagBits, VkAttachmentLoadOp,
+                   VkAttachmentStoreOp, VkAttachmentLoadOp, VkAttachmentStoreOp,
+                   VkImageLayout, VkImageLayout>
+    OptionalAttachmentDescriptorFlags;
 /**
 typedef struct VkAttachmentDescription {
 
@@ -58,33 +62,26 @@ the first subpass that uses the attachment. storeOp and stencilStoreOp define
 the store operations that execute as part of the last subpass that uses the
 attachment.
  */
-struct AttachmentDescriptionVk {
-  //
-  VkAttachmentDescription attachDescr;
-
-  template <
-      VkSampleCountFlagBits scfb = VK_SAMPLE_COUNT_1_BIT,                    //
-      VkAttachmentLoadOp loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,               //
-      VkAttachmentStoreOp storeOp = VK_ATTACHMENT_STORE_OP_STORE,            //
-      VkAttachmentLoadOp stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,    //
-      VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE, //
-      VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,               //
-      VkImageLayout finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR            //
-      >
-  void set(std::optional<VkFormat> &imformat) { //
+template <>
+struct VkStructSetter<VkAttachmentDescription,           // ObjType
+                      OptionalAttachmentDescriptorFlags, // Flags
+                      std::optional<VkFormat>            // Opts
+                      > {
+  static void set(VkAttachmentDescription &attachDescr,
+                  OptionalAttachmentDescriptorFlags &flags,
+                  std::optional<VkFormat> &imformat) {
     if (imformat.has_value()) {
       attachDescr.format = imformat.value();
     }
-    attachDescr.samples = scfb;
-    attachDescr.loadOp = loadOp;
-    attachDescr.storeOp = storeOp;
-    attachDescr.stencilLoadOp = stencilLoadOp;
-    attachDescr.stencilStoreOp = stencilStoreOp;
-    attachDescr.initialLayout = initialLayout;
-    attachDescr.finalLayout = finalLayout;
+    //
+    attachDescr.samples = std::get<0>(flags);
+    attachDescr.loadOp = std::get<1>(flags);
+    attachDescr.storeOp = std::get<2>(flags);
+    attachDescr.stencilLoadOp = std::get<3>(flags);
+    attachDescr.stencilStoreOp = std::get<4>(flags);
+    attachDescr.initialLayout = std::get<5>(flags);
+    attachDescr.finalLayout = std::get<6>(flags);
   }
-
-  AttachmentDescriptionVk(VkFormat &imformat) { attachDescr.format = imformat; }
 };
 
 /**
@@ -103,17 +100,15 @@ VK_ATTACHMENT_UNUSED to signify that this attachment is not used.
 during t e subpass.
 
  */
-struct AttachmentReferenceVk {
-  //
-  VkAttachmentReference attachRef;
-
-  template <std::uint32_t attachment = 0,
-            VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL //
-            >
-  void set() { //
-    attachRef.attachment = attachment;
-    attachRef.layout = layout;
+template <>
+struct VkStructSetter<VkAttachmentReference,                   // ObjType
+                      std::tuple<std::uint32_t, VkImageLayout> // Flags
+                      > {
+  static void set(VkAttachmentReference &attachRef,
+                  std::tuple<std::uint32_t, VkImageLayout> &flags) {
+    attachRef.attachment = std::get<0>(flags);
+    attachRef.layout = std::get<1>(flags);
   }
-  AttachmentDescriptionVk() {}
 };
-}; // namespace vtuto
+
+} // namespace vtuto

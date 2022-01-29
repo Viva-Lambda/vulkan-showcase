@@ -1,0 +1,865 @@
+==28393== Memcheck, a memory error detector
+==28393== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
+==28393== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+==28393== Command: ./vkgraphtri2.out
+==28393== 
+--28393-- WARNING: Serious error when reading debug info
+--28393-- When reading debug info from /lib/x86_64-linux-gnu/libgcc_s.so.1:
+--28393-- Ignoring non-Dwarf2/3/4 block in .debug_info
+--28393-- WARNING: Serious error when reading debug info
+--28393-- When reading debug info from /lib/x86_64-linux-gnu/libgcc_s.so.1:
+--28393-- Last block truncated in .debug_info; ignoring
+--28393-- WARNING: Serious error when reading debug info
+--28393-- When reading debug info from /lib/x86_64-linux-gnu/libgcc_s.so.1:
+--28393-- parse_CU_Header: is neither DWARF2 nor DWARF3 nor DWARF4
+initWindowNode
+createInstanceNode
+setupDebugMessengerNode
+createSurfaceNode
+pickPhysicalDeviceNode
+createLogicalDeviceNode
+createImageViewsNode
+createRenderPassNode
+createGraphicsPipelineNode
+createFramebuffersNode
+createCommandPoolNode
+createCommandBufferAllocNode
+createCommandBuffersNode
+createSyncObjectsNode
+windowShouldCloseNode
+drawFrameNode
+cleanupSwapChainNode2
+recreateSwapChainNode
+createSwapChainNode
+cleanupSwapChainNode
+createSwapChainNode2
+createImageViewsNode2
+createRenderPassNode2
+createGraphicsPipelineNode2
+createFramebuffersNode2
+createCommandBufferAllocNode2
+createCommandBuffersNode2
+imagesInFlightResizeNode
+destroyAllNode
+END
+validation layer: ReadDataFilesInSearchPaths: Searching the following paths for manifest files: /etc/xdg/xdg-GNOME/vulkan/implicit_layer.d:/etc/xdg/vulkan/implicit_layer.d:/etc/vulkan/implicit_layer.d:/usr/share/GNOME/vulkan/implicit_layer.d:/usr/share/gnome/vulkan/implicit_layer.d:/usr/local/share/vulkan/implicit_layer.d:/usr/share/vulkan/implicit_layer.d:/var/lib/snapd/desktop/vulkan/implicit_layer.d:/home/kaan/.local/share/vulkan/implicit_layer.d
+
+validation layer: ReadDataFilesInSearchPaths: Searching the following paths for manifest files: /home/kaan/GitProjects/vulkan-1.2/x86_64/etc/vulkan/explicit_layer.d
+
+validation layer: ReadDataFilesInSearchPaths: Searching the following paths for manifest files: /etc/xdg/xdg-GNOME/vulkan/icd.d:/etc/xdg/vulkan/icd.d:/etc/vulkan/icd.d:/usr/share/GNOME/vulkan/icd.d:/usr/share/gnome/vulkan/icd.d:/usr/local/share/vulkan/icd.d:/usr/share/vulkan/icd.d:/var/lib/snapd/desktop/vulkan/icd.d:/home/kaan/.local/share/vulkan/icd.d
+
+validation layer: Searching for ICD drivers named libGLX_nvidia.so.0
+validation layer: Build ICD instance extension list
+validation layer: Instance Extension: VK_KHR_device_group_creation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_display (libGLX_nvidia.so.0) version 0.0.23
+validation layer: Instance Extension: VK_KHR_external_fence_capabilities (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_external_memory_capabilities (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_external_semaphore_capabilities (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_get_display_properties2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_get_physical_device_properties2 (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Instance Extension: VK_KHR_get_surface_capabilities2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_surface (libGLX_nvidia.so.0) version 0.0.25
+validation layer: Instance Extension: VK_KHR_surface_protected_capabilities (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_xcb_surface (libGLX_nvidia.so.0) version 0.0.6
+validation layer: Instance Extension: VK_KHR_xlib_surface (libGLX_nvidia.so.0) version 0.0.6
+validation layer: Instance Extension: VK_EXT_acquire_xlib_display (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_EXT_debug_report (libGLX_nvidia.so.0) version 0.0.9
+validation layer: Instance Extension: VK_EXT_debug_utils (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_EXT_direct_mode_display (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_EXT_display_surface_counter (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Build ICD instance extension list
+validation layer: Instance Extension: VK_KHR_device_group_creation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_display (libGLX_nvidia.so.0) version 0.0.23
+validation layer: Instance Extension: VK_KHR_external_fence_capabilities (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_external_memory_capabilities (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_external_semaphore_capabilities (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_get_display_properties2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_get_physical_device_properties2 (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Instance Extension: VK_KHR_get_surface_capabilities2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_surface (libGLX_nvidia.so.0) version 0.0.25
+validation layer: Instance Extension: VK_KHR_surface_protected_capabilities (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_KHR_xcb_surface (libGLX_nvidia.so.0) version 0.0.6
+validation layer: Instance Extension: VK_KHR_xlib_surface (libGLX_nvidia.so.0) version 0.0.6
+validation layer: Instance Extension: VK_EXT_acquire_xlib_display (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_EXT_debug_report (libGLX_nvidia.so.0) version 0.0.9
+validation layer: Instance Extension: VK_EXT_debug_utils (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_EXT_direct_mode_display (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Instance Extension: VK_EXT_display_surface_counter (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_16bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_8bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_bind_memory2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_buffer_device_address (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_create_renderpass2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_depth_stencil_resolve (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_descriptor_update_template (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_device_group (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_draw_indirect_count (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_driver_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_get_memory_requirements2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_image_format_list (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_imageless_framebuffer (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance1 (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_maintenance2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance3 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_multiview (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_pipeline_executable_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_push_descriptor (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_relaxed_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_sampler_mirror_clamp_to_edge (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_sampler_ycbcr_conversion (libGLX_nvidia.so.0) version 0.0.14
+validation layer: Device Extension: VK_KHR_separate_depth_stencil_layouts (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_atomic_int64 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_clock (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_draw_parameters (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float16_int8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float_controls (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_shader_non_semantic_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_subgroup_extended_types (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_spirv_1_4 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_storage_buffer_storage_class (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_swapchain (libGLX_nvidia.so.0) version 0.0.70
+validation layer: Device Extension: VK_KHR_swapchain_mutable_format (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_timeline_semaphore (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_uniform_buffer_standard_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_variable_pointers (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_vulkan_memory_model (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_blend_operation_advanced (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_buffer_device_address (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_calibrated_timestamps (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_conditional_rendering (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_custom_border_color (libGLX_nvidia.so.0) version 0.0.11
+validation layer: Device Extension: VK_EXT_depth_clip_enable (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_depth_range_unrestricted (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_descriptor_indexing (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_discard_rectangles (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_display_control (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_global_priority (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_host_query_reset (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_index_type_uint8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_inline_uniform_block (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_line_rasterization (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_memory_budget (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_pci_bus_info (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_pipeline_creation_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_scalar_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_separate_stencil_usage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_demote_to_helper_invocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_ballot (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_vote (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_subgroup_size_control (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_texel_buffer_alignment (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_tooling_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_transform_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_vertex_attribute_divisor (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_ycbcr_image_arrays (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation_image_aliasing (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_device_diagnostic_checkpoints (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_NV_device_diagnostics_config (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_sm_builtins (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_subgroup_partitioned (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NVX_device_generated_commands (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_NVX_multiview_per_view_attributes (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_16bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_8bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_bind_memory2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_buffer_device_address (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_create_renderpass2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_depth_stencil_resolve (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_descriptor_update_template (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_device_group (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_draw_indirect_count (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_driver_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_get_memory_requirements2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_image_format_list (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_imageless_framebuffer (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance1 (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_maintenance2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance3 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_multiview (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_pipeline_executable_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_push_descriptor (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_relaxed_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_sampler_mirror_clamp_to_edge (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_sampler_ycbcr_conversion (libGLX_nvidia.so.0) version 0.0.14
+validation layer: Device Extension: VK_KHR_separate_depth_stencil_layouts (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_atomic_int64 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_clock (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_draw_parameters (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float16_int8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float_controls (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_shader_non_semantic_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_subgroup_extended_types (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_spirv_1_4 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_storage_buffer_storage_class (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_swapchain (libGLX_nvidia.so.0) version 0.0.70
+validation layer: Device Extension: VK_KHR_swapchain_mutable_format (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_timeline_semaphore (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_uniform_buffer_standard_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_variable_pointers (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_vulkan_memory_model (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_blend_operation_advanced (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_buffer_device_address (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_calibrated_timestamps (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_conditional_rendering (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_custom_border_color (libGLX_nvidia.so.0) version 0.0.11
+validation layer: Device Extension: VK_EXT_depth_clip_enable (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_depth_range_unrestricted (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_descriptor_indexing (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_discard_rectangles (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_display_control (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_global_priority (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_host_query_reset (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_index_type_uint8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_inline_uniform_block (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_line_rasterization (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_memory_budget (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_pci_bus_info (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_pipeline_creation_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_scalar_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_separate_stencil_usage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_demote_to_helper_invocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_ballot (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_vote (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_subgroup_size_control (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_texel_buffer_alignment (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_tooling_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_transform_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_vertex_attribute_divisor (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_ycbcr_image_arrays (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation_image_aliasing (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_device_diagnostic_checkpoints (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_NV_device_diagnostics_config (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_sm_builtins (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_subgroup_partitioned (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NVX_device_generated_commands (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_NVX_multiview_per_view_attributes (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_16bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_8bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_bind_memory2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_buffer_device_address (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_create_renderpass2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_depth_stencil_resolve (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_descriptor_update_template (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_device_group (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_draw_indirect_count (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_driver_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_get_memory_requirements2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_image_format_list (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_imageless_framebuffer (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance1 (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_maintenance2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance3 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_multiview (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_pipeline_executable_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_push_descriptor (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_relaxed_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_sampler_mirror_clamp_to_edge (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_sampler_ycbcr_conversion (libGLX_nvidia.so.0) version 0.0.14
+validation layer: Device Extension: VK_KHR_separate_depth_stencil_layouts (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_atomic_int64 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_clock (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_draw_parameters (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float16_int8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float_controls (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_shader_non_semantic_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_subgroup_extended_types (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_spirv_1_4 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_storage_buffer_storage_class (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_swapchain (libGLX_nvidia.so.0) version 0.0.70
+validation layer: Device Extension: VK_KHR_swapchain_mutable_format (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_timeline_semaphore (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_uniform_buffer_standard_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_variable_pointers (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_vulkan_memory_model (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_blend_operation_advanced (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_buffer_device_address (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_calibrated_timestamps (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_conditional_rendering (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_custom_border_color (libGLX_nvidia.so.0) version 0.0.11
+validation layer: Device Extension: VK_EXT_depth_clip_enable (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_depth_range_unrestricted (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_descriptor_indexing (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_discard_rectangles (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_display_control (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_global_priority (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_host_query_reset (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_index_type_uint8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_inline_uniform_block (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_line_rasterization (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_memory_budget (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_pci_bus_info (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_pipeline_creation_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_scalar_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_separate_stencil_usage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_demote_to_helper_invocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_ballot (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_vote (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_subgroup_size_control (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_texel_buffer_alignment (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_tooling_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_transform_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_vertex_attribute_divisor (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_ycbcr_image_arrays (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation_image_aliasing (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_device_diagnostic_checkpoints (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_NV_device_diagnostics_config (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_sm_builtins (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_subgroup_partitioned (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NVX_device_generated_commands (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_NVX_multiview_per_view_attributes (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_16bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_8bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_bind_memory2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_buffer_device_address (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_create_renderpass2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_depth_stencil_resolve (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_descriptor_update_template (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_device_group (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_draw_indirect_count (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_driver_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_get_memory_requirements2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_image_format_list (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_imageless_framebuffer (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance1 (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_maintenance2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance3 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_multiview (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_pipeline_executable_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_push_descriptor (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_relaxed_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_sampler_mirror_clamp_to_edge (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_sampler_ycbcr_conversion (libGLX_nvidia.so.0) version 0.0.14
+validation layer: Device Extension: VK_KHR_separate_depth_stencil_layouts (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_atomic_int64 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_clock (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_draw_parameters (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float16_int8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float_controls (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_shader_non_semantic_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_subgroup_extended_types (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_spirv_1_4 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_storage_buffer_storage_class (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_swapchain (libGLX_nvidia.so.0) version 0.0.70
+validation layer: Device Extension: VK_KHR_swapchain_mutable_format (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_timeline_semaphore (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_uniform_buffer_standard_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_variable_pointers (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_vulkan_memory_model (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_blend_operation_advanced (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_buffer_device_address (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_calibrated_timestamps (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_conditional_rendering (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_custom_border_color (libGLX_nvidia.so.0) version 0.0.11
+validation layer: Device Extension: VK_EXT_depth_clip_enable (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_depth_range_unrestricted (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_descriptor_indexing (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_discard_rectangles (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_display_control (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_global_priority (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_host_query_reset (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_index_type_uint8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_inline_uniform_block (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_line_rasterization (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_memory_budget (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_pci_bus_info (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_pipeline_creation_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_scalar_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_separate_stencil_usage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_demote_to_helper_invocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_ballot (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_vote (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_subgroup_size_control (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_texel_buffer_alignment (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_tooling_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_transform_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_vertex_attribute_divisor (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_ycbcr_image_arrays (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation_image_aliasing (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_device_diagnostic_checkpoints (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_NV_device_diagnostics_config (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_sm_builtins (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_subgroup_partitioned (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NVX_device_generated_commands (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_NVX_multiview_per_view_attributes (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_16bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_8bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_bind_memory2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_buffer_device_address (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_create_renderpass2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_depth_stencil_resolve (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_descriptor_update_template (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_device_group (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_draw_indirect_count (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_driver_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_get_memory_requirements2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_image_format_list (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_imageless_framebuffer (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance1 (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_maintenance2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance3 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_multiview (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_pipeline_executable_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_push_descriptor (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_relaxed_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_sampler_mirror_clamp_to_edge (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_sampler_ycbcr_conversion (libGLX_nvidia.so.0) version 0.0.14
+validation layer: Device Extension: VK_KHR_separate_depth_stencil_layouts (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_atomic_int64 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_clock (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_draw_parameters (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float16_int8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float_controls (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_shader_non_semantic_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_subgroup_extended_types (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_spirv_1_4 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_storage_buffer_storage_class (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_swapchain (libGLX_nvidia.so.0) version 0.0.70
+validation layer: Device Extension: VK_KHR_swapchain_mutable_format (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_timeline_semaphore (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_uniform_buffer_standard_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_variable_pointers (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_vulkan_memory_model (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_blend_operation_advanced (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_buffer_device_address (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_calibrated_timestamps (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_conditional_rendering (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_custom_border_color (libGLX_nvidia.so.0) version 0.0.11
+validation layer: Device Extension: VK_EXT_depth_clip_enable (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_depth_range_unrestricted (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_descriptor_indexing (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_discard_rectangles (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_display_control (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_global_priority (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_host_query_reset (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_index_type_uint8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_inline_uniform_block (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_line_rasterization (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_memory_budget (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_pci_bus_info (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_pipeline_creation_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_scalar_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_separate_stencil_usage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_demote_to_helper_invocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_ballot (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_vote (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_subgroup_size_control (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_texel_buffer_alignment (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_tooling_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_transform_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_vertex_attribute_divisor (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_ycbcr_image_arrays (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation_image_aliasing (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_device_diagnostic_checkpoints (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_NV_device_diagnostics_config (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_sm_builtins (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_subgroup_partitioned (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NVX_device_generated_commands (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_NVX_multiview_per_view_attributes (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_16bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_8bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_bind_memory2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_buffer_device_address (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_create_renderpass2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_depth_stencil_resolve (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_descriptor_update_template (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_device_group (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_draw_indirect_count (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_driver_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_get_memory_requirements2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_image_format_list (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_imageless_framebuffer (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance1 (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_maintenance2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance3 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_multiview (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_pipeline_executable_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_push_descriptor (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_relaxed_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_sampler_mirror_clamp_to_edge (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_sampler_ycbcr_conversion (libGLX_nvidia.so.0) version 0.0.14
+validation layer: Device Extension: VK_KHR_separate_depth_stencil_layouts (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_atomic_int64 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_clock (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_draw_parameters (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float16_int8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float_controls (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_shader_non_semantic_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_subgroup_extended_types (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_spirv_1_4 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_storage_buffer_storage_class (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_swapchain (libGLX_nvidia.so.0) version 0.0.70
+validation layer: Device Extension: VK_KHR_swapchain_mutable_format (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_timeline_semaphore (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_uniform_buffer_standard_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_variable_pointers (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_vulkan_memory_model (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_blend_operation_advanced (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_buffer_device_address (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_calibrated_timestamps (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_conditional_rendering (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_custom_border_color (libGLX_nvidia.so.0) version 0.0.11
+validation layer: Device Extension: VK_EXT_depth_clip_enable (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_depth_range_unrestricted (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_descriptor_indexing (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_discard_rectangles (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_display_control (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_global_priority (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_host_query_reset (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_index_type_uint8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_inline_uniform_block (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_line_rasterization (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_memory_budget (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_pci_bus_info (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_pipeline_creation_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_scalar_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_separate_stencil_usage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_demote_to_helper_invocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_ballot (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_vote (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_subgroup_size_control (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_texel_buffer_alignment (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_tooling_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_transform_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_vertex_attribute_divisor (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_ycbcr_image_arrays (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation_image_aliasing (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_device_diagnostic_checkpoints (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_NV_device_diagnostics_config (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_sm_builtins (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_subgroup_partitioned (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NVX_device_generated_commands (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_NVX_multiview_per_view_attributes (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_16bit_storage (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_8bit_storage (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_bind_memory2 (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_buffer_device_address (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_create_renderpass2 (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_dedicated_allocation (Unknown) version 0.0.3
+validation layer: Device Extension: VK_KHR_depth_stencil_resolve (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_descriptor_update_template (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_device_group (Unknown) version 0.0.4
+validation layer: Device Extension: VK_KHR_draw_indirect_count (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_driver_properties (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence_fd (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory_fd (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore_fd (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_get_memory_requirements2 (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_image_format_list (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_imageless_framebuffer (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance1 (Unknown) version 0.0.2
+validation layer: Device Extension: VK_KHR_maintenance2 (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance3 (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_multiview (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_pipeline_executable_properties (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_push_descriptor (Unknown) version 0.0.2
+validation layer: Device Extension: VK_KHR_relaxed_block_layout (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_sampler_mirror_clamp_to_edge (Unknown) version 0.0.3
+validation layer: Device Extension: VK_KHR_sampler_ycbcr_conversion (Unknown) version 0.0.14
+validation layer: Device Extension: VK_KHR_separate_depth_stencil_layouts (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_atomic_int64 (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_clock (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_draw_parameters (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float16_int8 (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float_controls (Unknown) version 0.0.4
+validation layer: Device Extension: VK_KHR_shader_non_semantic_info (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_subgroup_extended_types (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_spirv_1_4 (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_storage_buffer_storage_class (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_swapchain (Unknown) version 0.0.70
+validation layer: Device Extension: VK_KHR_swapchain_mutable_format (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_timeline_semaphore (Unknown) version 0.0.2
+validation layer: Device Extension: VK_KHR_uniform_buffer_standard_layout (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_variable_pointers (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_vulkan_memory_model (Unknown) version 0.0.3
+validation layer: Device Extension: VK_EXT_blend_operation_advanced (Unknown) version 0.0.2
+validation layer: Device Extension: VK_EXT_buffer_device_address (Unknown) version 0.0.2
+validation layer: Device Extension: VK_EXT_calibrated_timestamps (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_conditional_rendering (Unknown) version 0.0.2
+validation layer: Device Extension: VK_EXT_custom_border_color (Unknown) version 0.0.11
+validation layer: Device Extension: VK_EXT_depth_clip_enable (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_depth_range_unrestricted (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_descriptor_indexing (Unknown) version 0.0.2
+validation layer: Device Extension: VK_EXT_discard_rectangles (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_display_control (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_global_priority (Unknown) version 0.0.2
+validation layer: Device Extension: VK_EXT_host_query_reset (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_index_type_uint8 (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_inline_uniform_block (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_line_rasterization (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_memory_budget (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_pci_bus_info (Unknown) version 0.0.2
+validation layer: Device Extension: VK_EXT_pipeline_creation_feedback (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_scalar_block_layout (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_separate_stencil_usage (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_demote_to_helper_invocation (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_ballot (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_vote (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_subgroup_size_control (Unknown) version 0.0.2
+validation layer: Device Extension: VK_EXT_texel_buffer_alignment (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_tooling_info (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_transform_feedback (Unknown) version 0.0.1
+validation layer: Device Extension: VK_EXT_vertex_attribute_divisor (Unknown) version 0.0.3
+validation layer: Device Extension: VK_EXT_ycbcr_image_arrays (Unknown) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation (Unknown) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation_image_aliasing (Unknown) version 0.0.1
+validation layer: Device Extension: VK_NV_device_diagnostic_checkpoints (Unknown) version 0.0.2
+validation layer: Device Extension: VK_NV_device_diagnostics_config (Unknown) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_sm_builtins (Unknown) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_subgroup_partitioned (Unknown) version 0.0.1
+validation layer: Device Extension: VK_NVX_device_generated_commands (Unknown) version 0.0.3
+validation layer: Device Extension: VK_NVX_multiview_per_view_attributes (Unknown) version 0.0.1
+validation layer: Device Extension: VK_KHR_16bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_8bit_storage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_bind_memory2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_buffer_device_address (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_create_renderpass2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_depth_stencil_resolve (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_descriptor_update_template (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_device_group (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_draw_indirect_count (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_driver_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_fence_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_memory_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_external_semaphore_fd (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_get_memory_requirements2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_image_format_list (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_imageless_framebuffer (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance1 (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_maintenance2 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_maintenance3 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_multiview (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_pipeline_executable_properties (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_push_descriptor (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_relaxed_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_sampler_mirror_clamp_to_edge (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_KHR_sampler_ycbcr_conversion (libGLX_nvidia.so.0) version 0.0.14
+validation layer: Device Extension: VK_KHR_separate_depth_stencil_layouts (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_atomic_int64 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_clock (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_draw_parameters (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float16_int8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_float_controls (libGLX_nvidia.so.0) version 0.0.4
+validation layer: Device Extension: VK_KHR_shader_non_semantic_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_shader_subgroup_extended_types (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_spirv_1_4 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_storage_buffer_storage_class (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_swapchain (libGLX_nvidia.so.0) version 0.0.70
+validation layer: Device Extension: VK_KHR_swapchain_mutable_format (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_timeline_semaphore (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_KHR_uniform_buffer_standard_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_variable_pointers (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_KHR_vulkan_memory_model (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_blend_operation_advanced (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_buffer_device_address (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_calibrated_timestamps (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_conditional_rendering (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_custom_border_color (libGLX_nvidia.so.0) version 0.0.11
+validation layer: Device Extension: VK_EXT_depth_clip_enable (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_depth_range_unrestricted (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_descriptor_indexing (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_discard_rectangles (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_display_control (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_global_priority (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_host_query_reset (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_index_type_uint8 (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_inline_uniform_block (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_line_rasterization (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_memory_budget (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_pci_bus_info (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_pipeline_creation_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_scalar_block_layout (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_separate_stencil_usage (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_demote_to_helper_invocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_ballot (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_shader_subgroup_vote (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_subgroup_size_control (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_EXT_texel_buffer_alignment (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_tooling_info (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_transform_feedback (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_EXT_vertex_attribute_divisor (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_EXT_ycbcr_image_arrays (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_dedicated_allocation_image_aliasing (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_device_diagnostic_checkpoints (libGLX_nvidia.so.0) version 0.0.2
+validation layer: Device Extension: VK_NV_device_diagnostics_config (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_sm_builtins (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NV_shader_subgroup_partitioned (libGLX_nvidia.so.0) version 0.0.1
+validation layer: Device Extension: VK_NVX_device_generated_commands (libGLX_nvidia.so.0) version 0.0.3
+validation layer: Device Extension: VK_NVX_multiview_per_view_attributes (libGLX_nvidia.so.0) version 0.0.1
+==28393== Conditional jump or move depends on uninitialised value(s)
+==28393==    at 0xBDEE15A: ??? (in /usr/lib/nvidia-450/libnvidia-glcore.so.450.142.00)
+==28393==    by 0xBE2B2B2: ??? (in /usr/lib/nvidia-450/libnvidia-glcore.so.450.142.00)
+==28393==    by 0xBE2B6AA: ??? (in /usr/lib/nvidia-450/libnvidia-glcore.so.450.142.00)
+==28393==    by 0xBE2B7A1: ??? (in /usr/lib/nvidia-450/libnvidia-glcore.so.450.142.00)
+==28393==    by 0xBDB9D07: ??? (in /usr/lib/nvidia-450/libnvidia-glcore.so.450.142.00)
+==28393==    by 0xF203338: DispatchCmdBeginRenderPass(VkCommandBuffer_T*, VkRenderPassBeginInfo const*, VkSubpassContents) (layer_chassis_dispatch.cpp:3349)
+==28393==    by 0xF180245: vulkan_layer_chassis::CmdBeginRenderPass(VkCommandBuffer_T*, VkRenderPassBeginInfo const*, VkSubpassContents) (chassis.cpp:3674)
+==28393==    by 0x491C16: vtuto::vk_triAppFns[abi:cxx11]()::$_13::operator()(vtuto::vk_triapp&) const (./include/vkapp/vktriapp.hpp:1145)
+==28393==    by 0x4915CA: std::_Function_handler<vtuto::vk_output (vtuto::vk_triapp&), vtuto::vk_triAppFns[abi:cxx11]()::$_13>::_M_invoke(std::_Any_data const&, vtuto::vk_triapp&) (std_function.h:285)
+==28393==    by 0x4D11C0: std::function<vtuto::vk_output (vtuto::vk_triapp&)>::operator()(vtuto::vk_triapp&) const (in /home/kaan/GitProjects/vulkan-showcase/bin/vkgraphtri2.out)
+==28393==    by 0x4D0713: vtuto::vk_tnode<vtuto::vk_triapp>::run(vtuto::vk_triapp&) (./include/vkgraph/vknode.hpp:52)
+==28393==    by 0x49F3FC: vtuto::vk_graph2<vtuto::vk_triapp>::run_from_to(vtuto::vk_triapp&, vtuto::const_obj<char>, vtuto::const_obj<char>) (./include/vkgraph/vkgraph.hpp:88)
+==28393== 
+==28393== Conditional jump or move depends on uninitialised value(s)
+==28393==    at 0xBDEE15A: ??? (in /usr/lib/nvidia-450/libnvidia-glcore.so.450.142.00)
+==28393==    by 0xBE2B2B2: ??? (in /usr/lib/nvidia-450/libnvidia-glcore.so.450.142.00)
+==28393==    by 0xBE2B6AA: ??? (in /usr/lib/nvidia-450/libnvidia-glcore.so.450.142.00)
+==28393==    by 0xBE2B88F: ??? (in /usr/lib/nvidia-450/libnvidia-glcore.so.450.142.00)
+==28393==    by 0xBDB5280: ??? (in /usr/lib/nvidia-450/libnvidia-glcore.so.450.142.00)
+==28393==    by 0xF18072A: vulkan_layer_chassis::CmdEndRenderPass(VkCommandBuffer_T*) (chassis.cpp:3715)
+==28393==    by 0x491CAE: vtuto::vk_triAppFns[abi:cxx11]()::$_13::operator()(vtuto::vk_triapp&) const (./include/vkapp/vktriapp.hpp:1153)
+==28393==    by 0x4915CA: std::_Function_handler<vtuto::vk_output (vtuto::vk_triapp&), vtuto::vk_triAppFns[abi:cxx11]()::$_13>::_M_invoke(std::_Any_data const&, vtuto::vk_triapp&) (std_function.h:285)
+==28393==    by 0x4D11C0: std::function<vtuto::vk_output (vtuto::vk_triapp&)>::operator()(vtuto::vk_triapp&) const (in /home/kaan/GitProjects/vulkan-showcase/bin/vkgraphtri2.out)
+==28393==    by 0x4D0713: vtuto::vk_tnode<vtuto::vk_triapp>::run(vtuto::vk_triapp&) (./include/vkgraph/vknode.hpp:52)
+==28393==    by 0x49F3FC: vtuto::vk_graph2<vtuto::vk_triapp>::run_from_to(vtuto::vk_triapp&, vtuto::const_obj<char>, vtuto::const_obj<char>) (./include/vkgraph/vkgraph.hpp:88)
+==28393==    by 0x46F209: main (src/vkgraphtri02.cpp:682)
+==28393== 
+==28393== Conditional jump or move depends on uninitialised value(s)
+==28393==    at 0x465972: vtuto::toString[abi:cxx11](VkResult) (./include/vkresult/debug.hpp:13)
+==28393==    by 0x466457: vtuto::toString[abi:cxx11](vtuto::Result_Vk const&) (./include/vkresult/debug.hpp:272)
+==28393==    by 0x46F221: main (src/vkgraphtri02.cpp:684)
+==28393==  Uninitialised value was created by a stack allocation
+==28393==    at 0x49F274: vtuto::vk_graph2<vtuto::vk_triapp>::run_from_to(vtuto::vk_triapp&, vtuto::const_obj<char>, vtuto::const_obj<char>) (./include/vkgraph/vkgraph.hpp:79)
+==28393== 
+File path: 
+Function name: 
+Context: 
+Call information: 
+Description: 
+Specification information: 
+Status information: 
+Status: Success :: custom operation SUCCESSFUL
+Vulkan Status: SuccessCode :: VK_SUCCESS :: Command successfully completed
+Line: 0
+
+everything runs
+==28393== 
+==28393== HEAP SUMMARY:
+==28393==     in use at exit: 200,954 bytes in 876 blocks
+==28393==   total heap usage: 92,072 allocs, 91,196 frees, 216,180,735 bytes allocated
+==28393== 
+==28393== 32 bytes in 1 blocks are definitely lost in loss record 8 of 102
+==28393==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==28393==    by 0x113E6527: ???
+==28393==    by 0x1123F39D: ???
+==28393==    by 0x11235DF6: ???
+==28393==    by 0x10CF8C62: ???
+==28393==    by 0x115B24F5: ???
+==28393==    by 0x10CEDF45: ???
+==28393==    by 0x10C9A00F: ???
+==28393==    by 0x40106B9: call_init.part.0 (dl-init.c:58)
+==28393==    by 0x401080A: call_init (dl-init.c:30)
+==28393==    by 0x401080A: _dl_init (dl-init.c:120)
+==28393==    by 0x4015921: dl_open_worker (dl-open.c:575)
+==28393==    by 0x40105A3: _dl_catch_error (dl-error.c:187)
+==28393== 
+==28393== 160 bytes in 1 blocks are definitely lost in loss record 77 of 102
+==28393==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==28393==    by 0x113E6527: ???
+==28393==    by 0x11227A6D: ???
+==28393==    by 0x11235DF6: ???
+==28393==    by 0x112283BB: ???
+==28393==    by 0x10CF8151: ???
+==28393==    by 0x115B24F5: ???
+==28393==    by 0x10CEDF45: ???
+==28393==    by 0x10C9A00F: ???
+==28393==    by 0x40106B9: call_init.part.0 (dl-init.c:58)
+==28393==    by 0x401080A: call_init (dl-init.c:30)
+==28393==    by 0x401080A: _dl_init (dl-init.c:120)
+==28393==    by 0x4015921: dl_open_worker (dl-open.c:575)
+==28393== 
+==28393== 1,688 (136 direct, 1,552 indirect) bytes in 1 blocks are definitely lost in loss record 92 of 102
+==28393==    at 0x4C2FD5F: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==28393==    by 0x7CB925C: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==28393==    by 0x7CB97D0: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==28393==    by 0x7CBB0AE: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==28393==    by 0x7CBB8DB: _XlcCreateLC (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==28393==    by 0x7CDC85F: _XlcUtf8Loader (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==28393==    by 0x7CC2EAD: _XOpenLC (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==28393==    by 0x7CC30BA: _XrmInitParseInfo (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==28393==    by 0x7CAADDF: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==28393==    by 0x7CAE3FD: XrmGetStringDatabase (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==28393==    by 0x50A956B: getSystemContentScale (in /home/kaan/GitProjects/glfw-3.3.4/bin/lib/libglfw.so.3.3)
+==28393==    by 0x50A9BA2: _glfwPlatformInit (in /home/kaan/GitProjects/glfw-3.3.4/bin/lib/libglfw.so.3.3)
+==28393== 
+==28393== 72,704 bytes in 1 blocks are definitely lost in loss record 102 of 102
+==28393==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==28393==    by 0x10CFE1ED: ???
+==28393==    by 0x115B24F5: ???
+==28393==    by 0x10CEDF45: ???
+==28393==    by 0x10C9A00F: ???
+==28393==    by 0x40106B9: call_init.part.0 (dl-init.c:58)
+==28393==    by 0x401080A: call_init (dl-init.c:30)
+==28393==    by 0x401080A: _dl_init (dl-init.c:120)
+==28393==    by 0x4015921: dl_open_worker (dl-open.c:575)
+==28393==    by 0x40105A3: _dl_catch_error (dl-error.c:187)
+==28393==    by 0x4014DE8: _dl_open (dl-open.c:660)
+==28393==    by 0x785DF08: dlopen_doit (dlopen.c:66)
+==28393==    by 0x40105A3: _dl_catch_error (dl-error.c:187)
+==28393== 
+==28393== LEAK SUMMARY:
+==28393==    definitely lost: 73,032 bytes in 4 blocks
+==28393==    indirectly lost: 1,552 bytes in 34 blocks
+==28393==      possibly lost: 0 bytes in 0 blocks
+==28393==    still reachable: 126,370 bytes in 838 blocks
+==28393==         suppressed: 0 bytes in 0 blocks
+==28393== Reachable blocks (those to which a pointer was found) are not shown.
+==28393== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==28393== 
+==28393== For counts of detected and suppressed errors, rerun with: -v
+==28393== ERROR SUMMARY: 11 errors from 7 contexts (suppressed: 0 from 0)
