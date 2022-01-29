@@ -7,6 +7,12 @@
 //
 // debug
 #include <vkresult/debug.hpp>
+//
+// struct setter
+#include <vkutils/varia.hpp>
+//
+// application info
+#include <vkinit/vkapp.hpp>
 
 namespace vtuto {
 
@@ -526,12 +532,23 @@ vk_triAppFns() {
       return out;
     }
     VkApplicationInfo appInfo{};
+    auto app_name = const_str("Hello Triangle");
+    auto engine_name = const_str("No Engine");
+    const AppVersion app_version = VersionInfo(1, 0, 0);
+    const EngineVersion engine_version = VersionInfo(1, 0, 0);
+    const std::uint32_t api_version = VK_API_VERSION_1_0;
+    VkStructSetter<VkApplicationInfo, const EngineVersion, const AppVersion,
+                   const std::uint32_t, const_str,
+                   const_str>::set(appInfo, engine_version, app_version,
+                                   api_version, app_name, engine_name);
+    /*
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "Hello Triangle";
     appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.pEngineName = "No Engine";
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_API_VERSION_1_0;
+    */
 
     VkInstanceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
