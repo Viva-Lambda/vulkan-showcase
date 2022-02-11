@@ -28,15 +28,14 @@ typedef std::tuple<std::optional<array_vk<VkAttachmentReference>>,
                    std::optional<VkAttachmentReference>,
                    std::optional<const_uint32s>,
                    std::optional<array_vk<VkSubpassDescriptionFlagBits>>>
-    OptionalSubpassDescriptions;
+    SubpassDescriptionsOpts;
 
 typedef std::tuple<VkPipelineBindPoint> SubpassDescriptionFlags;
 
 template <>
-struct VkStructSetter<VkSubpassDescription, OptionalSubpassDescriptions,
+struct VkStructSetter<VkSubpassDescription, SubpassDescriptionsOpts,
                       SubpassDescriptionFlags> {
-  static void set(VkSubpassDescription &subpass,
-                  OptionalSubpassDescriptions &opts,
+  static void set(VkSubpassDescription &subpass, SubpassDescriptionsOpts &opts,
                   SubpassDescriptionFlags &pbp) {
     //
     auto colorRefs = std::get<0>(opts);
@@ -124,8 +123,7 @@ access mask.
 
 */
 template <>
-struct VkStructSetter<VkSubpassDependency, SubpassDependencyFlags,
-                      SubpassDependencyOpts> {
+struct VkStructSetter<VkSubpassDependency, SubpassDependencyFlags, SubpassDependencyOpts> {
 
   static void set(VkSubpassDependency &dependency,
                   SubpassDependencyFlags &flags, SubpassDependencyOpts &opts) {

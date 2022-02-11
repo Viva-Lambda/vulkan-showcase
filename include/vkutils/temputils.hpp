@@ -32,6 +32,12 @@ template <template <typename> class T, typename v> struct F {
  */
 
 template <unsigned int... Vals> struct UintContainer;
+template <unsigned long... Vals> struct UnsignedLongContainer {
+  constexpr std::array<unsigned long, sizeof...(Vals)> operator()() {
+    std::array<unsigned long, sizeof...(Vals)> arr = {Vals...};
+    return arr;
+  }
+};
 template <int... Vals> struct IntContainer;
 template <std::size_t... Vals> struct SizeContainer;
 template <char... Vals> struct CharContainer;

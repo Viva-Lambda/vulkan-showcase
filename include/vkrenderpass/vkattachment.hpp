@@ -72,8 +72,7 @@ struct VkStructSetter<VkAttachmentDescription,   // ObjType
                       AttachmentDescriptorArgs   // Opts
                       > {
   static void set(VkAttachmentDescription &attachDescr,
-                  AttachmentDescriptorFlags &flags,
-                  VkFormat &imformat) {
+                  AttachmentDescriptorFlags &flags, VkFormat &imformat) {
     attachDescr.format = imformat;
     //
     attachDescr.samples = std::get<0>(flags);
@@ -85,6 +84,8 @@ struct VkStructSetter<VkAttachmentDescription,   // ObjType
     attachDescr.finalLayout = std::get<6>(flags);
   }
 };
+
+typedef std::tuple<std::uint32_t, VkImageLayout> AttachmentReferenceFlags;
 
 /**
 typedef struct VkAttachmentReference {
@@ -100,14 +101,13 @@ VK_ATTACHMENT_UNUSED to signify that this attachment is not used.
 
 - layout is a VkImageLayout value specifying the layout the attachment uses
 during t e subpass.
-
  */
 template <>
-struct VkStructSetter<VkAttachmentReference,                   // ObjType
-                      std::tuple<std::uint32_t, VkImageLayout> // Flags
+struct VkStructSetter<VkAttachmentReference,   // ObjType
+                      AttachmentReferenceFlags // Flags
                       > {
   static void set(VkAttachmentReference &attachRef,
-                  std::tuple<std::uint32_t, VkImageLayout> &flags) {
+                  AttachmentReferenceFlags &flags) {
     attachRef.attachment = std::get<0>(flags);
     attachRef.layout = std::get<1>(flags);
   }
