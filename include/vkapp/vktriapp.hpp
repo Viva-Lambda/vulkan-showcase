@@ -904,16 +904,6 @@ vk_triAppFns() {
     VkRenderPassCreateInfo renderPassInfo{};
     VkStructSetter<VkRenderPassCreateInfo, RenderPassOpts>::set(renderPassInfo,
                                                                 rendOpts);
-    /*
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.attachmentCount = 1;
-    renderPassInfo.pAttachments = &colorAttachment;
-    renderPassInfo.subpassCount = 1;
-    renderPassInfo.pSubpasses = &subpass;
-    renderPassInfo.dependencyCount = 1;
-    renderPassInfo.pDependencies = &dependency;
-    */
-
     std::string nmsg = "failed to create render pass!";
 
     CHECK_VK(vkCreateRenderPass(myg.ldevice, &renderPassInfo, nullptr,
