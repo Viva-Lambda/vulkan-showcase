@@ -1,4 +1,5 @@
 #pragma once
+
 // external libraries
 #include <vulkan/vulkan.hpp>
 //
@@ -22,6 +23,7 @@
 
 //
 #include <array>
+#include <vector>
 #include <cstdint>
 #include <cstdlib>
 #include <fstream>
@@ -32,7 +34,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <vector>
 #include <set>
 #include <tuple>
 #include <utility>

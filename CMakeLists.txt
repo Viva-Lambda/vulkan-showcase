@@ -5,9 +5,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_COMPILER "/home/kaan/miniconda3/envs/dev-cpp/bin/clang++")
+# cmake .. -D CMAKE_CXX_COMPILER="/home/kaan/miniconda3/envs/clang/bin/clang-cpp" -D CMAKE_INSTALL_PREFIX="../bin/"
 
-set(CMAKE_CXX_FLAGS "-std=c++17")
+# set(CMAKE_CXX_FLAGS "-std=c++17")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -ggdb -Wall -Wextra -o2 -pedantic")
 
@@ -54,16 +54,16 @@ message("Vulkan Library Path: ${VulkanPath}/lib/libvulkan.so")
 include_directories("${VulkanPath}/include/")
 
 # vk main
-target_link_libraries(vulkantuto.out VulkanLib)
+target_link_libraries(vulkantuto.out -lm VulkanLib)
 
 # simple triangle
-target_link_libraries(vktriangle.out VulkanLib)
+target_link_libraries(vktriangle.out -lm VulkanLib)
 
 # simple graph triangle
-target_link_libraries(vkgraphtri.out VulkanLib)
+target_link_libraries(vkgraphtri.out -lm VulkanLib)
 
 # simple graph2 triangle
-target_link_libraries(vkgraphtri2.out VulkanLib)
+target_link_libraries(vkgraphtri2.out -lm VulkanLib)
 
 # glfw
 # find_package(glfw3 REQUIRED)
@@ -73,7 +73,7 @@ set_target_properties(glfwLib PROPERTIES IMPORTED_LOCATION
 include_directories("${AbsPathPrefix}/glfw-3.3.4/bin/include/")
 
 # vk main
-target_link_libraries(vulkantuto.out glfwLib)
+target_link_libraries(vulkantuto.out -lm glfwLib)
 
 # simple triangle
 target_link_libraries(vktriangle.out glfwLib)
@@ -102,7 +102,7 @@ set_target_properties(
 include_directories("${AbsPathPrefix}/assimp-5.0.1/build/include/")
 
 # vk main
-target_link_libraries(vulkantuto.out AssimpLib)
+target_link_libraries(vulkantuto.out -lm -ldl AssimpLib)
 
 # simple triangle
 target_link_libraries(vktriangle.out AssimpLib)
