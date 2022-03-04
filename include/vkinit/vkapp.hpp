@@ -19,9 +19,9 @@ typedef VersionInfo EngineVersion;
 typedef VersionInfo AppVersion;
 
 template <>
-struct VkStructSetter<VkApplicationInfo, EngineVersion,
-                      AppVersion, std::uint32_t, const_str,
-                      const_str> {
+struct VkStructSetter<
+    VkApplicationInfo, TypeList<EngineVersion, AppVersion>,
+    TypeList<std::uint32_t, const_str, const_str>> {
   static void
   set(VkApplicationInfo &appInfo, const EngineVersion &e,
       const AppVersion &a, const std::uint32_t &ApiVersion,

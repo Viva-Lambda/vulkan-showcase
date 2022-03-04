@@ -22,6 +22,12 @@ struct NextSetter {
   }
 };
 
+constexpr void VkFlagSetter() {}
+
+void VkOptSetter() {}
+
+void VkArgSetter() {}
+
 template <class ObjType, class FlagBitList, class... Args>
 struct VkStructSetter {
   static void set(ObjType &obj, FlagBitList &f,

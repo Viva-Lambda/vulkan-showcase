@@ -11,7 +11,7 @@ typedef std::tuple<
     VkAttachmentStoreOp,   // unsigned long
     VkAttachmentLoadOp,    // unsigned long
     VkAttachmentStoreOp,   // unsigned long
-    VkImageLayout,         // 
+    VkImageLayout,         //
     VkImageLayout>
     AttachmentDescriptorFlags;
 
@@ -110,6 +110,24 @@ struct VkStructSetter<VkAttachmentDescription,   // ObjType
     attachDescr.finalLayout = std::get<6>(flags);
   }
 };
+
+constexpr void VkFlagSetter(
+    VkAttachmentDescription &attachDescr,
+    const VkSampleCountFlagBits &sample_count_bits,
+    const VkAttachmentLoadOp &attachment_load,
+    const VkAttachmentStoreOp &attachment_store,
+    const VkAttachmentLoadOp &attachment_stencil_load,
+    const VkAttachmentStoreOp &attachment_stencil_store,
+    const VkImageLayout &intial_image_layout,
+    const VkImageLayout &final_image_layout) {
+  attachDescr.samples = sample_count_bits;
+  attachDescr.loadOp = attachment_load;
+  attachDescr.storeOp = attachment_store;
+  attachDescr.stencilLoadOp = attachment_stencil_load;
+  attachDescr.stencilStoreOp = attachment_stencil_store;
+  attachDescr.initialLayout = intial_image_layout;
+  attachDescr.finalLayout = final_image_layout;
+}
 
 typedef std::tuple<std::uint32_t, VkImageLayout>
     AttachmentReferenceFlags;

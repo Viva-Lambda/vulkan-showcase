@@ -21,13 +21,16 @@ typedef struct VkRenderPassCreateInfo {
 
  */
 
-typedef std::tuple<std::optional<array_vk<VkRenderPassCreateFlagBits>>,
-                   std::optional<array_vk<VkAttachmentDescription>>,
-                   std::optional<array_vk<VkSubpassDescription>>,
-                   std::optional<array_vk<VkSubpassDependency>>>
+typedef std::tuple<
+    std::optional<array_vk<VkRenderPassCreateFlagBits>>,
+    std::optional<array_vk<VkAttachmentDescription>>,
+    std::optional<array_vk<VkSubpassDescription>>,
+    std::optional<array_vk<VkSubpassDependency>>>
     RenderPassOpts;
 
-template <> struct VkStructSetter<VkRenderPassCreateInfo, RenderPassOpts> {
+template <>
+struct VkStructSetter<VkRenderPassCreateInfo,
+                      RenderPassOpts> {
   static void set(VkRenderPassCreateInfo &renderPassInfo,
                   RenderPassOpts &opts) {
     auto flagBitRefs = std::get<0>(opts);
@@ -35,11 +38,13 @@ template <> struct VkStructSetter<VkRenderPassCreateInfo, RenderPassOpts> {
     auto subpassDescrRefs = std::get<2>(opts);
     auto subpassDepRefs = std::get<3>(opts);
     //
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo.sType =
+        VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     if (flagBitRefs.has_value()) {
       auto flagBits = flagBitRefs.value();
       VkRenderPassCreateFlags f = flagBits.obj()[0];
-      unsigned int size = static_cast<unsigned int>(flagBits.length());
+      unsigned int size =
+          static_cast<unsigned int>(flagBits.length());
       for (unsigned int i = 0; i < size; i++) {
         f |= flagBits.obj()[i];
       }
@@ -58,7 +63,8 @@ template <> struct VkStructSetter<VkRenderPassCreateInfo, RenderPassOpts> {
     if (subpassDepRefs.has_value()) {
       auto dependencies = subpassDepRefs.value();
       renderPassInfo.pDependencies = dependencies.obj();
-      renderPassInfo.dependencyCount = dependencies.length();
+      renderPassInfo.dependencyCount =
+          dependencies.length();
     }
   }
 };
