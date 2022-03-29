@@ -932,21 +932,6 @@ vk_triAppFns() {
     out.signal = 1;
 
     VkAttachmentDescription colorAttachment{};
-    AttachmentDescriptorFlags flags = std::make_tuple(
-        VK_SAMPLE_COUNT_1_BIT, VK_ATTACHMENT_LOAD_OP_CLEAR,
-        VK_ATTACHMENT_STORE_OP_STORE,
-        VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-        VK_ATTACHMENT_STORE_OP_DONT_CARE,
-        VK_IMAGE_LAYOUT_UNDEFINED,
-        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
-
-    /*
-    VkStructSetter<VkAttachmentDescription,
-    AttachmentDescriptorFlags,
-                   AttachmentDescriptorArgs>::set(colorAttachment,
-    flags,
-                                                  myg.simage_format);
-    */
     colorAttachment.format = myg.simage_format;
     VkFlagSetter(colorAttachment, VK_SAMPLE_COUNT_1_BIT,
                  VK_ATTACHMENT_LOAD_OP_CLEAR,
@@ -957,12 +942,8 @@ vk_triAppFns() {
                  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
     VkAttachmentReference colorAttachmentRef{};
-    AttachmentReferenceFlags refFlags = std::make_tuple(
-        0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    VkStructSetter<
-        VkAttachmentReference,
-        AttachmentReferenceFlags>::set(colorAttachmentRef,
-                                       refFlags);
+    VkFlagSetter(colorAttachmentRef, 0,
+                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
     // dealing with subpasses
 
@@ -972,47 +953,31 @@ vk_triAppFns() {
         colorAttachmentRef};
     auto crefArr =
         array_vk<VkAttachmentReference>(colorRefs);
-    std::optional<array_vk<VkAttachmentReference>>
+    const std::optional<array_vk<VkAttachmentReference>>
         colorRefArr = std::make_optional(crefArr);
-    SubpassDescriptionsOpts subOpts =
-        std::make_tuple(colorRefArr,  // color reference
-                        std::nullopt, // input reference
-                        std::nullopt, // resolve reference
-                        std::nullopt, // depth stencil refs
-                        std::nullopt, // preserve refs
-                        std::nullopt  // flags
-                        );
-    SubpassDescriptionFlags subFlags =
-        std::make_tuple(VK_PIPELINE_BIND_POINT_GRAPHICS);
-    VkStructSetter<VkSubpassDescription,
-                   SubpassDescriptionsOpts,
-                   SubpassDescriptionFlags>::set(subpass,
-                                                 subOpts,
-                                                 subFlags);
+    VkOptSetter(subpass,
+                colorRefArr,  // color reference
+                std::nullopt, // input reference
+                std::nullopt, // resolve reference
+                std::nullopt, // depth stencil refs
+                std::nullopt, // preserve refs
+                std::nullopt  // flags
+                );
+    VkFlagSetter(subpass, VK_PIPELINE_BIND_POINT_GRAPHICS);
 
     // subpass dependencies
-    SubpassDependencyFlags subDepFlags = std::make_tuple(
-        VK_SUBPASS_EXTERNAL, // src subpass
-        0,                   // dst subpass
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // src
-                                                       // stage
-                                                       // mask
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // dst
-                                                       // stage
-                                                       // mask
-        0, // src access mask
-        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT // dst access
-                                             // mask
-        );
-    SubpassDependencyOpts subDepOpts =
-        std::make_tuple(std::nullopt);
-
     VkSubpassDependency dependency{};
-    VkStructSetter<VkSubpassDependency,
-                   SubpassDependencyFlags,
-                   SubpassDependencyOpts>::set(dependency,
-                                               subDepFlags,
-                                               subDepOpts);
+    //
+    VkFlagSetter(
+            dependency,
+            VK_SUBPASS_EXTERNAL, // src subpass
+            0,                   // dst subpass
+            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // src stage mask
+            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // dst stage mask
+            0, // src access mask
+            VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT // dst access mask
+            );
+    VkOptSetter(dependency, std::nullopt);
 
     // render pass create info
     VkAttachmentDescription attachDescr[] = {

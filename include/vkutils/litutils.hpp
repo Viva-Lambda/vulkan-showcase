@@ -10,10 +10,10 @@ template <class T> class array_vk {
 
 public:
   template <std::size_t Nb>
-  array_vk(const T (&arr)[Nb]) : _obj(arr), _max_index(Nb - 1), len(Nb) {}
-  const T *obj() const { return _obj; }
-  std::size_t last() const { return _max_index; }
-  std::size_t length() const { return len; }
+  constexpr array_vk(const T (&arr)[Nb]) : _obj(arr), _max_index(Nb - 1), len(Nb) {}
+  constexpr const T *obj() const { return _obj; }
+  constexpr std::size_t last() const { return _max_index; }
+  constexpr std::size_t length() const { return len; }
 };
 
 template <class T> class const_obj {

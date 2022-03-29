@@ -161,5 +161,12 @@ struct VkStructSetter<VkAttachmentReference,   // ObjType
     attachRef.layout = std::get<1>(flags);
   }
 };
+constexpr void
+VkFlagSetter(VkAttachmentReference &attachRef,
+             const std::uint32_t &attachment,
+             const VkImageLayout &imgLayout) {
+  attachRef.attachment = attachment;
+  attachRef.layout = imgLayout;
+}
 
 } // namespace vtuto
