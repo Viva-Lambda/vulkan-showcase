@@ -16,6 +16,7 @@ public:
   constexpr std::size_t length() const { return len; }
 };
 
+
 template <class T> class const_obj {
   const T *_obj;
   std::size_t _max_index;

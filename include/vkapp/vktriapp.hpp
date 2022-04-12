@@ -14,6 +14,11 @@
 // application info
 #include <vkinit/vkapp.hpp>
 
+// imageview related stuff
+#include <vkimageview/componentvk.hpp>
+#include <vkimageview/imageviewvk.hpp>
+#include <vkimageview/imsubresourcevk.hpp>
+
 // render pass related setter specializations
 #include <vkrenderpass/vkattachment.hpp>
 #include <vkrenderpass/vksubpass.hpp>
@@ -891,25 +896,27 @@ vk_triAppFns() {
 
     for (size_t i = 0; i < myg.simages.size(); i++) {
       VkImageViewCreateInfo createInfo{};
-      createInfo.sType =
-          VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-      createInfo.image = myg.simages[i];
-      createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-      createInfo.format = myg.simage_format;
-      createInfo.components.r =
-          VK_COMPONENT_SWIZZLE_IDENTITY;
-      createInfo.components.g =
-          VK_COMPONENT_SWIZZLE_IDENTITY;
-      createInfo.components.b =
-          VK_COMPONENT_SWIZZLE_IDENTITY;
-      createInfo.components.a =
-          VK_COMPONENT_SWIZZLE_IDENTITY;
-      createInfo.subresourceRange.aspectMask =
-          VK_IMAGE_ASPECT_COLOR_BIT;
-      createInfo.subresourceRange.baseMipLevel = 0;
-      createInfo.subresourceRange.levelCount = 1;
-      createInfo.subresourceRange.baseArrayLayer = 0;
-      createInfo.subresourceRange.layerCount = 1;
+      VkFlagSetter(createInfo, VK_IMAGE_VIEW_TYPE_2D);
+
+      VkFlagSetter(createInfo,
+                   VK_COMPONENT_SWIZZLE_IDENTITY,
+                   VK_COMPONENT_SWIZZLE_IDENTITY,
+                   VK_COMPONENT_SWIZZLE_IDENTITY,
+                   VK_COMPONENT_SWIZZLE_IDENTITY);
+      VkImageSubresourceRange subRange{};
+      flags_vk<VkImageAspectFlags,
+               VK_IMAGE_ASPECT_COLOR_BIT>
+          aspect_mask;
+      auto fmask = aspect_mask.mask();
+      VkFlagSetter(subRange,
+                   fmask, // VkImageAspectFlags
+                   0,     // baseMipLevel
+                   1,     // level_count
+                   0,     // base array layer
+                   1);    // layer count
+      // set arguments
+      VkArgSetter(createInfo, myg.simages[i],
+                  myg.simage_format, subRange);
 
       std::string nmsg = "failed to create image views!";
       CHECK_VK(vkCreateImageView(myg.ldevice, &createInfo,
@@ -970,14 +977,19 @@ vk_triAppFns() {
     VkSubpassDependency dependency{};
     //
     VkFlagSetter(
-            dependency,
-            VK_SUBPASS_EXTERNAL, // src subpass
-            0,                   // dst subpass
-            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // src stage mask
-            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // dst stage mask
-            0, // src access mask
-            VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT // dst access mask
-            );
+        dependency,
+        VK_SUBPASS_EXTERNAL, // src subpass
+        0,                   // dst subpass
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // src
+        // stage
+        // mask
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, // dst
+        // stage
+        // mask
+        0, // src access mask
+        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT // dst access
+                                             // mask
+        );
     VkOptSetter(dependency, std::nullopt);
 
     // render pass create info
@@ -985,7 +997,8 @@ vk_triAppFns() {
         colorAttachment};
     auto attachDescrArr =
         array_vk<VkAttachmentDescription>(attachDescr);
-    auto attachDescrArrOpt = std::make_optional(attachDescrArr);
+    auto attachDescrArrOpt =
+        std::make_optional(attachDescrArr);
     VkSubpassDescription subDescrArr[] = {subpass};
     auto subdepDescr =
         array_vk<VkSubpassDescription>(subDescrArr);
@@ -994,11 +1007,13 @@ vk_triAppFns() {
         array_vk<VkSubpassDependency>(subDepArr);
     auto subdepDescrOpt = std::make_optional(subdepDescr);
     auto subpassDepsOpt = std::make_optional(subpassDeps);
-    std::optional<array_vk<VkRenderPassCreateFlagBits>> flagBitOpt = std::nullopt;
+    std::optional<array_vk<VkRenderPassCreateFlagBits>>
+        flagBitOpt = std::nullopt;
 
     VkRenderPassCreateInfo renderPassInfo{};
-    VkOptSetter(renderPassInfo, flagBitOpt, attachDescrArrOpt,
-                subdepDescrOpt, subpassDepsOpt);
+    VkOptSetter(renderPassInfo, flagBitOpt,
+                attachDescrArrOpt, subdepDescrOpt,
+                subpassDepsOpt);
     std::string nmsg = "failed to create render pass!";
 
     CHECK_VK(vkCreateRenderPass(myg.ldevice,

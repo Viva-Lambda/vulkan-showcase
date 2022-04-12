@@ -28,6 +28,13 @@ void VkOptSetter() {}
 
 void VkArgSetter() {}
 
+template <class FlagBitMask, unsigned long... FlagBits>
+class flags_vk {
+  //
+public:
+  constexpr FlagBitMask mask() { return (FlagBits | ...); }
+};
+
 template <class ObjType, class FlagBitList, class... Args>
 struct VkStructSetter {
   static void set(ObjType &obj, FlagBitList &f,
