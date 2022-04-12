@@ -16,8 +16,9 @@
 
 // render pass related setter specializations
 #include <vkrenderpass/vkattachment.hpp>
-#include <vkrenderpass/vkrenderpass.hpp>
 #include <vkrenderpass/vksubpass.hpp>
+//
+#include <vkrenderpass/vkrenderpass.hpp>
 
 namespace vtuto {
 
@@ -984,6 +985,7 @@ vk_triAppFns() {
         colorAttachment};
     auto attachDescrArr =
         array_vk<VkAttachmentDescription>(attachDescr);
+    auto attachDescrArrOpt = std::make_optional(attachDescrArr);
     VkSubpassDescription subDescrArr[] = {subpass};
     auto subdepDescr =
         array_vk<VkSubpassDescription>(subDescrArr);
@@ -992,14 +994,11 @@ vk_triAppFns() {
         array_vk<VkSubpassDependency>(subDepArr);
     auto subdepDescrOpt = std::make_optional(subdepDescr);
     auto subpassDepsOpt = std::make_optional(subpassDeps);
-    RenderPassOpts rendOpts = std::make_tuple(
-        std::nullopt, std::make_optional(attachDescrArr),
-        subdepDescrOpt, subpassDepsOpt);
+    std::optional<array_vk<VkRenderPassCreateFlagBits>> flagBitOpt = std::nullopt;
 
     VkRenderPassCreateInfo renderPassInfo{};
-    VkStructSetter<VkRenderPassCreateInfo,
-                   RenderPassOpts>::set(renderPassInfo,
-                                        rendOpts);
+    VkOptSetter(renderPassInfo, flagBitOpt, attachDescrArrOpt,
+                subdepDescrOpt, subpassDepsOpt);
     std::string nmsg = "failed to create render pass!";
 
     CHECK_VK(vkCreateRenderPass(myg.ldevice,

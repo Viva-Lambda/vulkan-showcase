@@ -28,6 +28,46 @@ typedef std::tuple<
     std::optional<array_vk<VkSubpassDependency>>>
     RenderPassOpts;
 
+void VkOptSetter(
+    VkRenderPassCreateInfo &renderPassInfo,
+    std::optional<array_vk<VkRenderPassCreateFlagBits>>
+        &flagBitRefs,
+    std::optional<array_vk<VkAttachmentDescription>>
+        &attachmentRefs,
+    std::optional<array_vk<VkSubpassDescription>>
+        &subpassDescrRefs,
+    std::optional<array_vk<VkSubpassDependency>>
+        &subpassDepRefs) {
+  //
+  renderPassInfo.sType =
+      VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+  if (flagBitRefs.has_value()) {
+    auto flagBits = flagBitRefs.value();
+    VkRenderPassCreateFlags f = flagBits.obj()[0];
+    unsigned int size =
+        static_cast<unsigned int>(flagBits.length());
+    for (unsigned int i = 0; i < size; i++) {
+      f |= flagBits.obj()[i];
+    }
+    renderPassInfo.flags = f;
+  }
+  if (attachmentRefs.has_value()) {
+    auto attachments = attachmentRefs.value();
+    renderPassInfo.pAttachments = attachments.obj();
+    renderPassInfo.attachmentCount = attachments.length();
+  }
+  if (subpassDescrRefs.has_value()) {
+    auto subpasses = subpassDescrRefs.value();
+    renderPassInfo.pSubpasses = subpasses.obj();
+    renderPassInfo.subpassCount = subpasses.length();
+  }
+  if (subpassDepRefs.has_value()) {
+    auto dependencies = subpassDepRefs.value();
+    renderPassInfo.pDependencies = dependencies.obj();
+    renderPassInfo.dependencyCount = dependencies.length();
+  }
+}
+
 template <>
 struct VkStructSetter<VkRenderPassCreateInfo,
                       RenderPassOpts> {
