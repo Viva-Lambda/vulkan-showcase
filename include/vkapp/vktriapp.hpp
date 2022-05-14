@@ -341,6 +341,10 @@ struct QueueFamilyIndices {
     return graphicsFamily.has_value() &&
            presentFamily.has_value();
   }
+  std::uint32_t nb_families() {
+    // we have two families, present and graphics
+    return 2;
+  }
 };
 
 struct SwapChainSupportDetails {
@@ -828,9 +832,25 @@ vk_triAppFns() {
     }
 
     VkSwapchainCreateInfoKHR createInfo{};
+    std::uint32_t imarr_layers = 1;
+    VkImageUsageFlagBits imflagArr[] = {
+        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT};
+    auto imflags = array_vk<VkImageUsageFlagBits>(imflagArr);
+
+    createInfo.compositeAlpha =
+        VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    VkCompositeAlphaFlagBitsKHR composite_arr[] ={VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR};
+    auto composite_bits = array_vk<VkCompositeAlphaFlagBitsKHR>(composite_arr);
+
+    // VkFlagSetter(createInfo, imarr_layers, imflags, composite_bits);
+
     createInfo.sType =
         VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     createInfo.surface = myg.surface;
+
+    //
+    // VkArgSetter(createInfo, swapChainSupport, 
+    // surface, window, pdevice)
 
     createInfo.minImageCount = imageCount;
     createInfo.imageFormat = surfaceFormat.format;
@@ -858,8 +878,6 @@ vk_triAppFns() {
 
     createInfo.preTransform =
         swapChainSupport.capabilities.currentTransform;
-    createInfo.compositeAlpha =
-        VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     createInfo.presentMode = presentMode;
     createInfo.clipped = VK_TRUE;
 

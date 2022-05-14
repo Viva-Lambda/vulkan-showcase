@@ -10,12 +10,12 @@ template <class T> class array_vk {
 
 public:
   template <std::size_t Nb>
-  constexpr array_vk(const T (&arr)[Nb]) : _obj(arr), _max_index(Nb - 1), len(Nb) {}
+  constexpr array_vk(const T (&arr)[Nb])
+      : _obj(arr), _max_index(Nb - 1), len(Nb) {}
   constexpr const T *obj() const { return _obj; }
   constexpr std::size_t last() const { return _max_index; }
   constexpr std::size_t length() const { return len; }
 };
-
 
 template <class T> class const_obj {
   const T *_obj;
@@ -44,7 +44,8 @@ public:
   }
 };
 template <class T> struct const_comp {
-  bool operator()(const const_obj<T> &a, const const_obj<T> &b) const {
+  bool operator()(const const_obj<T> &a,
+                  const const_obj<T> &b) const {
     return a.obj() < b.obj();
   }
 };
@@ -55,5 +56,21 @@ typedef const_obj<unsigned int> const_uints;
 typedef const_obj<std::uint32_t> const_uint32s;
 typedef const_obj<float> const_floats;
 typedef const_obj<double> const_doubles;
+
+struct const_uint_longs : const_obj<unsigned long> {
+
+public:
+  template <std::size_t Nb>
+  constexpr const_uint_longs(const unsigned long (&a)[Nb])
+      : const_obj<unsigned long>(a) {}
+
+  constexpr unsigned long concat() {
+    auto f = obj()[0];
+    for (std::size_t i = 1; i <= last(); i++) {
+      f |= obj()[i];
+    }
+    return f;
+  }
+};
 
 } // namespace vtuto

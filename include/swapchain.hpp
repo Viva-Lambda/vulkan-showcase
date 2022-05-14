@@ -9,6 +9,7 @@
 #include <pdevice.hpp>
 #include <support.hpp>
 #include <utils.hpp>
+#include <vkutils/varia.hpp>
 
 using namespace vtuto;
 
@@ -104,19 +105,19 @@ public:
 
     //
     CHECK_VK2(vkCreateSwapchainKHR(logical_dev.device(),
-                                  &createInfo, nullptr,
-                                  &chain),
-             "failed to create a swap chain");
+                                   &createInfo, nullptr,
+                                   &chain),
+              "failed to create a swap chain");
 
     CHECK_VK2(vkGetSwapchainImagesKHR(logical_dev.device(),
-                                     chain, &img_count,
-                                     nullptr),
-             "failed to reserve for swapchain images");
+                                      chain, &img_count,
+                                      nullptr),
+              "failed to reserve for swapchain images");
     simages.resize(img_count);
     CHECK_VK2(vkGetSwapchainImagesKHR(logical_dev.device(),
-                                     chain, &img_count,
-                                     simages.data()),
-             "failed to set swapchain images");
+                                      chain, &img_count,
+                                      simages.data()),
+              "failed to set swapchain images");
     simage_format = surfaceFormat.format;
     sextent = extent;
     set_image_views(logical_dev);
@@ -186,8 +187,7 @@ public:
       std::vector<VkDeviceMemory> &uniform_buffer_memories,
       VkDescriptorPool &descriptor_pool,
       VkImage &depth_image, VkImageView &depth_image_view,
-      VkDeviceMemory &depth_image_memory
-      ) {
+      VkDeviceMemory &depth_image_memory) {
     // clear out depth image view
     vkDestroyImageView(logical_dev.device(),
                        depth_image_view, nullptr);
