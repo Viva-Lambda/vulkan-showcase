@@ -24,6 +24,9 @@
 #include <vkrenderpass/vksubpass.hpp>
 //
 #include <vkrenderpass/vkrenderpass.hpp>
+//
+// swapchain related
+#include <vkswapchain/swapchainvk.hpp>
 
 namespace vtuto {
 
@@ -333,63 +336,14 @@ static void populateDebugMessengerCreateInfo(
   createInfo.pfnUserCallback = debugCallback;
 }
 
-struct QueueFamilyIndices {
-  std::optional<uint32_t> graphicsFamily;
-  std::optional<uint32_t> presentFamily;
-
-  bool isComplete() {
-    return graphicsFamily.has_value() &&
-           presentFamily.has_value();
-  }
-  std::uint32_t nb_families() {
-    // we have two families, present and graphics
-    return 2;
-  }
-};
-
+/*
 struct SwapChainSupportDetails {
   VkSurfaceCapabilitiesKHR capabilities;
   std::vector<VkSurfaceFormatKHR> formats;
   std::vector<VkPresentModeKHR> presentModes;
 };
+*/
 
-static QueueFamilyIndices
-findQueueFamilies(VkPhysicalDevice device,
-                  VkSurfaceKHR surface) {
-  QueueFamilyIndices indices;
-
-  uint32_t queueFamilyCount = 0;
-  vkGetPhysicalDeviceQueueFamilyProperties(
-      device, &queueFamilyCount, nullptr);
-
-  std::vector<VkQueueFamilyProperties> queueFamilies(
-      queueFamilyCount);
-  vkGetPhysicalDeviceQueueFamilyProperties(
-      device, &queueFamilyCount, queueFamilies.data());
-
-  int i = 0;
-  for (const auto &queueFamily : queueFamilies) {
-    if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-      indices.graphicsFamily = i;
-    }
-
-    VkBool32 presentSupport = false;
-    vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface,
-                                         &presentSupport);
-
-    if (presentSupport) {
-      indices.presentFamily = i;
-    }
-
-    if (indices.isComplete()) {
-      break;
-    }
-
-    i++;
-  }
-
-  return indices;
-}
 static bool
 checkDeviceExtensionSupport(VkPhysicalDevice device) {
   uint32_t extensionCount;
@@ -411,38 +365,6 @@ checkDeviceExtensionSupport(VkPhysicalDevice device) {
 
   return requiredExtensions.empty();
 }
-static SwapChainSupportDetails
-querySwapChainSupport(VkPhysicalDevice device,
-                      VkSurfaceKHR surface) {
-  SwapChainSupportDetails details;
-
-  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
-      device, surface, &details.capabilities);
-
-  uint32_t formatCount;
-  vkGetPhysicalDeviceSurfaceFormatsKHR(
-      device, surface, &formatCount, nullptr);
-
-  if (formatCount != 0) {
-    details.formats.resize(formatCount);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(
-        device, surface, &formatCount,
-        details.formats.data());
-  }
-
-  uint32_t presentModeCount;
-  vkGetPhysicalDeviceSurfacePresentModesKHR(
-      device, surface, &presentModeCount, nullptr);
-
-  if (presentModeCount != 0) {
-    details.presentModes.resize(presentModeCount);
-    vkGetPhysicalDeviceSurfacePresentModesKHR(
-        device, surface, &presentModeCount,
-        details.presentModes.data());
-  }
-
-  return details;
-}
 
 static bool isDeviceSuitable(VkPhysicalDevice device,
                              VkSurfaceKHR surface) {
@@ -458,7 +380,7 @@ static bool isDeviceSuitable(VkPhysicalDevice device,
         querySwapChainSupport(device, surface);
     swapChainAdequate =
         !swapChainSupport.formats.empty() &&
-        !swapChainSupport.presentModes.empty();
+        !swapChainSupport.present_modes.empty();
   }
 
   return indices.isComplete() && extensionsSupported &&
@@ -492,31 +414,6 @@ chooseSwapPresentMode(const std::vector<VkPresentModeKHR>
   return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-static VkExtent2D chooseSwapExtent(
-    const VkSurfaceCapabilitiesKHR &capabilities,
-    GLFWwindow *window) {
-  if (capabilities.currentExtent.width != UINT32_MAX) {
-    return capabilities.currentExtent;
-  } else {
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-
-    VkExtent2D actualExtent = {
-        static_cast<uint32_t>(width),
-        static_cast<uint32_t>(height)};
-
-    actualExtent.width =
-        std::clamp(actualExtent.width,
-                   capabilities.minImageExtent.width,
-                   capabilities.maxImageExtent.width);
-    actualExtent.height =
-        std::clamp(actualExtent.height,
-                   capabilities.minImageExtent.height,
-                   capabilities.maxImageExtent.height);
-
-    return actualExtent;
-  }
-}
 static std::vector<char>
 readFile(const std::string &filename) {
   std::ifstream file(filename,
@@ -818,7 +715,7 @@ vk_triAppFns() {
     VkSurfaceFormatKHR surfaceFormat =
         chooseSwapSurfaceFormat(swapChainSupport.formats);
     VkPresentModeKHR presentMode = chooseSwapPresentMode(
-        swapChainSupport.presentModes);
+        swapChainSupport.present_modes);
     VkExtent2D extent = chooseSwapExtent(
         swapChainSupport.capabilities, myg.window);
 
@@ -835,23 +732,28 @@ vk_triAppFns() {
     std::uint32_t imarr_layers = 1;
     VkImageUsageFlagBits imflagArr[] = {
         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT};
-    auto imflags = array_vk<VkImageUsageFlagBits>(imflagArr);
+    auto imflags =
+        array_vk<VkImageUsageFlagBits>(imflagArr);
 
-    createInfo.compositeAlpha =
+    VkCompositeAlphaFlagBitsKHR composite_arr =
         VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    VkCompositeAlphaFlagBitsKHR composite_arr[] ={VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR};
-    auto composite_bits = array_vk<VkCompositeAlphaFlagBitsKHR>(composite_arr);
+    // auto composite_bits =
+    // array_vk<VkCompositeAlphaFlagBitsKHR>(composite_arr);
 
-    // VkFlagSetter(createInfo, imarr_layers, imflags, composite_bits);
+    VkFlagSetter(createInfo, imarr_layers, imflags,
+                 composite_arr);
 
+    /*
     createInfo.sType =
         VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     createInfo.surface = myg.surface;
+    */
 
     //
-    // VkArgSetter(createInfo, swapChainSupport, 
-    // surface, window, pdevice)
+    VkArgSetter(createInfo, swapChainSupport, myg.surface,
+                myg.window, myg.pdevice);
 
+    /*
     createInfo.minImageCount = imageCount;
     createInfo.imageFormat = surfaceFormat.format;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -880,6 +782,7 @@ vk_triAppFns() {
         swapChainSupport.capabilities.currentTransform;
     createInfo.presentMode = presentMode;
     createInfo.clipped = VK_TRUE;
+    */
 
     std::string nmsg = "failed to create swap chain!";
     CHECK_VK(vkCreateSwapchainKHR(myg.ldevice, &createInfo,

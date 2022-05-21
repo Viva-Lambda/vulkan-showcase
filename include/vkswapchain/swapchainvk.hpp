@@ -1,7 +1,9 @@
 #pragma once
 
 #include <external.hpp>
-#include <varia.hpp>
+#include <vkqueuefamily/index.hpp>
+#include <vkswapchain/support.hpp>
+#include <vkutils/varia.hpp>
 
 using namespace vtuto;
 
@@ -120,8 +122,7 @@ constexpr void
 VkFlagSetter(VkSwapchainCreateInfoKHR &createInfo,
              const std::uint32_t &image_array_layers,
              const array_vk<VkImageUsageFlagBits> &imflags,
-             const array_vk<VkCompositeAlphaFlagBitsKHR>
-                 &composite_bits) {
+             VkCompositeAlphaFlagBitsKHR &composite_bits) {
   createInfo.sType =
       VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
   createInfo.imageArrayLayers = image_array_layers;
@@ -133,24 +134,19 @@ VkFlagSetter(VkSwapchainCreateInfoKHR &createInfo,
   }
   createInfo.imageUsage = f;
 
-  // create bitmask from composite_bits
-  size = static_cast<unsigned int>(composite_bits.length());
-  VkCompositeAlphaFlagsKHR k = composite_bits.obj()[0];
-  for (unsigned int i = 1; i < size; i++) {
-    k |= composite_bits.obj()[i];
-  }
-  createInfo.compositeAlpha = k;
+  // no bitmask for composite_bits see spec
+  createInfo.compositeAlpha = composite_bits;
 }
 
 void VkArgSetter(VkSwapchainCreateInfoKHR &createInfo,
                  SwapChainSupportDetails &swapChainSupport,
-                 VkSurfaceKHR &surface, GLFWwindow &window,
+                 VkSurfaceKHR &surface, GLFWwindow *window,
                  VkPhysicalDevice &pdevice) {
   //
   VkSurfaceFormatKHR surfaceFormat =
       chooseSwapSurfaceFormat(swapChainSupport.formats);
   VkPresentModeKHR presentMode =
-      chooseSwapPresentMode(swapChainSupport.presentModes);
+      chooseSwapPresentMode(swapChainSupport.present_modes);
   VkExtent2D extent = chooseSwapExtent(
       swapChainSupport.capabilities, window);
   //
@@ -224,8 +220,6 @@ void VkArgSetter(VkSwapchainCreateInfoKHR &createInfo,
   }
   createInfo.preTransform =
       swapChainSupport.capabilities.currentTransform;
-  createInfo.compositeAlpha =
-      VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
   createInfo.presentMode = presentMode;
   createInfo.clipped = VK_TRUE;
 }
