@@ -45,8 +45,8 @@ struct QueueFamilyIndices {
 };
 
 QueueFamilyIndices
-findQueueFamilies(VkPhysicalDevice device,
-                  VkSurfaceKHR surface) {
+findQueueFamilies(VkPhysicalDevice &device,
+                  VkSurfaceKHR &surface) {
   QueueFamilyIndices indices;
 
   uint32_t queueFamilyCount = 0;
@@ -80,6 +80,108 @@ findQueueFamilies(VkPhysicalDevice device,
   }
 
   return indices;
+}
+
+/**
+typedef struct VkDeviceQueueCreateInfo {
+
+VkStructureType sType;
+
+const void* pNext;
+VkDeviceQueueCreateFlags flags;
+
+uint32_t queueFamilyIndex;
+
+uint32_t queueCount;
+
+const float* pQueuePriorities;
+} VkDeviceQueueCreateInfo;
+
+- sType is the type of this structure.
+- pNext is NULL or a pointer to a structure extending this
+structure.
+- flags is a bitmask indicating behavior of the queue.
+- queueFamilyIndex is an unsigned integer indicating the
+index of the queue
+family in which to create the queue on this device. This
+index corresponds to
+the index of an element of the pQueueFamilyProperties array
+that was returned
+by vkGetPhysicalDeviceQueueFamilyProperties.
+- queueCount is an unsigned integer specifying the number of
+queues to create
+in the queue family indicated by queueFamilyIndex.
+- pQueuePriorities is a pointer to an array of queueCount
+normalized floating
+point values, specifying priorities of work that will be
+submitted to each
+created queue. See Queue Priority for more information.
+
+5.3.4. Queue Priority
+
+Each queue is assigned a priority, as set in the
+VkDeviceQueueCreateInfo
+structures when creating the device. The priority of each
+queue is a
+normalized floating point value between 0.0 and 1.0, which
+is then translated
+to a discrete priority level by the implementation. Higher
+values indicate a
+higher priority, with 0.0 being the lowest priority and 1.0
+being the highest.
+
+Within the same device, queues with higher priority may be
+allotted more
+processing time than queues with lower priority. The
+implementation makes no
+guarantees with regards to ordering or scheduling among
+queues with the same
+priority, other than the constraints defined by any explicit
+synchronization
+primitives. The implementation makes no guarantees with
+regards to queues
+across different devices.
+
+An implementation may allow a higher-priority queue to
+starve a lower-priority
+queue on the same VkDevice until the higher-priority queue
+has no further
+commands to execute. The relationship of queue priorities
+must not cause
+queues on one VkDevice to starve queues on another VkDevice.
+No specific
+guarantees are made about higher priority queues receiving
+more processing
+time or better quality of service than lower priority
+queues.
+ */
+
+constexpr void
+VkFlagSetter(VkDeviceQueueCreateInfo &createInfo) {
+  createInfo.sType =
+      VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+}
+void VkOptSetter(
+    VkDeviceQueueCreateInfo &createInfo,
+    std::optional<array_vk<VkDeviceQueueCreateFlagBits>>
+        &qflag_opt) {
+  if (qflag_opt.has_value()) {
+    auto qflags = qflag_opt.value();
+    VkDeviceQueueCreateFlags f = qflags.obj()[0];
+    for (unsigned int i = 1; i < qflags.length(); i++) {
+      f |= qflags.obj()[i];
+    }
+    createInfo.flags = f;
+  }
+}
+void VkArgSetter(VkDeviceQueueCreateInfo &createInfo,
+                 std::uint32_t family_index,
+                 const_floats &priorities) {
+  std::uint32_t count =
+      static_cast<std::uint32_t>(priorities.length());
+  createInfo.queueFamilyIndex = family_index;
+  createInfo.queueCount = count;
+  createInfo.pQueuePriorities = priorities.obj();
 }
 
 } // namespace vtuto

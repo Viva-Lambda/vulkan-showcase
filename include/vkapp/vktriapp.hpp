@@ -646,14 +646,14 @@ vk_triAppFns() {
         indices.graphicsFamily.value(),
         indices.presentFamily.value()};
 
-    float queuePriority = 1.0f;
+    float queuePriority[] = {1.0f};
+    const_floats priorities(queuePriority);
+    std::optional<array_vk<VkDeviceQueueCreateFlagBits>> fopt = std::nullopt;
     for (uint32_t queueFamily : uniqueQueueFamilies) {
       VkDeviceQueueCreateInfo queueCreateInfo{};
-      queueCreateInfo.sType =
-          VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-      queueCreateInfo.queueFamilyIndex = queueFamily;
-      queueCreateInfo.queueCount = 1;
-      queueCreateInfo.pQueuePriorities = &queuePriority;
+      VkFlagSetter(queueCreateInfo);
+      VkOptSetter(queueCreateInfo, fopt);
+      VkArgSetter(queueCreateInfo, queueFamily, priorities);
       queueCreateInfos.push_back(queueCreateInfo);
     }
 
