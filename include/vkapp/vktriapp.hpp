@@ -28,6 +28,9 @@
 // swapchain related
 #include <vkswapchain/swapchainvk.hpp>
 
+// queue family related
+#include <vkqueuefamily/index.hpp>
+
 namespace vtuto {
 
 struct vk_triapp {
@@ -643,8 +646,8 @@ vk_triAppFns() {
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<uint32_t> uniqueQueueFamilies = {
-        indices.graphicsFamily.value(),
-        indices.presentFamily.value()};
+        indices.graphics_family.value(),
+        indices.present_family.value()};
 
     float queuePriority[] = {1.0f};
     const_floats priorities(queuePriority);
@@ -693,10 +696,10 @@ vk_triAppFns() {
     }
 
     vkGetDeviceQueue(myg.ldevice,
-                     indices.graphicsFamily.value(), 0,
+                     indices.graphics_family.value(), 0,
                      &myg.graphics_queue);
     vkGetDeviceQueue(myg.ldevice,
-                     indices.presentFamily.value(), 0,
+                     indices.present_family.value(), 0,
                      &myg.present_queue);
     return out;
   };
@@ -1158,7 +1161,7 @@ vk_triAppFns() {
     poolInfo.sType =
         VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex =
-        queueFamilyIndices.graphicsFamily.value();
+        queueFamilyIndices.graphics_family.value();
 
     std::string nmsg = "failed to create command pool!";
 

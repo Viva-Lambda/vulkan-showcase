@@ -29,18 +29,38 @@ typedef enum VkQueueFlagBits {
     VK_QUEUE_VIDEO_ENCODE_BIT_KHR = 0x00000040,
 #endif
 } VkQueueFlagBits;
+
  */
 struct QueueFamilyIndices {
-  std::optional<uint32_t> graphicsFamily;
-  std::optional<uint32_t> presentFamily;
+  std::optional<uint32_t> graphics_family;
+  std::optional<uint32_t> present_family;
+  std::optional<uint32_t> compute_family;
+  std::optional<uint32_t> transfer;
+  std::optional<uint32_t> sparse_binding;
 
   bool isComplete() {
-    return graphicsFamily.has_value() &&
-           presentFamily.has_value();
+    return graphics_family.has_value() &&
+           present_family.has_value();
   }
   std::uint32_t nb_families() {
     // we have two families, present and graphics
-    return 2;
+    std::uint32_t counter = 0;
+    if (graphics_family.has_value()) {
+      counter++;
+    }
+    if (present_family.has_value()) {
+      counter++;
+    }
+    if (transfer.has_value()) {
+      counter++;
+    }
+    if (compute_family.has_value()) {
+      counter++;
+    }
+    if (sparse_binding.has_value()) {
+      counter++;
+    }
+    return counter;
   }
 };
 
@@ -61,7 +81,16 @@ findQueueFamilies(VkPhysicalDevice &device,
   int i = 0;
   for (const auto &queueFamily : queueFamilies) {
     if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-      indices.graphicsFamily = i;
+      indices.graphics_family = i;
+    } else if (queueFamily.queueFlags &
+               VK_QUEUE_COMPUTE_BIT) {
+      indices.compute_family = i;
+    } else if (queueFamily.queueFlags &
+               VK_QUEUE_TRANSFER_BIT) {
+      indices.transfer = i;
+    } else if (queueFamily.queueFlags &
+               VK_QUEUE_SPARSE_BINDING_BIT) {
+      indices.sparse_binding = i;
     }
 
     VkBool32 presentSupport = false;
@@ -69,7 +98,7 @@ findQueueFamilies(VkPhysicalDevice &device,
                                          &presentSupport);
 
     if (presentSupport) {
-      indices.presentFamily = i;
+      indices.present_family = i;
     }
 
     if (indices.isComplete()) {

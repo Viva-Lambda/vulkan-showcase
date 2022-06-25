@@ -167,8 +167,8 @@ void VkArgSetter(VkSwapchainCreateInfoKHR &createInfo,
   QueueFamilyIndices indices =
       findQueueFamilies(pdevice, surface);
   uint32_t queueFamilyIndices[] = {
-      indices.graphicsFamily.value(),
-      indices.presentFamily.value()};
+      indices.graphics_family.value(),
+      indices.present_family.value()};
 
   /**
     If the presentation queue is different from the graphics
@@ -207,7 +207,7 @@ void VkArgSetter(VkSwapchainCreateInfoKHR &createInfo,
     specified by a
     VkQueueFlagBit, then this number 2 needs to be adjusted
    */
-  if (indices.graphicsFamily != indices.presentFamily) {
+  if (indices.graphics_family != indices.present_family) {
     createInfo.imageSharingMode =
         VK_SHARING_MODE_CONCURRENT;
     // we only distinguish two families graphics family and
