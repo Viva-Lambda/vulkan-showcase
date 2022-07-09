@@ -35,12 +35,29 @@ struct QueueFamilyIndices {
   std::optional<uint32_t> graphics_family;
   std::optional<uint32_t> present_family;
   std::optional<uint32_t> compute_family;
-  std::optional<uint32_t> transfer;
+  std::optional<uint32_t> transfer_bit;
   std::optional<uint32_t> sparse_binding;
 
+  template <bool graphics, bool present, bool compute,
+            bool transfer, bool sparse>
   bool isComplete() {
-    return graphics_family.has_value() &&
-           present_family.has_value();
+    bool counter = true;
+    if (graphics) {
+      counter &= graphics_family.has_value();
+    }
+    if (present == true) {
+      counter &= present_family.has_value();
+    }
+    if (compute == true) {
+      counter &= compute_family.has_value();
+    }
+    if (transfer == true) {
+      counter &= transfer_bit.has_value();
+    }
+    if (sparse == true) {
+      counter &= sparse_binding.has_value();
+    }
+    return counter;
   }
   std::uint32_t nb_families() {
     // we have two families, present and graphics
@@ -51,7 +68,7 @@ struct QueueFamilyIndices {
     if (present_family.has_value()) {
       counter++;
     }
-    if (transfer.has_value()) {
+    if (transfer_bit.has_value()) {
       counter++;
     }
     if (compute_family.has_value()) {
@@ -79,6 +96,11 @@ findQueueFamilies(VkPhysicalDevice &device,
       device, &queueFamilyCount, queueFamilies.data());
 
   int i = 0;
+  const bool graphic = true;
+  const bool present = true;
+  const bool transfer = false;
+  const bool sparse = false;
+  const bool compute = false;
   for (const auto &queueFamily : queueFamilies) {
     if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
       indices.graphics_family = i;
@@ -87,7 +109,7 @@ findQueueFamilies(VkPhysicalDevice &device,
       indices.compute_family = i;
     } else if (queueFamily.queueFlags &
                VK_QUEUE_TRANSFER_BIT) {
-      indices.transfer = i;
+      indices.transfer_bit = i;
     } else if (queueFamily.queueFlags &
                VK_QUEUE_SPARSE_BINDING_BIT) {
       indices.sparse_binding = i;
@@ -100,8 +122,8 @@ findQueueFamilies(VkPhysicalDevice &device,
     if (presentSupport) {
       indices.present_family = i;
     }
-
-    if (indices.isComplete()) {
+    if (indices.isComplete<graphic, present, compute,
+                           transfer, sparse>()) {
       break;
     }
 

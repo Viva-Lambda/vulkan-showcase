@@ -385,9 +385,15 @@ static bool isDeviceSuitable(VkPhysicalDevice device,
         !swapChainSupport.formats.empty() &&
         !swapChainSupport.present_modes.empty();
   }
+  const bool graphic = true;
+  const bool present = true;
+  const bool transfer = false;
+  const bool sparse = false;
+  const bool compute = false;
+  bool is_complete = indices.isComplete<graphic, present, compute,
+                           transfer, sparse>();
 
-  return indices.isComplete() && extensionsSupported &&
-         swapChainAdequate;
+  return is_complete && extensionsSupported && swapChainAdequate;
 }
 static VkSurfaceFormatKHR chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR>
@@ -651,7 +657,8 @@ vk_triAppFns() {
 
     float queuePriority[] = {1.0f};
     const_floats priorities(queuePriority);
-    std::optional<array_vk<VkDeviceQueueCreateFlagBits>> fopt = std::nullopt;
+    std::optional<array_vk<VkDeviceQueueCreateFlagBits>>
+        fopt = std::nullopt;
     for (uint32_t queueFamily : uniqueQueueFamilies) {
       VkDeviceQueueCreateInfo queueCreateInfo{};
       VkFlagSetter(queueCreateInfo);
