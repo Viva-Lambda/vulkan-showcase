@@ -14,6 +14,9 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
+const std::vector<const char *> validationLayers = {
+    "VK_LAYER_KHRONOS_validation"};
+
 /**
   All success code explanations are taken from
   vulkan specification 1.2
@@ -21,19 +24,23 @@ const bool enableValidationLayers = true;
 std::string toString(VkResult r) {
   std::string str = "";
   if (r == VK_SUCCESS) {
-    str = "SuccessCode :: VK_SUCCESS :: Command successfully completed";
+    str = "SuccessCode :: VK_SUCCESS :: Command "
+          "successfully completed";
   } else if (r == VK_NOT_READY) {
-    str =
-        "SuccessCode :: VK_NOT_READY :: A fence or query has not yet completed";
+    str = "SuccessCode :: VK_NOT_READY :: A fence or query "
+          "has not yet completed";
   } else if (r == VK_TIMEOUT) {
     str =
         R"(SuccessCode :: VK_TIMEOUT :: A wait operation has not completed in the specified time)";
   } else if (r == VK_EVENT_SET) {
-    str = "SuccessCode :: VK_EVENT_SET :: An event is signaled";
+    str = "SuccessCode :: VK_EVENT_SET :: An event is "
+          "signaled";
   } else if (r == VK_EVENT_RESET) {
-    str = "SuccessCode :: VK_EVENT_RESET :: An event is unsignaled";
+    str = "SuccessCode :: VK_EVENT_RESET :: An event is "
+          "unsignaled";
   } else if (r == VK_INCOMPLETE) {
-    str = "SuccessCode :: VK_INCOMPLETE :: A return array was too small for "
+    str = "SuccessCode :: VK_INCOMPLETE :: A return array "
+          "was too small for "
           "the result";
   } else if (r == VK_SUBOPTIMAL_KHR) {
     str =
@@ -68,10 +75,12 @@ creation would have required compilation, but the application requested
 compilation to not be performed.
 )";
   } else if (r == VK_ERROR_OUT_OF_HOST_MEMORY) {
-    str = "ErrorCode :: VK_ERROR_OUT_OF_HOST_MEMORY :: A host memory "
+    str = "ErrorCode :: VK_ERROR_OUT_OF_HOST_MEMORY :: A "
+          "host memory "
           "allocation has failed.";
   } else if (r == VK_ERROR_OUT_OF_DEVICE_MEMORY) {
-    str = R"(ErrorCode :: VK_ERROR_OUT_OF_DEVICE_MEMORY :: A device memory
+    str =
+        R"(ErrorCode :: VK_ERROR_OUT_OF_DEVICE_MEMORY :: A device memory
     allocation has failed.)";
   } else if (r == VK_ERROR_INITIALIZATION_FAILED) {
     str = R"(
@@ -79,19 +88,24 @@ ErrorCode :: VK_ERROR_INITIALIZATION_FAILED :: Initialization of an object
 could not be completed for implementation-specific reasons
 )";
   } else if (r == VK_ERROR_DEVICE_LOST) {
-    str = R"(ErrorCode :: VK_ERROR_DEVICE_LOST :: The logical or physical
+    str =
+        R"(ErrorCode :: VK_ERROR_DEVICE_LOST :: The logical or physical
     device has been lost.)";
   } else if (r == VK_ERROR_MEMORY_MAP_FAILED) {
-    str = "ErrorCode :: VK_ERROR_MEMORY_MAP_FAILED :: Mapping of a memory "
+    str = "ErrorCode :: VK_ERROR_MEMORY_MAP_FAILED :: "
+          "Mapping of a memory "
           "object has failed";
   } else if (r == VK_ERROR_LAYER_NOT_PRESENT) {
-    str = "ErrorCode :: VK_ERROR_LAYER_NOT_PRESENT :: A requested layer is not "
+    str = "ErrorCode :: VK_ERROR_LAYER_NOT_PRESENT :: A "
+          "requested layer is not "
           "present or could not be loaded";
   } else if (r == VK_ERROR_EXTENSION_NOT_PRESENT) {
-    str = "ErrorCode :: VK_ERROR_EXTENSION_NOT_PRESENT :: A requested "
+    str = "ErrorCode :: VK_ERROR_EXTENSION_NOT_PRESENT :: "
+          "A requested "
           "extension is not supported";
   } else if (r == VK_ERROR_FEATURE_NOT_PRESENT) {
-    str = "ErrorCode :: VK_ERROR_FEATURE_NOT_PRESENT :: A requested feature is "
+    str = "ErrorCode :: VK_ERROR_FEATURE_NOT_PRESENT :: A "
+          "requested feature is "
           "not supported.";
   } else if (r == VK_ERROR_INCOMPATIBLE_DRIVER) {
     str = R"(
@@ -105,7 +119,8 @@ ErrorCode :: VK_ERROR_TOO_MANY_OBJECTS :: Too many objects of the type have
 already been created
 )";
   } else if (r == VK_ERROR_FORMAT_NOT_SUPPORTED) {
-    str = "ErrorCode :: VK_ERROR_FORMAT_NOT_SUPPORTED :: A requested format is "
+    str = "ErrorCode :: VK_ERROR_FORMAT_NOT_SUPPORTED :: A "
+          "requested format is "
           "not supported on this device";
   } else if (r == VK_ERROR_FRAGMENTED_POOL) {
     str = R"(
@@ -117,7 +132,8 @@ if the implementation is certain that the pool allocation failure was due to
 fragmentation.
 )";
   } else if (r == VK_ERROR_SURFACE_LOST_KHR) {
-    str = "ErrorCode :: VK_ERROR_SURFACE_LOST_KHR :: A surface is no longer "
+    str = "ErrorCode :: VK_ERROR_SURFACE_LOST_KHR :: A "
+          "surface is no longer "
           "available";
   } else if (r == VK_ERROR_NATIVE_WINDOW_IN_USE_KHR) {
     str = R"(
@@ -175,7 +191,8 @@ memory allocation failed because the requested address is not available. A
 shader group handle assignment failed because the requested shader group
 handle information is no longer valid
 )";
-  } else if (r == VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT) {
+  } else if (r ==
+             VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT) {
     str = R"(
 ErrorCode :: VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT :: An operation on a
 swapchain created with VK_FULL_SCREEN_EXCLUSIVE_APPLICATION_CONTROLLED_EXT
@@ -216,25 +233,35 @@ std::string toString(status_t_vk r) {
   } else if (r == GLFW_ERROR) {
     str = "Error :: GLFW_ERROR :: error in glfw call";
   } else if (r == NODE_ERROR) {
-    str = "Error :: NODE_ERROR :: error in node operation call";
+    str = "Error :: NODE_ERROR :: error in node operation "
+          "call";
   } else if (r == GRAPH_ERROR) {
-    str = "Error :: GRAPH_ERROR :: error in graph operation call";
+    str = "Error :: GRAPH_ERROR :: error in graph "
+          "operation call";
   }
 
   return str;
 }
 /**
-  \param filepath contains the path to the file which called the function
+  \param filepath contains the path to the file which called
+  the function
   \param fn_name contains the caller function name
-  \param context any contextual information that might help identifying the
-  result. For example, arguments, or the calling object name, etc.
-  \param call_info function call that produces the result most probably filled
+  \param context any contextual information that might help
+  identifying the
+  result. For example, arguments, or the calling object
+  name, etc.
+  \param call_info function call that produces the result
+  most probably filled
   with a checking macro
-  \param description description message for the vulkan result code, most
+  \param description description message for the vulkan
+  result code, most
   probably filled with a checking macro
-  \param spec_info if the error is caught by struct checker then this slot is
-  filled with a valid usage information provided by the specification.
-  \param status_info contains descriptive information with respect to status
+  \param spec_info if the error is caught by struct checker
+  then this slot is
+  filled with a valid usage information provided by the
+  specification.
+  \param status_info contains descriptive information with
+  respect to status
   code provided by our api.
   \param status contains status code provided by our api.
  */
@@ -287,51 +314,51 @@ std::string toString(const Result_Vk &r) {
   return result;
 }
 
-#define UPDATE_RESULT_VK(res, msg)                                             \
-  do {                                                                         \
-    res.line = __LINE__;                                                       \
-    res.filepath = __FILE__;                                                   \
-    res.fn_name = __FUNCTION__;                                                \
-    res.context += " " + msg;                                                  \
+#define UPDATE_RESULT_VK(res, msg)                         \
+  do {                                                     \
+    res.line = __LINE__;                                   \
+    res.filepath = __FILE__;                               \
+    res.fn_name = __FUNCTION__;                            \
+    res.context += " " + msg;                              \
   } while (0)
 
-#define CHECK_VK(call, msg, res)                                               \
-  do {                                                                         \
-    VkResult r = call;                                                         \
-    if (r != VK_SUCCESS) {                                                     \
-      res.line = __LINE__;                                                     \
-      res.description = toString(r);                                           \
-      res.fn_name = __FUNCTION__;                                              \
-      res.filepath = __FILE__;                                                 \
-      res.context = msg;                                                       \
-      res.call_info = #call;                                                   \
-      res.status = FAIL_OP;                                                    \
-      res.status_info = toString(FAIL_OP);                                     \
-      res.result = r;                                                          \
-    } else {                                                                   \
-      res.status = SUCCESS_OP;                                                 \
-      res.description = toString(r);                                           \
-      res.status_info = toString(SUCCESS_OP);                                  \
-      res.result = r;                                                          \
-    }                                                                          \
+#define CHECK_VK(call, msg, res)                           \
+  do {                                                     \
+    VkResult r = call;                                     \
+    if (r != VK_SUCCESS) {                                 \
+      res.line = __LINE__;                                 \
+      res.description = toString(r);                       \
+      res.fn_name = __FUNCTION__;                          \
+      res.filepath = __FILE__;                             \
+      res.context = msg;                                   \
+      res.call_info = #call;                               \
+      res.status = FAIL_OP;                                \
+      res.status_info = toString(FAIL_OP);                 \
+      res.result = r;                                      \
+    } else {                                               \
+      res.status = SUCCESS_OP;                             \
+      res.description = toString(r);                       \
+      res.status_info = toString(SUCCESS_OP);              \
+      res.result = r;                                      \
+    }                                                      \
   } while (0)
 
-#define CHECK_GLFW(res, msg)                                                   \
-  do {                                                                         \
-    const char *des;                                                           \
-    int r = glfwGetError(&des);                                                \
-    if (r != GLFW_NO_ERROR) {                                                  \
-      res.line = __LINE__;                                                     \
-      res.description = std::string(des);                                      \
-      res.fn_name = __FUNCTION__;                                              \
-      res.filepath = __FILE__;                                                 \
-      res.context = msg;                                                       \
-      res.status = GLFW_ERROR;                                                 \
-      res.status_info = toString(GLFW_ERROR);                                  \
-    } else {                                                                   \
-      res.status = SUCCESS_OP;                                                 \
-      res.description = std::string(des);                                      \
-      res.status_info = toString(SUCCESS_OP);                                  \
-    }                                                                          \
+#define CHECK_GLFW(res, msg)                               \
+  do {                                                     \
+    const char *des;                                       \
+    int r = glfwGetError(&des);                            \
+    if (r != GLFW_NO_ERROR) {                              \
+      res.line = __LINE__;                                 \
+      res.description = std::string(des);                  \
+      res.fn_name = __FUNCTION__;                          \
+      res.filepath = __FILE__;                             \
+      res.context = msg;                                   \
+      res.status = GLFW_ERROR;                             \
+      res.status_info = toString(GLFW_ERROR);              \
+    } else {                                               \
+      res.status = SUCCESS_OP;                             \
+      res.description = std::string(des);                  \
+      res.status_info = toString(SUCCESS_OP);              \
+    }                                                      \
   } while (0)
 } // namespace vtuto

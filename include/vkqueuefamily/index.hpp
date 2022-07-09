@@ -1,7 +1,6 @@
 #pragma once
 #include <external.hpp>
-#include <vkqueuefamily/queue.hpp>
-#include <vkresult/vkoptional.hpp>
+#include <vkutils/varia.hpp>
 
 namespace vtuto {
 

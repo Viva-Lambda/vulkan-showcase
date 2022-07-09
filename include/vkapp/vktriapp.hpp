@@ -14,6 +14,9 @@
 // application info
 #include <vkinit/vkapp.hpp>
 
+// device related
+#include <vkdevice/logical.hpp>
+
 // imageview related stuff
 #include <vkimageview/componentvk.hpp>
 #include <vkimageview/imageviewvk.hpp>
@@ -24,9 +27,13 @@
 #include <vkrenderpass/vksubpass.hpp>
 //
 #include <vkrenderpass/vkrenderpass.hpp>
+
 //
 // swapchain related
 #include <vkswapchain/swapchainvk.hpp>
+
+// pipeline
+#include <vkpipeline/pipeline.hpp>
 
 // queue family related
 #include <vkqueuefamily/index.hpp>
@@ -235,8 +242,6 @@ static void framebufferResizeCallback(GLFWwindow *window,
       glfwGetWindowUserPointer(window));
   app->framebuffer_resized = true;
 }
-const std::vector<const char *> validationLayers = {
-    "VK_LAYER_KHRONOS_validation"};
 
 const std::vector<const char *> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME};
@@ -390,10 +395,12 @@ static bool isDeviceSuitable(VkPhysicalDevice device,
   const bool transfer = false;
   const bool sparse = false;
   const bool compute = false;
-  bool is_complete = indices.isComplete<graphic, present, compute,
-                           transfer, sparse>();
+  bool is_complete =
+      indices.isComplete<graphic, present, compute,
+                         transfer, sparse>();
 
-  return is_complete && extensionsSupported && swapChainAdequate;
+  return is_complete && extensionsSupported &&
+         swapChainAdequate;
 }
 static VkSurfaceFormatKHR chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR>
@@ -670,27 +677,9 @@ vk_triAppFns() {
     VkPhysicalDeviceFeatures deviceFeatures{};
 
     VkDeviceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-
-    createInfo.queueCreateInfoCount =
-        static_cast<uint32_t>(queueCreateInfos.size());
-    createInfo.pQueueCreateInfos = queueCreateInfos.data();
-
-    createInfo.pEnabledFeatures = &deviceFeatures;
-
-    createInfo.enabledExtensionCount =
-        static_cast<uint32_t>(deviceExtensions.size());
-    createInfo.ppEnabledExtensionNames =
-        deviceExtensions.data();
-
-    if (enableValidationLayers) {
-      createInfo.enabledLayerCount =
-          static_cast<uint32_t>(validationLayers.size());
-      createInfo.ppEnabledLayerNames =
-          validationLayers.data();
-    } else {
-      createInfo.enabledLayerCount = 0;
-    }
+    VkFlagSetter(createInfo);
+    VkArgSetter(createInfo, queueCreateInfos,
+                deviceFeatures, deviceExtensions);
 
     std::string nmsg = "failed to create logical device!";
 
@@ -753,46 +742,9 @@ vk_triAppFns() {
     VkFlagSetter(createInfo, imarr_layers, imflags,
                  composite_arr);
 
-    /*
-    createInfo.sType =
-        VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = myg.surface;
-    */
-
     //
     VkArgSetter(createInfo, swapChainSupport, myg.surface,
                 myg.window, myg.pdevice);
-
-    /*
-    createInfo.minImageCount = imageCount;
-    createInfo.imageFormat = surfaceFormat.format;
-    createInfo.imageColorSpace = surfaceFormat.colorSpace;
-    createInfo.imageExtent = extent;
-    createInfo.imageArrayLayers = 1;
-    createInfo.imageUsage =
-        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-    QueueFamilyIndices indices =
-        findQueueFamilies(myg.pdevice, myg.surface);
-    uint32_t queueFamilyIndices[] = {
-        indices.graphicsFamily.value(),
-        indices.presentFamily.value()};
-
-    if (indices.graphicsFamily != indices.presentFamily) {
-      createInfo.imageSharingMode =
-          VK_SHARING_MODE_CONCURRENT;
-      createInfo.queueFamilyIndexCount = 2;
-      createInfo.pQueueFamilyIndices = queueFamilyIndices;
-    } else {
-      createInfo.imageSharingMode =
-          VK_SHARING_MODE_EXCLUSIVE;
-    }
-
-    createInfo.preTransform =
-        swapChainSupport.capabilities.currentTransform;
-    createInfo.presentMode = presentMode;
-    createInfo.clipped = VK_TRUE;
-    */
 
     std::string nmsg = "failed to create swap chain!";
     CHECK_VK(vkCreateSwapchainKHR(myg.ldevice, &createInfo,
@@ -976,19 +928,16 @@ vk_triAppFns() {
         createShaderModule(fragShaderCode, myg.ldevice);
 
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
-    vertShaderStageInfo.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vertShaderStageInfo.module = vertShaderModule;
-    vertShaderStageInfo.pName = "main";
+    // setting up vertex shader
+    VkFlagSetter(vertShaderStageInfo,
+                 VK_SHADER_STAGE_VERTEX_BIT,
+                 vertShaderModule, "main");
 
+    // setting up fragment shader
     VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
-    fragShaderStageInfo.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    fragShaderStageInfo.stage =
-        VK_SHADER_STAGE_FRAGMENT_BIT;
-    fragShaderStageInfo.module = fragShaderModule;
-    fragShaderStageInfo.pName = "main";
+    VkFlagSetter(vertShaderStageInfo,
+                 VK_SHADER_STAGE_FRAGMENT_BIT,
+                 fragShaderModule, "main");
 
     VkPipelineShaderStageCreateInfo shaderStages[] = {
         vertShaderStageInfo, fragShaderStageInfo};
