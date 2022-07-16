@@ -34,6 +34,7 @@
 
 // pipeline
 #include <vkpipeline/pipeline.hpp>
+#include <vkpipeline/viewportstate.hpp>
 
 // queue family related
 #include <vkqueuefamily/index.hpp>
@@ -943,18 +944,20 @@ vk_triAppFns() {
         vertShaderStageInfo, fragShaderStageInfo};
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-    vertexInputInfo.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
+    VkFlagSetter(vertexInputInfo);
+    std::optional<array_vk<VkVertexInputBindingDescription>> bref =
+        std::nullopt;
 
+    std::optional<array_vk<VkVertexInputAttributeDescription>> aref =
+        std::nullopt;
+    VkOptSetter(vertexInputInfo, bref, aref);
+
+    const VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    const VkBool32 should_restart = VK_FALSE;
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-    inputAssembly.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.topology =
-        VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-    inputAssembly.primitiveRestartEnable = VK_FALSE;
 
+    VkFlagSetter(inputAssembly, topology, should_restart);
+    
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
@@ -968,12 +971,23 @@ vk_triAppFns() {
     scissor.extent = myg.sextent;
 
     VkPipelineViewportStateCreateInfo viewportState{};
+    VkFlagSetter(viewportState);
+
+    std::pair<VkViewport, VkRect2D> view_scissor = std::make_pair(
+            viewport, scissor);
+    std::pair<VkViewport, VkRect2D> views[] = {view_scissor};
+    auto view_scissor_arr = array_vk(views);
+    auto view_scissor_ref = std::make_optional(view_scissor_arr);
+    VkOptSetter(viewportState, view_scissor_ref);
+    
+    /*
     viewportState.sType =
         VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewportState.viewportCount = 1;
     viewportState.pViewports = &viewport;
     viewportState.scissorCount = 1;
     viewportState.pScissors = &scissor;
+    */
 
     VkPipelineRasterizationStateCreateInfo rasterizer{};
     rasterizer.sType =
