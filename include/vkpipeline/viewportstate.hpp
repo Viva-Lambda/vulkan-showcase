@@ -55,7 +55,7 @@ void VkOptSetter(
     VkPipelineViewportStateCreateInfo &createInfo,
     const std::optional<
         array_vk<std::pair<VkViewport, VkRect2D>>>
-        &viewport_scissors_ref) {
+        &viewport_scissors_ref = std::nullopt) {
   //
   if (viewport_scissors_ref.has_value()) {
     array_vk<std::pair<VkViewport, VkRect2D>>

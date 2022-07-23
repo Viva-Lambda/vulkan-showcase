@@ -266,7 +266,7 @@ VkFlagSetter(VkSubpassDependency &dependency,
 void VkOptSetter(
     VkSubpassDependency &dependency,
     const std::optional<array_vk<VkDependencyFlagBits>>
-        &flagRef) {
+        &flagRef = std::nullopt) {
   if (flagRef.has_value()) {
     auto fs = flagRef.value();
     VkDependencyFlags f = fs.obj()[0];
