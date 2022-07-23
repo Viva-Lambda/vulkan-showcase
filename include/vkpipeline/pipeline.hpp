@@ -54,8 +54,9 @@ VkFlagSetter(VkPipelineShaderStageCreateInfo &createInfo,
 }
 void VkOptSetter(
     VkPipelineShaderStageCreateInfo &createInfo,
-    const std::optional<array_vk<
-        VkPipelineShaderStageCreateFlagBits>> &bitsRef) {
+    const std::optional<
+        array_vk<VkPipelineShaderStageCreateFlagBits>>
+        &bitsRef = std::nullopt) {
   //
   if (bitsRef.has_value()) {
     auto fs = bitsRef.value();
@@ -117,10 +118,10 @@ void VkOptSetter(
     VkPipelineVertexInputStateCreateInfo &createInfo,
     const std::optional<
         array_vk<VkVertexInputBindingDescription>>
-        &binding_descriptions_ref,
+        &binding_descriptions_ref = std::nullopt,
     const std::optional<
         array_vk<VkVertexInputAttributeDescription>>
-        &attribute_descriptions_ref) {
+        &attribute_descriptions_ref = std::nullopt) {
   if (binding_descriptions_ref.has_value()) {
     auto binding_descriptions =
         binding_descriptions_ref.value();
@@ -194,4 +195,57 @@ constexpr void VkFlagSetter(
   createInfo.primitiveRestartEnable =
       restart_with_primitive;
 }
+
+/** VkPipelineMultisampleStateCreateInfo overloads */
+
+/**
+typedef struct VkPipelineMultisampleStateCreateInfo {
+
+VkStructureType sType;
+
+const void* pNext;
+
+VkPipelineMultisampleStateCreateFlags flags;
+
+VkSampleCountFlagBits rasterizationSamples;
+
+VkBool32 sampleShadingEnable;
+
+float minSampleShading;
+
+const VkSampleMask* pSampleMask;
+VkBool32 alphaToCoverageEnable;
+VkBool32 alphaToOneEnable;
+
+} VkPipelineMultisampleStateCreateInfo;
+
+- sType is the type of this structure.
+- pNext is NULL or a pointer to a structure extending this
+structure.
+- flags is reserved for future use.
+- rasterizationSamples is a VkSampleCountFlagBits value
+specifying the number of samples used
+in rasterization.
+- sampleShadingEnable can be used to enable Sample Shading.
+- minSampleShading specifies a minimum fraction of sample
+shading if sampleShadingEnable is set to
+VK_TRUE.
+- pSampleMask is a pointer to an array of VkSampleMask
+values used in the sample mask test.
+- alphaToCoverageEnable controls whether a temporary
+coverage value is
+generated based on the alpha component of the fragment’s
+first color output as
+specified in the Multisample Coverage section.
+- alphaToOneEnable controls whether the alpha component of
+the fragment’s
+first color output is replaced with one as described in
+Multisample Coverage.
+ */
+constexpr void VkFlagSetter(
+    VkPipelineMultisampleStateCreateInfo &createInfo) {
+  createInfo.sType =
+      VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+}
+// void VkOptSetter() {}
 }

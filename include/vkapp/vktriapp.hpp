@@ -35,6 +35,7 @@
 // pipeline
 #include <vkpipeline/pipeline.hpp>
 #include <vkpipeline/viewportstate.hpp>
+#include <vkpipeline/rasterization.hpp>
 
 // queue family related
 #include <vkqueuefamily/index.hpp>
@@ -874,7 +875,7 @@ vk_triAppFns() {
         VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT // dst access
                                              // mask
         );
-    VkOptSetter(dependency, std::nullopt);
+    VkOptSetter(dependency);
 
     // render pass create info
     VkAttachmentDescription attachDescr[] = {
@@ -950,7 +951,9 @@ vk_triAppFns() {
 
     std::optional<array_vk<VkVertexInputAttributeDescription>> aref =
         std::nullopt;
-    VkOptSetter(vertexInputInfo, bref, aref);
+    // VkOptSetter(vertexInputInfo, bref, aref);
+    VkOptSetter(vertexInputInfo);
+
 
     const VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     const VkBool32 should_restart = VK_FALSE;
@@ -980,25 +983,22 @@ vk_triAppFns() {
     auto view_scissor_ref = std::make_optional(view_scissor_arr);
     VkOptSetter(viewportState, view_scissor_ref);
     
-    /*
-    viewportState.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    viewportState.viewportCount = 1;
-    viewportState.pViewports = &viewport;
-    viewportState.scissorCount = 1;
-    viewportState.pScissors = &scissor;
-    */
-
     VkPipelineRasterizationStateCreateInfo rasterizer{};
-    rasterizer.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    rasterizer.depthClampEnable = VK_FALSE;
-    rasterizer.rasterizerDiscardEnable = VK_FALSE;
-    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
-    rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
-    rasterizer.depthBiasEnable = VK_FALSE;
+    const auto depth_enable = VK_FALSE;
+    const auto rasterizer_discard = VK_FALSE;
+    const VkPolygonMode poly_mode = VK_POLYGON_MODE_FILL;
+    const VkCullModeFlags cull_mode = VK_CULL_MODE_BACK_BIT;
+    const VkFrontFace front_face = VK_FRONT_FACE_CLOCKWISE;
+    const auto depth_bias = VK_FALSE;
+
+    VkFlagSetter(rasterizer, depth_enable, rasterizer_discard,
+                 poly_mode, cull_mode, front_face, depth_bias);
+
+    const std::optional<float> d1 = std::nullopt;
+    const std::optional<float> d2 = std::nullopt;
+    const std::optional<float> d3 = std::nullopt;
+    const std::optional<float> lineRef = std::make_optional(1.0);
+    VkOptSetter(rasterizer, d1, d2, d3, lineRef);
 
     VkPipelineMultisampleStateCreateInfo multisampling{};
     multisampling.sType =
