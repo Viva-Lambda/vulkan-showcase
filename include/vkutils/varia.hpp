@@ -22,11 +22,20 @@ struct NextSetter {
   }
 };
 
+/** set flags to structs at compile time */
 constexpr void VkFlagSetter() {}
 
+/** set optional arguments to structs at run time */
 void VkOptSetter() {}
 
+/** set normal arguments to structs at run time */
 void VkArgSetter() {}
+
+/** a template for setting same sized arrays to structs at runtime*/
+template <class StructType, std::size_t N, class... Ts>
+struct VkArraySetter {
+  static void set(StructType &s, const std::array<Ts, N> &... arrs) {}
+};
 
 template <class FlagBitMask, unsigned long... FlagBits>
 class flags_vk {

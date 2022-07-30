@@ -51,35 +51,20 @@ constexpr void VkFlagSetter(
       VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 }
 
-void VkOptSetter(
-    VkPipelineViewportStateCreateInfo &createInfo,
-    const std::optional<
-        array_vk<std::pair<VkViewport, VkRect2D>>>
-        &viewport_scissors_ref = std::nullopt) {
-  //
-  if (viewport_scissors_ref.has_value()) {
-    array_vk<std::pair<VkViewport, VkRect2D>>
-        viewport_scissors = viewport_scissors_ref.value();
-    const std::uint32_t nb_viewport_scissors =
-        static_cast<std::uint32_t>(
-            viewport_scissors.length());
-    std::vector<VkViewport> viewports;
-    std::vector<VkRect2D> scissors;
-    const std::pair<VkViewport, VkRect2D> *view_sciss =
-        viewport_scissors.obj();
-    for (std::uint32_t i = 0;
-         i < viewport_scissors.length(); i++) {
-      std::pair<VkViewport, VkRect2D> vs = view_sciss[i];
-      VkViewport vport = vs.first;
-      VkRect2D scissor = vs.second;
-      viewports.push_back(vport);
-      scissors.push_back(scissor);
-    }
-    createInfo.viewportCount = nb_viewport_scissors;
-    createInfo.pViewports = (const VkViewport*)viewports.data();
-    createInfo.scissorCount = nb_viewport_scissors;
-    createInfo.pScissors = (const VkRect2D*)scissors.data();
+template <std::size_t N>
+struct VkArraySetter<VkPipelineViewportStateCreateInfo, N,
+                     VkViewport, VkRect2D> {
+  static void
+  set(VkPipelineViewportStateCreateInfo &createInfo,
+      const std::array<VkViewport, N> &vports,
+      const std::array<VkRect2D, N> &vrects) {
+    createInfo.pViewports = vports.data();
+    createInfo.pScissors = vrects.data();
+    createInfo.viewportCount =
+        static_cast<std::uint32_t>(vports.size());
+    createInfo.scissorCount =
+        static_cast<std::uint32_t>(vrects.size());
   }
-}
+};
 
 } // namespace vtuto

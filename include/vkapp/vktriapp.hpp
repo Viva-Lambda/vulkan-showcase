@@ -977,10 +977,16 @@ vk_triAppFns() {
 
     VkPipelineViewportStateCreateInfo viewportState{};
     VkFlagSetter(viewportState);
+    std::array<VkViewport, 1> vports = {viewport};
+    std::array<VkRect2D, 1> scissors = {scissor};
+    const std::size_t N = 1;
+    VkArraySetter<VkPipelineViewportStateCreateInfo, N, VkViewport, VkRect2D>::set(viewportState, vports, scissors);
+    /*
     viewportState.pViewports = &viewport;
     viewportState.pScissors = &scissor;
     viewportState.viewportCount = 1;
     viewportState.scissorCount = 1;
+    */
 
     /*
     std::pair<VkViewport, VkRect2D> view_scissor =
