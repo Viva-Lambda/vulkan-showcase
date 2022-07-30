@@ -233,19 +233,53 @@ VK_TRUE.
 - pSampleMask is a pointer to an array of VkSampleMask
 values used in the sample mask test.
 - alphaToCoverageEnable controls whether a temporary
-coverage value is
-generated based on the alpha component of the fragment’s
-first color output as
-specified in the Multisample Coverage section.
+coverage value is generated based on the alpha component of
+the fragment’s
+first color output as specified in the Multisample Coverage
+section.
 - alphaToOneEnable controls whether the alpha component of
 the fragment’s
 first color output is replaced with one as described in
 Multisample Coverage.
  */
 constexpr void VkFlagSetter(
-    VkPipelineMultisampleStateCreateInfo &createInfo) {
+    VkPipelineMultisampleStateCreateInfo &createInfo,
+    const VkBool32 &sampleShadingEnable,
+    const VkSampleCountFlagBits &rasterizationSamples) {
+
   createInfo.sType =
       VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+  createInfo.sampleShadingEnable = sampleShadingEnable;
+  createInfo.rasterizationSamples = rasterizationSamples;
+}
+
+void VkOptSetter(
+    VkPipelineMultisampleStateCreateInfo &createInfo,
+    std::optional<float> minSampleShadingRef = std::nullopt,
+    const std::optional<array_vk<VkSampleMask>>
+        &pSampleMaskRef = std::nullopt,
+    const std::optional<VkBool32>
+        &alphaToCoverageEnableRef = std::nullopt,
+    const std::optional<VkBool32> &alphaToOneEnableRef =
+        std::nullopt) {
+  if (minSampleShadingRef.has_value()) {
+    auto minSampleShading = minSampleShadingRef.value();
+    createInfo.minSampleShading = minSampleShading;
+  }
+  if (pSampleMaskRef.has_value()) {
+    array_vk<VkSampleMask> pSampleMask_arr =
+        pSampleMaskRef.value();
+    const VkSampleMask *pSampleMask = pSampleMask_arr.obj();
+    createInfo.pSampleMask = pSampleMask;
+  }
+  if (alphaToCoverageEnableRef.has_value()) {
+    createInfo.alphaToCoverageEnable =
+        alphaToCoverageEnableRef.value();
+  }
+  if (alphaToOneEnableRef.has_value()) {
+    createInfo.alphaToOneEnable =
+        alphaToOneEnableRef.value();
+  }
 }
 // void VkOptSetter() {}
 }

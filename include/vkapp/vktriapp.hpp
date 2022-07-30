@@ -34,8 +34,8 @@
 
 // pipeline
 #include <vkpipeline/pipeline.hpp>
-#include <vkpipeline/viewportstate.hpp>
 #include <vkpipeline/rasterization.hpp>
+#include <vkpipeline/viewportstate.hpp>
 
 // queue family related
 #include <vkqueuefamily/index.hpp>
@@ -937,7 +937,7 @@ vk_triAppFns() {
 
     // setting up fragment shader
     VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
-    VkFlagSetter(vertShaderStageInfo,
+    VkFlagSetter(fragShaderStageInfo,
                  VK_SHADER_STAGE_FRAGMENT_BIT,
                  fragShaderModule, "main");
 
@@ -946,26 +946,28 @@ vk_triAppFns() {
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     VkFlagSetter(vertexInputInfo);
-    std::optional<array_vk<VkVertexInputBindingDescription>> bref =
-        std::nullopt;
+    std::optional<array_vk<VkVertexInputBindingDescription>>
+        bref = std::nullopt;
 
-    std::optional<array_vk<VkVertexInputAttributeDescription>> aref =
-        std::nullopt;
+    std::optional<
+        array_vk<VkVertexInputAttributeDescription>>
+        aref = std::nullopt;
     // VkOptSetter(vertexInputInfo, bref, aref);
     VkOptSetter(vertexInputInfo);
 
-
-    const VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    const VkPrimitiveTopology topology =
+        VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     const VkBool32 should_restart = VK_FALSE;
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 
     VkFlagSetter(inputAssembly, topology, should_restart);
-    
+
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)myg.sextent.width;
-    viewport.height = (float)myg.sextent.height;
+    viewport.width = static_cast<float>(myg.sextent.width);
+    viewport.height =
+        static_cast<float>(myg.sextent.height);
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
@@ -975,14 +977,22 @@ vk_triAppFns() {
 
     VkPipelineViewportStateCreateInfo viewportState{};
     VkFlagSetter(viewportState);
+    viewportState.pViewports = &viewport;
+    viewportState.pScissors = &scissor;
+    viewportState.viewportCount = 1;
+    viewportState.scissorCount = 1;
 
-    std::pair<VkViewport, VkRect2D> view_scissor = std::make_pair(
-            viewport, scissor);
-    std::pair<VkViewport, VkRect2D> views[] = {view_scissor};
+    /*
+    std::pair<VkViewport, VkRect2D> view_scissor =
+        std::make_pair(viewport, scissor);
+    std::pair<VkViewport, VkRect2D> views[] = {
+        view_scissor};
     auto view_scissor_arr = array_vk(views);
-    auto view_scissor_ref = std::make_optional(view_scissor_arr);
+    auto view_scissor_ref =
+        std::make_optional(view_scissor_arr);
     VkOptSetter(viewportState, view_scissor_ref);
-    
+    */
+
     VkPipelineRasterizationStateCreateInfo rasterizer{};
     const auto depth_enable = VK_FALSE;
     const auto rasterizer_discard = VK_FALSE;
@@ -991,13 +1001,15 @@ vk_triAppFns() {
     const VkFrontFace front_face = VK_FRONT_FACE_CLOCKWISE;
     const auto depth_bias = VK_FALSE;
 
-    VkFlagSetter(rasterizer, depth_enable, rasterizer_discard,
-                 poly_mode, cull_mode, front_face, depth_bias);
+    VkFlagSetter(rasterizer, depth_enable,
+                 rasterizer_discard, poly_mode, cull_mode,
+                 front_face, depth_bias);
 
     const std::optional<float> d1 = std::nullopt;
     const std::optional<float> d2 = std::nullopt;
     const std::optional<float> d3 = std::nullopt;
-    const std::optional<float> lineRef = std::make_optional(1.0);
+    const std::optional<float> lineRef =
+        std::make_optional(1.0);
     VkOptSetter(rasterizer, d1, d2, d3, lineRef);
 
     VkPipelineMultisampleStateCreateInfo multisampling{};

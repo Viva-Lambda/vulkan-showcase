@@ -63,21 +63,22 @@ void VkOptSetter(
     const std::uint32_t nb_viewport_scissors =
         static_cast<std::uint32_t>(
             viewport_scissors.length());
-    auto viewports =
-        std::vector<VkViewport>(nb_viewport_scissors);
-    auto scissors =
-        std::vector<VkRect2D>(nb_viewport_scissors);
-    for (std::uint32_t i = 0; i < nb_viewport_scissors;
-         i++) {
-      VkViewport vport = viewport_scissors.obj()[i].first;
-      VkRect2D scissor = viewport_scissors.obj()[i].second;
-      viewports[i] = vport;
-      scissors[i] = scissor;
+    std::vector<VkViewport> viewports;
+    std::vector<VkRect2D> scissors;
+    const std::pair<VkViewport, VkRect2D> *view_sciss =
+        viewport_scissors.obj();
+    for (std::uint32_t i = 0;
+         i < viewport_scissors.length(); i++) {
+      std::pair<VkViewport, VkRect2D> vs = view_sciss[i];
+      VkViewport vport = vs.first;
+      VkRect2D scissor = vs.second;
+      viewports.push_back(vport);
+      scissors.push_back(scissor);
     }
     createInfo.viewportCount = nb_viewport_scissors;
-    createInfo.pViewports = viewports.data();
+    createInfo.pViewports = (const VkViewport*)viewports.data();
     createInfo.scissorCount = nb_viewport_scissors;
-    createInfo.pScissors = scissors.data();
+    createInfo.pScissors = (const VkRect2D*)scissors.data();
   }
 }
 
